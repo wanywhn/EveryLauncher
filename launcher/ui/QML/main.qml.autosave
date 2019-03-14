@@ -57,7 +57,7 @@ ApplicationWindow {
 
                 resListView.height =mheight
                 //                resListView.width = listViewWidth
-                root.height=resListView.height+queryHeader.height+70+16
+                root.height=resListView.height+queryHeader.height+70
                 console.log("resListView height:",resListView.height)
                 console.log("queryHeader height:",queryHeader.height)
                 mpage.height=resListView.height

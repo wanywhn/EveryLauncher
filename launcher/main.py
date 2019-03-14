@@ -9,7 +9,7 @@ from threading import Event
 
 import dbus
 import dbus.service
-from PySide2.QtCore import QUrl, QSortFilterProxyModel
+from PySide2.QtCore import QUrl
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 from PySide2.QtWidgets import QApplication
 from dbus.mainloop.glib import DBusGMainLoop
@@ -118,14 +118,14 @@ def main():
     engine = QQmlApplicationEngine()
 
     model=recollQueryModel()
-    proxy=QSortFilterProxyModel()
-    proxy.setSourceModel(model)
-    proxy.setFilterRole(recollQueryModel.Role_TYPE)
+    # proxy=QSortFilterProxyModel()
+    # proxy.setSourceModel(model)
+    # proxy.setFilterRole(recollQueryModel.Role_TYPE)
 
     # qmlRegisterType(recollQueryModel, 'RecollQuery', 1, 0, 'EveryQueryModel')
 
     engine.rootContext().setContextProperty("queryModel",model)
-    engine.rootContext().setContextProperty("filterModel",proxy)
+    # engine.rootContext().setContextProperty("filterModel",proxy)
     engine.load(QUrl("ui/QML/main.qml"))
 
     if not engine.rootObjects():

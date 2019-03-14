@@ -2,7 +2,7 @@ import random
 import sys
 
 from PySide2 import QtCore
-from PySide2.QtCore import QAbstractListModel, QTimer, Qt, QByteArray, Property, Signal, Slot
+from PySide2.QtCore import QAbstractListModel, QTimer, Qt, QByteArray, Property, Signal, Slot, QModelIndex
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import QMainWindow, QShortcut, QFileDialog
 
@@ -98,7 +98,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
         self.attrs = ("filename", "title", "mtime", "url", "ipath")
         # TODO read from config and prepare db
 
-        # confdir = CONFIG_DIR
+        # TODO confdir = CONFIG_DIR
         confdir="/home/tender/.recoll"
         extra_dbs = []
         # Snippet params
@@ -119,7 +119,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
 
     def rowCount(self, parent):
         ret = len(self.searchResults)
-        # print("RecollQuery.rowCount(): %d"% ret)
+        print("RecollQuery.rowCount(): %d"% ret)
         return ret
 
     # def columnCount(self, parent):
@@ -143,8 +143,12 @@ class recollQueryModel(QtCore.QAbstractListModel):
         print("total res:",self.totres)
         self.qtext = q
         self.db = db
+        self.beginResetModel()
         self.searchResults = []
-        self.fetchMore(None)
+        self.endResetModel()
+        if self.canFetchMore(None):
+            self.fetchMore(None)
+
 
     def getdoc(self, index):
         if index.row() < len(self.searchResults):
@@ -165,10 +169,12 @@ class recollQueryModel(QtCore.QAbstractListModel):
     def data(self, index, role):
         # print("RecollQuery.data: row %d, role: %s" % (index.row(),role))
         if not index.isValid():
-            return QtCore.QVariant()
+            return None
 
+        if index.row() <0:
+            return None
         if index.row() >= len(self.searchResults):
-            return QtCore.QVariant()
+            return None
 
         d = self.searchResults[index.row()]
         if role == recollQueryModel.Role_FILE_NAME:
@@ -181,9 +187,10 @@ class recollQueryModel(QtCore.QAbstractListModel):
             return d['abstract']
         elif role == recollQueryModel.Role_FILE_STATUS:
             pass
+        return
 
     def canFetchMore(self, parent):
-        print("RecollQuery.canFetchMore:")
+        print("RecollQuery.canFetchMore:", self.searchResults," ",self.totres)
         if len(self.searchResults) < self.totres:
             return True
         else:
@@ -191,14 +198,16 @@ class recollQueryModel(QtCore.QAbstractListModel):
 
     def fetchMore(self, parent):
         print("RecollQuery.fetchMore:")
+        num_to_fetch=min(self.pagelen,self.totres-len(self.searchResults))
         self.beginInsertRows(QtCore.QModelIndex(), len(self.searchResults),
-                             len(self.searchResults) + self.pagelen)
-        for count in range(self.pagelen):
+                             len(self.searchResults) + num_to_fetch-1)
+        for count in range(num_to_fetch):
             try:
                 self.searchResults.append(self.query.fetchone())
                 print("insert ",count)
             except:
-                break
+                print("except",count)
+                # break
         self.endInsertRows()
 
     def startQuery(self):

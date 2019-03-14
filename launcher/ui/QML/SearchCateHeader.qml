@@ -2,6 +2,7 @@ import QtQuick.Controls 2.0
 import QtQuick 2.0
 
 Rectangle{
+    height:btnFilter.height+btnText.height
     property alias text: btnText.text
     Rectangle{
         id:btnFilter
@@ -15,7 +16,7 @@ Rectangle{
         }
         TabBar {
              id: bar
-             width: parent.width
+             anchors.fill:parent
              TabButton {
                  text: qsTr("ALL")
              }
