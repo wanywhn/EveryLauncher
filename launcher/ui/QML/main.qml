@@ -10,13 +10,21 @@ ApplicationWindow {
     width: 640
     height:mpage.height
     minimumHeight: 100
-    visible: true
+    visible: systemTray.mainWindowVisiable
     title: "everyLauncher"
     flags: Qt.FramelessWindowHint
 
     Component.onCompleted: {
         setX(Screen.width/2-width/2);
         setY(Screen.height/5-height)
+
+    }
+
+    onActiveChanged: {
+        if(!active){
+//            systemTray.mainWindowVisiable=false
+            systemTray.showMainWindow(false)
+        }
     }
 
     Page{
@@ -32,6 +40,8 @@ ApplicationWindow {
 
         header:SearchCateHeader{
             id:queryHeader
+            focus: true
+            //TODO get focus
         }
 
         contentItem:
@@ -58,8 +68,8 @@ ApplicationWindow {
                 resListView.height =mheight
                 //                resListView.width = listViewWidth
                 root.height=resListView.height+queryHeader.height+70+16
-                console.log("resListView height:",resListView.height)
-                console.log("queryHeader height:",queryHeader.height)
+                //console.log("resListView height:",resListView.height)
+                //console.log("queryHeader height:",queryHeader.height)
                 mpage.height=resListView.height
             }
 
@@ -67,8 +77,8 @@ ApplicationWindow {
             //     id:every_query_model;
             //     queryText:queryHeader.text
             // }
-            model:queryModel
-            //model:filterModel
+            //model:queryModel
+            model:filterModel
             Binding{
                 target:queryModel;
                 property:"queryText";

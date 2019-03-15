@@ -3,18 +3,16 @@ import sys
 import os
 import signal
 import logging
-import time
 from threading import Event
 
 
 import dbus
 import dbus.service
-from PySide2.QtCore import QUrl
-from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PySide2.QtCore import QUrl, QSortFilterProxyModel
+from PySide2.QtQml import QQmlApplicationEngine
 from PySide2.QtWidgets import QApplication
 from dbus.mainloop.glib import DBusGMainLoop
 
-from launcher.ui.MainWindow import MainWindow
 from launcher.ui.SystemTray import SystemTray
 from launcher.config import (get_version, get_options, is_wayland, is_wayland_compatibility_on,
                      gdk_backend, CACHE_DIR, CONFIG_DIR)
@@ -37,13 +35,13 @@ def _create_dirs():
 
 class EveryLauncherDbusService(dbus.service.Object):
     def __init__(self, window):
-        self.window = window
+        self.tray = window
         bus_name = dbus.service.BusName(DBUS_SERVICE, bus=dbus.SessionBus())
         super(EveryLauncherDbusService, self).__init__(bus_name, DBUS_PATH)
 
     @dbus.service.method(DBUS_SERVICE)
     def toggle_window(self):
-        self.window.show()
+        self.tray.showMainWindow(True)
 
 
 class SignalHandler(object):
@@ -118,25 +116,28 @@ def main():
     engine = QQmlApplicationEngine()
 
     model=recollQueryModel()
-    # proxy=QSortFilterProxyModel()
-    # proxy.setSourceModel(model)
-    # proxy.setFilterRole(recollQueryModel.Role_TYPE)
+    proxy=QSortFilterProxyModel()
+    proxy.setSourceModel(model)
+    proxy.setFilterRole(recollQueryModel.Role_TYPE)
 
     # qmlRegisterType(recollQueryModel, 'RecollQuery', 1, 0, 'EveryQueryModel')
 
-    engine.rootContext().setContextProperty("queryModel",model)
-    # engine.rootContext().setContextProperty("filterModel",proxy)
-    engine.load(QUrl("ui/QML/main.qml"))
+    tray=SystemTray.get_instance(None)
 
+    engine.rootContext().setContextProperty("queryModel",model)
+    engine.rootContext().setContextProperty("filterModel",proxy)
+    engine.rootContext().setContextProperty("systemTray",tray)
+
+
+    EveryLauncherDbusService(tray)
+    # if not options.hide_window:
+    #     tray.showMainWindow(False)
+    tray.show()
+    engine.load(QUrl("ui/QML/main.qml"))
     if not engine.rootObjects():
         sys.exit(-1)
 
-# EveryLauncherDbusService(window)
-#     if not options.hide_window:
-#         window.show()
-
     # if Settings.get_instance().get_property('show-indicator-icon'):
-    # SystemTray.get_instance(window).show()
 
 
     # workaround to make Ctrl+C quiting the app

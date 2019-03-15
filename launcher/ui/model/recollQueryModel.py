@@ -54,8 +54,7 @@ def textextract(doc):
 # use the url !)
 def extractofile(doc, outfilename=""):
     extractor = rclextract.Extractor(doc)
-    outfilename = extractor.idoctofile(doc.ipath, doc.mimetype, \
-                                       ofilename=outfilename)
+    outfilename = extractor.idoctofile(doc.ipath, doc.mimetype, ofilename=outfilename)
     return outfilename
 
 
@@ -66,7 +65,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
     Role_LOCATION = Qt.UserRole + 2
     Role_FILE_STATUS = Qt.UserRole + 3
     Role_FILE_SIMPLE_CONTENT = Qt.UserRole + 4
-    Role_TYPE=Qt.UserRole+5
+    Role_TYPE = Qt.UserRole + 5
 
     @Signal
     def queryTextChanged(self):
@@ -99,7 +98,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
         # TODO read from config and prepare db
 
         # TODO confdir = CONFIG_DIR
-        confdir="/home/tender/.recoll"
+        confdir = "/home/tender/.recoll"
         extra_dbs = []
         # Snippet params
         maxchars = 300
@@ -119,7 +118,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
 
     def rowCount(self, parent):
         ret = len(self.searchResults)
-        print("RecollQuery.rowCount(): %d"% ret)
+        # print("RecollQuery.rowCount(): %d"% ret)
         return ret
 
     # def columnCount(self, parent):
@@ -133,14 +132,14 @@ class recollQueryModel(QtCore.QAbstractListModel):
         """Parse and execute query on open db"""
         # print("RecollQuery.setquery():")
         # Get query object
-        if q=="":
+        if q == "":
             return
         self.query = db.query()
         if sortfield:
             self.query.sortby(sortfield, ascending)
         # Parse/run input query string
         self.totres = self.query.execute(q)
-        print("total res:",self.totres)
+        # print("total res:",self.totres)
         self.qtext = q
         self.db = db
         self.beginResetModel()
@@ -148,7 +147,6 @@ class recollQueryModel(QtCore.QAbstractListModel):
         self.endResetModel()
         if self.canFetchMore(None):
             self.fetchMore(None)
-
 
     def getdoc(self, index):
         if index.row() < len(self.searchResults):
@@ -171,7 +169,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
         if not index.isValid():
             return None
 
-        if index.row() <0:
+        if index.row() < 0:
             return None
         if index.row() >= len(self.searchResults):
             return None
@@ -190,24 +188,24 @@ class recollQueryModel(QtCore.QAbstractListModel):
         return
 
     def canFetchMore(self, parent):
-        print("RecollQuery.canFetchMore:", self.searchResults," ",self.totres)
+        # print("RecollQuery.canFetchMore:", self.searchResults," ",self.totres)
         if len(self.searchResults) < self.totres:
             return True
         else:
             return False
 
     def fetchMore(self, parent):
-        print("RecollQuery.fetchMore:")
-        num_to_fetch=min(self.pagelen,self.totres-len(self.searchResults))
+        # print("RecollQuery.fetchMore:")
+        num_to_fetch = min(self.pagelen, self.totres - len(self.searchResults))
         self.beginInsertRows(QtCore.QModelIndex(), len(self.searchResults),
-                             len(self.searchResults) + num_to_fetch-1)
+                             len(self.searchResults) + num_to_fetch - 1)
         for count in range(num_to_fetch):
             try:
                 self.searchResults.append(self.query.fetchone())
-                print("insert ",count)
+                # print("insert ",count)
             except:
-                print("except",count)
-                # break
+                # print("except",count)
+                break
         self.endInsertRows()
 
     def startQuery(self):
@@ -266,7 +264,7 @@ class RclGui_Main(QMainWindow):
         self.ui.resDetail.setText(text)
 
     def on_savePB_clicked(self):
-        print("on_savePB_clicked(self)")
+        # print("on_savePB_clicked(self)")
         doc = self.currentdoc
         ipath = doc.ipath
         if not ipath:

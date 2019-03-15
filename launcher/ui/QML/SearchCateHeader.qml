@@ -45,9 +45,7 @@ Rectangle{
         Keys.onReturnPressed: {
             resListView.focus=true
         }
-
-
-
+        focus: true
     }
 
 }
