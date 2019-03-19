@@ -8,14 +8,18 @@ from threading import Event
 
 import dbus
 import dbus.service
-from PySide2.QtCore import QUrl, QSortFilterProxyModel
+from PySide2 import QtCore
+from PySide2.QtCore import QUrl, QSortFilterProxyModel, QCoreApplication, QSettings
 from PySide2.QtQml import QQmlApplicationEngine
+from PySide2.QtQuickWidgets import QQuickWidget
 from PySide2.QtWidgets import QApplication
 from dbus.mainloop.glib import DBusGMainLoop
 
+from launcher.ui.PreferenceWindow import PreferenceWindow
 from launcher.ui.SystemTray import SystemTray
 from launcher.config import (get_version, get_options, is_wayland, is_wayland_compatibility_on,
-                             gdk_backend, CACHE_DIR, CONFIG_DIR, RECOLL_CONFIG_DIR, XAPIAN_DB_DIR)
+                             gdk_backend, CACHE_DIR, CONFIG_DIR, RECOLL_CONFIG_DIR, XAPIAN_DB_DIR, ORGANIZATION_NAME,
+                             ORGANIZATION_DOMAIN, APPLICATION_NAME, SHOW_INDICATOR)
 
 from launcher.ui.model.recollQueryModel import recollQueryModel
 
@@ -119,7 +123,15 @@ def main():
     # sys.excepthook = except_hook
 
     app=QApplication(sys.argv)
-    engine = QQmlApplicationEngine()
+    QCoreApplication.setOrganizationName(ORGANIZATION_NAME)
+    QCoreApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
+    QCoreApplication.setApplicationName(APPLICATION_NAME)
+
+    # engine = QQmlApplicationEngine()
+    view=QQuickWidget()
+    view.setWindowFlags(QtCore.Qt.WindowCloseButtonHint \
+                        |QtCore.Qt.FramelessWindowHint)
+    engine=view.engine()
 
     model= recollQueryModel(RECOLL_CONFIG_DIR,[])
     proxy=QSortFilterProxyModel()
@@ -128,7 +140,7 @@ def main():
 
     # qmlRegisterType(recollQueryModel, 'RecollQuery', 1, 0, 'EveryQueryModel')
 
-    tray=SystemTray.get_instance(None)
+    tray=SystemTray.get_instance(view)
 
     engine.rootContext().setContextProperty("queryModel",model)
     engine.rootContext().setContextProperty("filterModel",proxy)
@@ -136,13 +148,25 @@ def main():
 
 
     EveryLauncherDbusService(tray)
-    # if not options.hide_window:
-    #     tray.showMainWindow(False)
-    tray.show()
-    engine.load(QUrl("ui/QML/main.qml"))
-    if not engine.rootObjects():
-        sys.exit(-1)
+    if not options.hide_window:
+        tray.showMainWindow(True)
+    # engine.load(QUrl("ui/QML/main.qml"))
+    # if not engine.rootObjects():
+    #     sys.exit(-1)
 
+    view.setSource(QUrl("ui/QML/main.qml"))
+    view.show()
+
+
+    setting=QSettings()
+    if bool(setting.value(SHOW_INDICATOR,True)):
+        tray.show()
+
+
+    # w=PreferenceWindow()
+    # w.show()
+
+    # tray.show()
     # if Settings.get_instance().get_property('show-indicator-icon'):
 
 

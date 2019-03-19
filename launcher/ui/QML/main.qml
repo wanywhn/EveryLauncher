@@ -4,28 +4,27 @@ import QtQuick.Controls 2.0
 
 
 
-ApplicationWindow {
+Rectangle{
     id: root
 
     width: 640
     height:mpage.height
-    minimumHeight: 100
+    //minimumHeight: 100
     visible: systemTray.mainWindowVisiable
-    title: "everyLauncher"
-    flags: Qt.FramelessWindowHint
+    //title: "everyLauncher"
+    //flags: Qt.FramelessWindowHint
 
-    Component.onCompleted: {
-        setX(Screen.width/2-width/2);
-        setY(Screen.height/5-height)
+    //Component.onCompleted: {
+        //setX(Screen.width/2-width/2);
+        //setY(Screen.height/5-height)
+    //}
 
-    }
-
-    onActiveChanged: {
-        if(!active){
+    //onActiveChanged: {
+        //if(!active){
 //            systemTray.mainWindowVisiable=false
-            systemTray.showMainWindow(false)
-        }
-    }
+            //systemTray.showMainWindow(false)
+        //}
+    //}
 
     Page{
 

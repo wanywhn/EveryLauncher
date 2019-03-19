@@ -23,6 +23,12 @@ DESKTOP_DIRS = filter(os.path.exists, [os.path.join(dir, "applications") for dir
 EXTENSIONS_DIR = os.path.join(CACHE_DIR, 'extensions')
 EXT_PREFERENCES_DIR = os.path.join(CONFIG_DIR, 'ext_preferences')
 ULAUNCHER_APP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+ORGANIZATION_NAME="WANYWHN"
+ORGANIZATION_DOMAIN="gitee.com/wanywhn/everyLauncher"
+APPLICATION_NAME="EveryLauncher"
+
+#CONFIG
+SHOW_INDICATOR="SHOW_INDICATOR"
 
 
 class ProjectPathNotFoundError(Exception):
