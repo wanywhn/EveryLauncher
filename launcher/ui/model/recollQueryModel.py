@@ -87,7 +87,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
     # once set quertText ,the query will exec
     queryText = Property(str, get_query_text, set_query_text, notify=queryTextChanged)
 
-    def __init__(self):
+    def __init__(self, cfgDir, extra_dbs):
         QtCore.QAbstractListModel.__init__(self)
         self.totres = -1
         self.query = None
@@ -98,8 +98,8 @@ class recollQueryModel(QtCore.QAbstractListModel):
         # TODO read from config and prepare db
 
         # TODO confdir = CONFIG_DIR
-        confdir = "/home/tender/.recoll"
-        extra_dbs = []
+        confdir = cfgDir
+        extra_dbs = extra_dbs
         # Snippet params
         maxchars = 300
         contextwords = 6

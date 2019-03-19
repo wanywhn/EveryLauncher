@@ -43,6 +43,10 @@ class SystemTray(QSystemTrayIcon):
 
     def init_conn(self):
         self.showUp.triggered.connect(lambda :self.showMainWindow(self.mainWindowVisibility!=True))
+        self.preferenceAction.triggered.connect(self.preferenceActionTriggered)
+    def preferenceActionTriggered(self):
+        pass
+
 
     @Slot(bool)
     def showMainWindow(self, f):

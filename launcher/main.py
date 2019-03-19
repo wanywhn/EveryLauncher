@@ -15,7 +15,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 
 from launcher.ui.SystemTray import SystemTray
 from launcher.config import (get_version, get_options, is_wayland, is_wayland_compatibility_on,
-                     gdk_backend, CACHE_DIR, CONFIG_DIR)
+                             gdk_backend, CACHE_DIR, CONFIG_DIR, RECOLL_CONFIG_DIR, XAPIAN_DB_DIR)
 
 from launcher.ui.model.recollQueryModel import recollQueryModel
 
@@ -27,6 +27,12 @@ DBUS_PATH = '/com/gitee/wanywhn/evertlauncher'
 def _create_dirs():
     if not os.path.exists(CONFIG_DIR):
         os.makedirs(CONFIG_DIR)
+
+    if not os.path.exists(RECOLL_CONFIG_DIR):
+        os.makedirs(RECOLL_CONFIG_DIR)
+
+    if not os.path.exists(XAPIAN_DB_DIR):
+        os.makedirs(XAPIAN_DB_DIR)
 
     # make sure ~/.cache/ulauncher exists
     if not os.path.exists(CACHE_DIR):
@@ -115,7 +121,7 @@ def main():
     app=QApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    model=recollQueryModel()
+    model= recollQueryModel(RECOLL_CONFIG_DIR,[])
     proxy=QSortFilterProxyModel()
     proxy.setSourceModel(model)
     proxy.setFilterRole(recollQueryModel.Role_TYPE)
@@ -142,6 +148,7 @@ def main():
 
     # workaround to make Ctrl+C quiting the app
     # signal_handler = SignalHandler(window)
+    # TODO add shortkey in deepin control
 
     sys.exit(app.exec_())
 

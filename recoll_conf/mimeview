@@ -1,0 +1,2 @@
+[view]
+application/x-all = xdg-open %u

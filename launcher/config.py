@@ -16,6 +16,8 @@ from xdg.BaseDirectory import xdg_config_home, xdg_cache_home, xdg_data_dirs
 CACHE_DIR = os.path.join(xdg_cache_home, 'everylauncher_cache')
 CONFIG_DIR = os.path.join(xdg_config_home, 'everylauncher')
 SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, 'settings.json')
+RECOLL_CONFIG_DIR=os.path.join(CONFIG_DIR,"recoll")
+XAPIAN_DB_DIR=os.path.join(RECOLL_CONFIG_DIR,"xapiandb")
 # spec: https://specifications.freedesktop.org/menu-spec/latest/ar01s02.html
 DESKTOP_DIRS = filter(os.path.exists, [os.path.join(dir, "applications") for dir in xdg_data_dirs])
 EXTENSIONS_DIR = os.path.join(CACHE_DIR, 'extensions')
