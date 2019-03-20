@@ -41,6 +41,9 @@ Rectangle{
             id:queryHeader
             focus: true
             //TODO get focus
+            onPreferenceClicked: {
+                systemTray.preferenceActionTriggered()
+            }
         }
 
         contentItem:

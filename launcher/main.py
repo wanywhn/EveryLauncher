@@ -1,27 +1,25 @@
 from __future__ import print_function
-import sys
+
+import logging
 import os
 import signal
-import logging
+import sys
 from threading import Event
-
 
 import dbus
 import dbus.service
 from PySide2 import QtCore
-from PySide2.QtCore import QUrl, QSortFilterProxyModel, QCoreApplication, QSettings
-from PySide2.QtQml import QQmlApplicationEngine
+from PySide2.QtCore import QUrl, QSortFilterProxyModel, QSettings
 from PySide2.QtQuickWidgets import QQuickWidget
 from PySide2.QtWidgets import QApplication
 from dbus.mainloop.glib import DBusGMainLoop
 
-from launcher.ui.PreferenceWindow import PreferenceWindow
-from launcher.ui.SystemTray import SystemTray
 from launcher.config import (get_version, get_options, is_wayland, is_wayland_compatibility_on,
                              gdk_backend, CACHE_DIR, CONFIG_DIR, RECOLL_CONFIG_DIR, XAPIAN_DB_DIR, ORGANIZATION_NAME,
-                             ORGANIZATION_DOMAIN, APPLICATION_NAME, SHOW_INDICATOR)
-
+                             ORGANIZATION_DOMAIN, APPLICATION_NAME, SHOW_INDICATOR, SHOW_WINDOW_ON_START)
+from launcher.ui.SystemTray import SystemTray
 from launcher.ui.model.recollQueryModel import recollQueryModel
+from launcher.utils.utils import trans_to_bool
 
 DBUS_SERVICE = 'com.gitee.wanywhn.everylauncher'
 DBUS_PATH = '/com/gitee/wanywhn/evertlauncher'
@@ -55,7 +53,6 @@ class EveryLauncherDbusService(dbus.service.Object):
 
 
 class SignalHandler(object):
-
     _exit_event = None
     _app_window = None
     _logger = None
@@ -122,30 +119,33 @@ def main():
 
     # sys.excepthook = except_hook
 
-    app=QApplication(sys.argv)
-    QCoreApplication.setOrganizationName(ORGANIZATION_NAME)
-    QCoreApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
-    QCoreApplication.setApplicationName(APPLICATION_NAME)
+    app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
+    QApplication.setOrganizationName(ORGANIZATION_NAME)
+    QApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
+    QApplication.setApplicationName(APPLICATION_NAME)
 
     # engine = QQmlApplicationEngine()
-    view=QQuickWidget()
+    view = QQuickWidget()
     view.setWindowFlags(QtCore.Qt.WindowCloseButtonHint \
-                        |QtCore.Qt.FramelessWindowHint)
-    engine=view.engine()
+                        | QtCore.Qt.FramelessWindowHint)
+    # view.setWindowTitle(QObject.tr("EveryLauncher"))
+    # TODO hide when lise focus
+    view.move((QApplication.desktop().width() - view.width()) / 2, QApplication.desktop().height() / 2 - view.height())
+    engine = view.engine()
 
-    model= recollQueryModel(RECOLL_CONFIG_DIR,[])
-    proxy=QSortFilterProxyModel()
+    model = recollQueryModel(RECOLL_CONFIG_DIR, [])
+    proxy = QSortFilterProxyModel()
     proxy.setSourceModel(model)
     proxy.setFilterRole(recollQueryModel.Role_TYPE)
 
     # qmlRegisterType(recollQueryModel, 'RecollQuery', 1, 0, 'EveryQueryModel')
 
-    tray=SystemTray.get_instance(view)
+    tray = SystemTray.get_instance(view)
 
-    engine.rootContext().setContextProperty("queryModel",model)
-    engine.rootContext().setContextProperty("filterModel",proxy)
-    engine.rootContext().setContextProperty("systemTray",tray)
-
+    engine.rootContext().setContextProperty("queryModel", model)
+    engine.rootContext().setContextProperty("filterModel", proxy)
+    engine.rootContext().setContextProperty("systemTray", tray)
 
     EveryLauncherDbusService(tray)
     if not options.hide_window:
@@ -157,10 +157,13 @@ def main():
     view.setSource(QUrl("ui/QML/main.qml"))
     view.show()
 
-
-    setting=QSettings()
-    if bool(setting.value(SHOW_INDICATOR,True)):
+    setting = QSettings()
+    setting.beginGroup("General")
+    if trans_to_bool(setting.value(SHOW_INDICATOR, True)):
         tray.show()
+    if not trans_to_bool(setting.value(SHOW_WINDOW_ON_START,True)):
+        view.hide()
+    setting.endGroup()
 
 
     # w=PreferenceWindow()
@@ -168,7 +171,6 @@ def main():
 
     # tray.show()
     # if Settings.get_instance().get_property('show-indicator-icon'):
-
 
     # workaround to make Ctrl+C quiting the app
     # signal_handler = SignalHandler(window)

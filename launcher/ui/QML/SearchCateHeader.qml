@@ -4,6 +4,8 @@ import QtQuick 2.0
 Rectangle{
     height:btnFilter.height+btnText.height
     property alias text: btnText.text
+
+    signal preferenceClicked
     Rectangle{
         id:btnFilter
         anchors{
@@ -36,7 +38,8 @@ Rectangle{
         anchors{
             top:btnFilter.bottom
             left: parent.left
-            right: parent.right
+            right: btnSettings.left
+//            right: parent.right
             topMargin: 16
             leftMargin: 16
             rightMargin: 16
@@ -46,6 +49,17 @@ Rectangle{
             resListView.focus=true
         }
         focus: true
+    }
+    Button{
+        id:btnSettings
+        anchors{
+            top:btnFilter.bottom
+            right: parent.right
+        }
+        text: "Settings"
+        onClicked: {
+            preferenceClicked()
+        }
     }
 
 }

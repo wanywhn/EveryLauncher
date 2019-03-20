@@ -1,6 +1,6 @@
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
-from PySide2.QtCore import Property, Signal,Slot
+from PySide2.QtCore import Property, Signal, Slot
 
 from launcher.ui.PreferenceWindow import PreferenceWindow
 
@@ -21,7 +21,7 @@ class SystemTray(QSystemTrayIcon):
             self._mainWindowVisibility = f
             self.mainWindowVisiableChanged.emit(self._mainWindowVisibility)
 
-    mainWindowVisiable = Property(bool,_readMainWindowVisiable,_writeMainWindowVisiable,
+    mainWindowVisiable = Property(bool, _readMainWindowVisiable, _writeMainWindowVisiable,
                                   notify=mainWindowVisiableChanged)
 
     def __init__(self, icon, parent):
@@ -44,15 +44,20 @@ class SystemTray(QSystemTrayIcon):
         self.setContextMenu(self.trayMenu)
 
     def _init_conn(self):
-        self.showUp.triggered.connect(lambda :self.showMainWindow(self._mainWindowVisibility != True))
+        self.showUp.triggered.connect(lambda: self.showMainWindow(self._mainWindowVisibility != True))
         self.preferenceAction.triggered.connect(self.preferenceActionTriggered)
+
+    # @Slot()
     def preferenceActionTriggered(self):
-        pw=PreferenceWindow(self.parent())
+        pw = PreferenceWindow(self.parent())
         pw.show()
         pass
 
-
     @Slot(bool)
     def showMainWindow(self, f):
-        print("visibility change to ",f)
+        print("visibility change to ", f)
         self._writeMainWindowVisiable(f)
+        if f == True:
+            self.parent().show()
+        else:
+            self.parent().hide()
