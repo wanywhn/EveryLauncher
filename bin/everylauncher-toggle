@@ -1,0 +1,9 @@
+#!/bin/sh
+
+
+dbus-send \
+    --session \
+    --print-reply \
+    --dest=com.gitee.wanywhn.everylauncher \
+    /com/gitee/wanywhn/evertlauncher \
+    com.gitee.wanywhn.everylauncher.toggle_window
