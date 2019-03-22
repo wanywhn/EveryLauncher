@@ -1,1 +1,7 @@
+[index]
 application/x-all = internal
+
+
+
+image/jpeg = execm rclimg_ocr.py
+image/png = execm rclimg_ocr.py

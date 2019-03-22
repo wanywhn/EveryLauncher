@@ -6,6 +6,7 @@ from launcher.config import SHOW_WINDOW_ON_START, SHOW_INDICATOR, ORGANIZATION_N
 from launcher.utils.utils import trans_to_bool
 
 
+#TODO check state in main.py
 class PreferenceWindow(QDialog):
     def __init__(self, parent):
         super().__init__(parent)

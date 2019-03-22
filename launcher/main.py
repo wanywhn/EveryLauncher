@@ -10,6 +10,7 @@ import dbus
 import dbus.service
 from PySide2 import QtCore
 from PySide2.QtCore import QUrl, QSortFilterProxyModel, QSettings
+from PySide2.QtGui import QDesktopServices
 from PySide2.QtQuickWidgets import QQuickWidget
 from PySide2.QtWidgets import QApplication
 from dbus.mainloop.glib import DBusGMainLoop
@@ -125,6 +126,7 @@ def main():
     QApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
     QApplication.setApplicationName(APPLICATION_NAME)
 
+
     # engine = QQmlApplicationEngine()
     view = QQuickWidget()
     view.setWindowFlags(QtCore.Qt.WindowCloseButtonHint \
@@ -143,9 +145,11 @@ def main():
 
     tray = SystemTray.get_instance(view)
 
+    desktop_servers=QDesktopServices()
     engine.rootContext().setContextProperty("queryModel", model)
     engine.rootContext().setContextProperty("filterModel", proxy)
     engine.rootContext().setContextProperty("systemTray", tray)
+    engine.rootContext().setContextProperty("desktopServices",desktop_servers)
 
     EveryLauncherDbusService(tray)
     if not options.hide_window:
@@ -155,14 +159,13 @@ def main():
     #     sys.exit(-1)
 
     view.setSource(QUrl("ui/QML/main.qml"))
-    view.show()
 
     setting = QSettings()
     setting.beginGroup("General")
     if trans_to_bool(setting.value(SHOW_INDICATOR, True)):
         tray.show()
-    if not trans_to_bool(setting.value(SHOW_WINDOW_ON_START,True)):
-        view.hide()
+    if trans_to_bool(setting.value(SHOW_WINDOW_ON_START,True)):
+        view.show()
     setting.endGroup()
 
 

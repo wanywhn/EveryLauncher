@@ -10,20 +10,20 @@ Rectangle{
     width: 640
     height:mpage.height
     //minimumHeight: 100
-    visible: systemTray.mainWindowVisiable
+    //visible: systemTray.mainWindowVisiable
     //title: "everyLauncher"
     //flags: Qt.FramelessWindowHint
 
     //Component.onCompleted: {
-        //setX(Screen.width/2-width/2);
-        //setY(Screen.height/5-height)
+    //setX(Screen.width/2-width/2);
+    //setY(Screen.height/5-height)
     //}
 
     //onActiveChanged: {
-        //if(!active){
-//            systemTray.mainWindowVisiable=false
-            //systemTray.showMainWindow(false)
-        //}
+    //if(!active){
+    //            systemTray.mainWindowVisiable=false
+    //systemTray.showMainWindow(false)
+    //}
     //}
 
     Page{
@@ -34,7 +34,7 @@ Rectangle{
             top:parent.top
             right:parent.right
         }
-//        height:resListView.height
+        //        height:resListView.height
 
 
         header:SearchCateHeader{
@@ -45,9 +45,15 @@ Rectangle{
                 systemTray.preferenceActionTriggered()
             }
         }
+        Keys.onDownPressed: {
+            resListView.incrementCurrentIndex()
+        }
+        Keys.onUpPressed: {
+            resListView.decrementCurrentIndex()
 
+        }
         contentItem:
-            ListView {
+        ListView {
             id:resListView
 
 
@@ -59,6 +65,10 @@ Rectangle{
                 leftMargin: 16
                 rightMargin: 16
             }
+            highlight:ItemHighlightBar{
+
+            }
+
             onCountChanged: {
                 /* calculate ListView dimensions based on content */
 
@@ -87,80 +97,14 @@ Rectangle{
                 value:queryHeader.text
             }
 
-            delegate:
-                Rectangle {
+
+            delegate:ResItemDelegate{
+                color: "transparent"
                 height: 60
-                Text{
-                    id: file_icon
-                    //                    source: ""
-                    text:"image"
-                    height: 60
-                    width: 60
-                    anchors{
-                        left: parent.left
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                }
-                Text {
-                    id: file_name
-                    text: fileName
-                    //                        wrapMode:
-                    anchors{
-                        left: file_icon.right
-                        top:parent.top
-                        //                            right:file_statu.left
-                    }
-                }
-                Text {
-                    id: file_location
-                    text: fileLocation
-                    //                        wrapMode:
-                    anchors{
-                        left: file_icon.right
-                        top:file_name.bottom
-                        right: parent.right
-                    }
-                }
-                Text {
-                    //TODO Text browser
-                    id: file_simple_content
-                    text:fileSimpleContent
-
-                    anchors{
-                        left: file_icon.right
-                        top:file_location.bottom
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
-                }
-                //                    Text {
-                //                        id: file_statu
-                //                        text: "text"
-                //                        anchors{
-                //                            left: file_name.right
-                //                            top:parent.top
-                //                            bottom: file_location.top
-                //                            right: short_key.left
-
-                //                        }
-                //                    }
-
-                //                    Text {
-                //                    anchors.fill: parent
-                //                        id:short_key
-                //                        height: 10
-                //                        width: 10
-                //                        text:"keyyyyyyyy"
-                //                        anchors{
-                //                            top:parent.top
-                //                            right:parent.right
-                //                            bottom:parent.bottom
-                //                            bottom: file_location.top
-
-                //                        }
-                //                    }
+                width: parent.width
             }
+
+
             ScrollBar.vertical:ScrollBar{}
             highlightFollowsCurrentItem: true
         }

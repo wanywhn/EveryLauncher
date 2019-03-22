@@ -188,3 +188,8 @@ recoll_conf/index.pid
 recoll_conf/missing
 recoll_conf/ptrans
 recoll_conf/xapiandb/
+
+
+
+filters/__init__.py
+filters/rclexecm.py

@@ -51,7 +51,6 @@ class SystemTray(QSystemTrayIcon):
     def preferenceActionTriggered(self):
         pw = PreferenceWindow(self.parent())
         pw.show()
-        pass
 
     @Slot(bool)
     def showMainWindow(self, f):

@@ -43,10 +43,10 @@ class HlMeths:
 #
 # Extract and return document text (in text or html format, indicated
 # by newdoc.mimetype)
-def textextract(doc):
-    extractor = rclextract.Extractor(doc)
-    newdoc = extractor.textextract(doc.ipath)
-    return newdoc
+# def textextract(doc):
+#     extractor = rclextract.Extractor(doc)
+#     newdoc = extractor.textextract(doc.ipath)
+#     return newdoc
 
 
 # Extract document in original format (ie: application/msword) and
@@ -132,7 +132,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
         """Parse and execute query on open db"""
         # print("RecollQuery.setquery():")
         # Get query object
-        if q == "":
+        if q.strip() == "":
             return
         self.query = db.query()
         if sortfield:
@@ -154,6 +154,13 @@ class recollQueryModel(QtCore.QAbstractListModel):
         else:
             return None
 
+    @Slot(int)
+    def textextract(self, index):
+        doc = self.searchResults[index]
+        extractor = rclextract.Extractor(doc)
+        newdoc = extractor.textextract(doc.ipath)
+        print(newdoc.text)
+
     def sort(self, col, order):
         # print("sort %s %s", (col, order))
         self.setquery(self.db, self.qtext, sortfield=self.attrs[col],
@@ -174,7 +181,8 @@ class recollQueryModel(QtCore.QAbstractListModel):
         if index.row() >= len(self.searchResults):
             return None
 
-        d = self.searchResults[index.row()]
+        d = self.getdoc(index)
+        # d = self.searchResults[index.row()]
         if role == recollQueryModel.Role_FILE_NAME:
             # print("RecollQuery.data: row %d, col %d role: %s" % \
             #     (index.row(), index.column() role))
@@ -182,7 +190,18 @@ class recollQueryModel(QtCore.QAbstractListModel):
         elif role == recollQueryModel.Role_LOCATION:
             return d['url']
         elif role == recollQueryModel.Role_FILE_SIMPLE_CONTENT:
-            return d['abstract']
+            # return d['abstract']
+            if d is None:
+                print("No Doc")
+                return
+            groups = self.query.getgroups()
+            # meths=HlMeths(groups)
+            # tabs=self.query.makedocabstract(d,methods=meths)
+            tabs = self.query.makedocabstract(d)
+            tabs = self.query.highlight(tabs)
+            return tabs
+
+
         elif role == recollQueryModel.Role_FILE_STATUS:
             pass
         return
@@ -246,7 +265,8 @@ class RclGui_Main(QMainWindow):
 
     def on_previewPB_clicked(self):
         print("on_previewPB_clicked(self)")
-        newdoc = textextract(self.currentdoc)
+        # newdoc = textextract(self.currentdoc)
+        newdoc=self.currentdoc
         query = self.qmodel.query;
         groups = query.getgroups()
         meths = HlMeths(groups)
@@ -264,7 +284,6 @@ class RclGui_Main(QMainWindow):
         self.ui.resDetail.setText(text)
 
     def on_savePB_clicked(self):
-        # print("on_savePB_clicked(self)")
         doc = self.currentdoc
         ipath = doc.ipath
         if not ipath:
@@ -279,33 +298,3 @@ class RclGui_Main(QMainWindow):
 
     def onexit(self):
         self.close()
-
-# class recollQueryModel(QAbstractListModel):
-#    def __init__(self):
-#        QAbstractListModel.__init__(self)
-#
-#        self.__cpu_count = random.randint(0,10)
-#        self.__cpu_load = [0] * self.__cpu_count
-#
-#        self.__update_timer = QTimer(self)
-#        self.__update_timer.setInterval(1000)
-#        self.__update_timer.timeout.connect(self.__update)
-#        self.__update_timer.start()
-#
-#        # The first call returns invalid data
-#
-#    def __update(self):
-#        self.__cpu_load = random_int_list(0,100,10)
-#        self.dataChanged.emit(self.index(0, 0), self.index(self.__cpu_count - 1, 0))
-#
-#    def rowCount(self, parent):
-#        return self.__cpu_count
-#
-#    def data(self, index, role):
-#        if (role == Qt.DisplayRole and
-#                index.row() >= 0 and
-#                index.row() < len(self.__cpu_load) and
-#                index.column() == 0):
-#            return self.__cpu_load[index.row()]
-#        else:
-#            return None
