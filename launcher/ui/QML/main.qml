@@ -94,7 +94,7 @@ Rectangle{
             Binding{
                 target:queryModel;
                 property:"queryText";
-                value:queryHeader.text
+                value:queryHeader.modifiedText
             }
 
 

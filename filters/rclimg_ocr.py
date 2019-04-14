@@ -9,6 +9,7 @@
 #
 from __future__ import print_function
 from aip import AipOcr
+from aip import AipImageClassify
 
 import sys
 import os
@@ -26,9 +27,9 @@ except:
 
 khexre = re.compile('.*\.0[xX][0-9a-fA-F]+$')
 
-APP_ID = "15812924"
-API_KEY = "26HciRtTBRdXGlq4xz8wC2rU"
-SECRET_KEY = "zZ5z7IvxBl6C9H7Vx1kd0UXr9h0Nkatg"
+APP_ID = "15998878"
+API_KEY = "qBPgUS6aScH9EtXM8GYwuuRj"
+SECRET_KEY = "cSXxA8Ns1TwBLXXyXAvqWGavZYV7gCjZ"
 
 
 def get_file_content(filePath):  # 这样只要获得文件名就能够进行识别
@@ -65,6 +66,8 @@ class ImgTagExtractor:
         self.em = em
         self.currentindex = 0
         self._client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
+        self._imgClient=AipImageClassify(APP_ID,API_KEY,SECRET_KEY)
+
 
     def extractone(self, params):
         # self.em.rclog("extractone %s" % params["filename:"])
@@ -125,10 +128,12 @@ class ImgTagExtractor:
                 docdata += rclexecm.makebytes(k + " : " + \
                                           self.em.htmlescape(mdic[k]) + "<br />\n")
 
+        img_result = self._imgClient.advancedGeneral(get_file_content(filename))
         ocr_result = self._client.basicGeneral(get_file_content(filename))
         for item in ocr_result['words_result']:
-            docdata += rclexecm.makebytes(self.em.htmlescape(item["words"]) + "<br />\n"
-                                          )
+            docdata += rclexecm.makebytes(self.em.htmlescape(item["words"]) + "<br />\n")
+        for item in img_result['result']:
+            docdata += rclexecm.makebytes(self.em.htmlescape(item["keyword"]) + "<br />\n")
         docdata += b'</pre></body></html>'
 
         self.em.setmimetype("text/html")

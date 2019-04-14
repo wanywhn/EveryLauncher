@@ -18,10 +18,29 @@ Rectangle {
         }
     }
     
-    Text{
+    function oc(a)
+    {
+      var o = {}; //相当于var o = new Object();
+      for(var i=0;i<a.length;i++)
+      {
+        o[a[i]]=''; //注意该写法，不能写成o.a[i]
+      }
+      return o;
+    }
+    //TODO 添加默认图片
+    function getFileLocation(fl){
+        var suffix=fileLocation.split(".").pop()
+        console.log("suffix:"+suffix)
+        var image_suffix=["jpg","jpeg","png","gif"]
+        var location=suffix in oc(image_suffix)?fileLocation:""
+        return location
+    }
+
+
+    Image{
         id: file_icon
-        //                    source: ""
-        text:"image"
+
+        source:getFileLocation(fileLocation)
         height: 60
         width: 60
         anchors{

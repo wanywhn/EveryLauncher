@@ -4,6 +4,9 @@ import QtQuick 2.0
 Rectangle{
     height:btnFilter.height+btnText.height
     property alias text: btnText.text
+    property string modifiedText: ""
+
+    id:root
 
     signal preferenceClicked
     Rectangle{
@@ -49,6 +52,16 @@ Rectangle{
             resListView.focus=true
         }
         focus: true
+        onTextChanged: {
+            var str=""
+            var t=btnText.text
+            for (var i=0;i<t.length;++i){
+                str+=t.charAt(i)
+                str+="*"
+            }
+
+            root.modifiedText=str
+        }
     }
     Button{
         id:btnSettings
