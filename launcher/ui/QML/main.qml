@@ -50,8 +50,8 @@ Rectangle{
         }
         Keys.onUpPressed: {
             resListView.decrementCurrentIndex()
-
         }
+
         contentItem:
         ListView {
             id:resListView
@@ -89,8 +89,8 @@ Rectangle{
             //     id:every_query_model;
             //     queryText:queryHeader.text
             // }
-            //model:queryModel
-            model:filterModel
+            model:queryModel
+//            model:filterModel
             Binding{
                 target:queryModel;
                 property:"queryText";

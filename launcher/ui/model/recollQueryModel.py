@@ -1,12 +1,17 @@
+import os
 import random
 import sys
 
 from PySide2 import QtCore
 from PySide2.QtCore import QAbstractListModel, QTimer, Qt, QByteArray, Property, Signal, Slot, QModelIndex
-from PySide2.QtGui import QKeySequence
+from PySide2.QtGui import QKeySequence, QIcon
 from PySide2.QtWidgets import QMainWindow, QShortcut, QFileDialog
+from xdg.Exceptions import ParsingError, DuplicateGroupError, DuplicateKeyError
 
 from launcher.config import CONFIG_DIR
+from xdg.DesktopEntry import DesktopEntry
+from xdg.IconTheme import getIconPath
+import subprocess
 
 try:
     from recoll import recoll
@@ -58,6 +63,19 @@ def extractofile(doc, outfilename=""):
     return outfilename
 
 
+def getDesktopFile(url):
+    #TODO nfs??
+    url=str(url[7:])
+    if url.endswith("desktop"):
+        desktop=DesktopEntry()
+        try:
+            desktop.parse(url)
+        except (ParsingError,DuplicateGroupError,DuplicateKeyError) as e:
+            print(e)
+            return None
+        return desktop
+    return None
+
 #########
 # RecollQuery wraps a recoll.query object in a Qt model
 class recollQueryModel(QtCore.QAbstractListModel):
@@ -66,11 +84,20 @@ class recollQueryModel(QtCore.QAbstractListModel):
     Role_FILE_STATUS = Qt.UserRole + 3
     Role_FILE_SIMPLE_CONTENT = Qt.UserRole + 4
     Role_TYPE = Qt.UserRole + 5
+    Role_FILE_ICON=Qt.UserRole+6
+    Role_FILE_EXEC=Qt.UserRole+7
+    Role_DESKTOP_NAME=Qt.UserRole+8
+
 
     @Signal
     def queryTextChanged(self):
         pass
 
+    @Slot(str)
+    def openDesktopFile(self,val):
+        subprocess.Popen(val)
+
+        pass
     @Slot(str)
     def setQueryText(self, val):
         self.set_queryText(val)
@@ -112,7 +139,10 @@ class recollQueryModel(QtCore.QAbstractListModel):
             recollQueryModel.Role_FILE_NAME: QByteArray(b'fileName'),
             recollQueryModel.Role_LOCATION: QByteArray(b'fileLocation'),
             recollQueryModel.Role_FILE_SIMPLE_CONTENT: QByteArray(b'fileSimpleContent'),
-            recollQueryModel.Role_FILE_STATUS: QByteArray(b'fileStatus')
+            recollQueryModel.Role_FILE_STATUS: QByteArray(b'fileStatus'),
+            recollQueryModel.Role_FILE_ICON:QByteArray(b'fileIcon'),
+            recollQueryModel.Role_FILE_EXEC:QByteArray(b'fileExec'),
+            recollQueryModel.Role_DESKTOP_NAME:QByteArray(b'desktopName')
         }
         return roles
 
@@ -202,9 +232,30 @@ class recollQueryModel(QtCore.QAbstractListModel):
             return tabs
 
 
-        elif role == recollQueryModel.Role_FILE_STATUS:
-            pass
-        return
+        elif role == recollQueryModel.Role_FILE_ICON:
+            # icon=d['icon']
+            desktop=getDesktopFile(d['url'])
+            if desktop is None:
+                return ""
+            icon=desktop.getIcon()
+            # print("icon:",icon)
+            path=getIconPath(icon)
+            # print("path:",path)
+            return path
+
+        elif role==recollQueryModel.Role_FILE_EXEC:
+            desktop=getDesktopFile(d['url'])
+            if desktop is None:
+                return ""
+            return desktop.getExec().split(" ")[0]
+        elif role==recollQueryModel.Role_DESKTOP_NAME:
+            desktop=getDesktopFile(d['url'])
+            if desktop is None:
+                return ""
+            return desktop.getName()
+
+
+        return ""
 
     def canFetchMore(self, parent):
         # print("RecollQuery.canFetchMore:", self.searchResults," ",self.totres)
@@ -216,15 +267,30 @@ class recollQueryModel(QtCore.QAbstractListModel):
     def fetchMore(self, parent):
         # print("RecollQuery.fetchMore:")
         num_to_fetch = min(self.pagelen, self.totres - len(self.searchResults))
-        self.beginInsertRows(QtCore.QModelIndex(), len(self.searchResults),
-                             len(self.searchResults) + num_to_fetch - 1)
+        titem=[]
         for count in range(num_to_fetch):
             try:
-                self.searchResults.append(self.query.fetchone())
-                # print("insert ",count)
+                item=self.query.fetchone()
+                url=str(item['url'][7:])
+                if url.endswith("desktop"):
+                    desktop=DesktopEntry()
+                    try:
+                        desktop.parse(url)
+                    except (ParsingError,DuplicateGroupError,DuplicateKeyError)as e:
+                        print(e)
+                    if desktop.getNoDisplay():
+                        continue
+                    if len(desktop.getOnlyShowIn())!=0:
+                        continue
+
+
+                titem.append(item)
             except:
-                # print("except",count)
                 break
+        self.beginInsertRows(QtCore.QModelIndex(), len(self.searchResults),
+                             len(self.searchResults) + len(titem)- 1)
+        self.searchResults.extend(titem)
+
         self.endInsertRows()
 
     def startQuery(self):

@@ -1,5 +1,5 @@
 [index]
-application/x-all = internal text/plain
+#application/x-all = exec rcldesktop
 
 
 

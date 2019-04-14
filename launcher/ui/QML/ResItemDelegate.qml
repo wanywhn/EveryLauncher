@@ -16,8 +16,17 @@ Rectangle {
             //desktopServices.openUrl(fileLocation)
             //queryModel.textextract(idx)
         }
+//        onPressed: {
+//            console.log("Pressed:",fileExec)
+//            resListView.model.openDesktopFile(fileExec)
+//        }
     }
-    
+//        Keys.onEnterPressed: {
+        Keys.onReturnPressed:{
+            console.log("test:",fileExec)
+            resListView.model.openDesktopFile(fileExec)
+        }
+
     function oc(a)
     {
       var o = {}; //相当于var o = new Object();
@@ -28,19 +37,30 @@ Rectangle {
       return o;
     }
     //TODO 添加默认图片
-    function getFileLocation(fl){
-        var suffix=fileLocation.split(".").pop()
-        console.log("suffix:"+suffix)
+    function getIconLocation(fn){
+        var suffix=fn.split(".").pop()
+        if(suffix==="desktop"){
+            return fileIcon
+        }
+        return ""
+
         var image_suffix=["jpg","jpeg","png","gif"]
         var location=suffix in oc(image_suffix)?fileLocation:""
         return location
+    }
+    function getDisplayName(fn){
+        var suffix=fn.split(".").pop()
+        if(suffix==="desktop"){
+            return desktopName
+        }
+        return fn
     }
 
 
     Image{
         id: file_icon
 
-        source:getFileLocation(fileLocation)
+        source:getIconLocation(fileName)
         height: 60
         width: 60
         anchors{
@@ -51,7 +71,7 @@ Rectangle {
     }
     Text {
         id: file_name
-        text: fileName
+        text: getDisplayName(fileName)
         //                        wrapMode:
         anchors{
             left: file_icon.right
@@ -79,7 +99,6 @@ Rectangle {
         
         wrapMode:Text.WordWrap
         
-        
         anchors{
             left: file_icon.right
             top:file_location.bottom
@@ -87,30 +106,4 @@ Rectangle {
             bottom: parent.bottom
         }
     }
-    //                    Text {
-    //                        id: file_statu
-    //                        text: "text"
-    //                        anchors{
-    //                            left: file_name.right
-    //                            top:parent.top
-    //                            bottom: file_location.top
-    //                            right: short_key.left
-    
-    //                        }
-    //                    }
-    
-    //                    Text {
-    //                    anchors.fill: parent
-    //                        id:short_key
-    //                        height: 10
-    //                        width: 10
-    //                        text:"keyyyyyyyy"
-    //                        anchors{
-    //                            top:parent.top
-    //                            right:parent.right
-    //                            bottom:parent.bottom
-    //                            bottom: file_location.top
-    
-    //                        }
-    //                    }
 }
