@@ -66,15 +66,13 @@ def extractofile(doc, outfilename=""):
 def getDesktopFile(url):
     #TODO nfs??
     url=str(url[7:])
-    if url.endswith("desktop"):
-        desktop=DesktopEntry()
-        try:
-            desktop.parse(url)
-        except (ParsingError,DuplicateGroupError,DuplicateKeyError) as e:
-            print(e)
-            return None
-        return desktop
-    return None
+    desktop=DesktopEntry()
+    try:
+        desktop.parse(url)
+    except (ParsingError,DuplicateGroupError,DuplicateKeyError) as e:
+        print(e)
+        return None
+    return desktop
 
 #########
 # RecollQuery wraps a recoll.query object in a Qt model
@@ -93,11 +91,26 @@ class recollQueryModel(QtCore.QAbstractListModel):
     def queryTextChanged(self):
         pass
 
-    @Slot(str)
-    def openDesktopFile(self,val):
-        subprocess.Popen(val)
+    @Slot(int)
+    def openFile(self,idx):
 
-        pass
+        item=str(self.getdoc(idx)["url"])
+        if item.endswith("desktop"):
+            desktop=getDesktopFile(item)
+            if  desktop is None:
+                return
+            print("ok:",desktop.getExec())
+            u=desktop.getExec().split(" ")[0]
+            if u.endswith("\""):
+                u=u[:-1]
+            if u.startswith("\""):
+                u=u[1:]
+            subprocess.Popen(u)
+        else:
+            subprocess.Popen(("xdg-open",item))
+
+
+
     @Slot(str)
     def setQueryText(self, val):
         self.set_queryText(val)
@@ -179,8 +192,14 @@ class recollQueryModel(QtCore.QAbstractListModel):
             self.fetchMore(None)
 
     def getdoc(self, index):
-        if index.row() < len(self.searchResults):
-            return self.searchResults[index.row()]
+        idx=0;
+        if isinstance(index,int):
+            idx=index
+        elif isinstance(index,QModelIndex):
+            idx=index.row()
+
+        if idx < len(self.searchResults):
+            return self.searchResults[idx]
         else:
             return None
 

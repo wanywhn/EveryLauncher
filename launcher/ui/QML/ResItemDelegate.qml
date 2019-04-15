@@ -12,20 +12,11 @@ Rectangle {
         anchors.fill: parent
         onClicked: {
             resListView.currentIndex=index
-            //                        Qt.openUrlExternally(fileLocation)
-            //desktopServices.openUrl(fileLocation)
-            //queryModel.textextract(idx)
         }
-//        onPressed: {
-//            console.log("Pressed:",fileExec)
-//            resListView.model.openDesktopFile(fileExec)
-//        }
     }
-//        Keys.onEnterPressed: {
-        Keys.onReturnPressed:{
-            console.log("test:",fileExec)
-            resListView.model.openDesktopFile(fileExec)
-        }
+//        Keys.onReturnPressed:{
+//            console.log("test:",fileExec)
+//        }
 
     function oc(a)
     {
@@ -42,8 +33,6 @@ Rectangle {
         if(suffix==="desktop"){
             return fileIcon
         }
-        return ""
-
         var image_suffix=["jpg","jpeg","png","gif"]
         var location=suffix in oc(image_suffix)?fileLocation:""
         return location
@@ -93,9 +82,7 @@ Rectangle {
         id: file_simple_content
         text:css_style+ fileSimpleContent
         
-        
         textFormat: Text.RichText
-        
         
         wrapMode:Text.WordWrap
         

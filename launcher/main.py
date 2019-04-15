@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 from __future__ import print_function
 
 import logging
@@ -6,11 +7,15 @@ import signal
 import sys
 from threading import Event
 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parentdir)
+import PySide2.QtCore
+from PySide2.QtCore import Qt
 import dbus
 import dbus.service
 from PySide2 import QtCore
-from PySide2.QtCore import QUrl, QSortFilterProxyModel, QSettings
-from PySide2.QtGui import QDesktopServices
+from PySide2.QtCore import QUrl, QSortFilterProxyModel, QSettings, QEvent
+from PySide2.QtGui import QDesktopServices, QKeyEvent
 from PySide2.QtQuickWidgets import QQuickWidget
 from PySide2.QtWidgets import QApplication
 from dbus.mainloop.glib import DBusGMainLoop
@@ -50,34 +55,51 @@ class EveryLauncherDbusService(dbus.service.Object):
 
     @dbus.service.method(DBUS_SERVICE)
     def toggle_window(self):
-        self.tray.showMainWindow(True)
+        self.tray.showMainWindow(None)
 
 
-class SignalHandler(object):
-    _exit_event = None
-    _app_window = None
-    _logger = None
+# class SignalHandler(object):
+#     _exit_event = None
+#     _app_window = None
+#     _logger = None
+#
+#     def __init__(self, app_window):
+#         self._exit_event = Event()
+#         self._app_window = app_window
+#         self._logger = logging.getLogger('everylauncher')
+#         signal.signal(signal.SIGINT, self._exit_gracefully)
+#         signal.signal(signal.SIGTERM, self._exit_gracefully)
+#         signal.signal(signal.SIGHUP, self._reload_configs)
+#
+#     def _reload_configs(self, *args):
+#         self._logger.info('Received SIGHUP. Reloading configs')
+#         self._app_window.init_theme()
+#
+#     def killed(self):
+#         """
+#         :rtype: bool
+#         """
+#         return self._exit_event.is_set()
+#
+#     def _exit_gracefully(self, signum, frame):
+#         self._exit_event.set()
 
-    def __init__(self, app_window):
-        self._exit_event = Event()
-        self._app_window = app_window
-        self._logger = logging.getLogger('everylauncher')
-        signal.signal(signal.SIGINT, self._exit_gracefully)
-        signal.signal(signal.SIGTERM, self._exit_gracefully)
-        signal.signal(signal.SIGHUP, self._reload_configs)
 
-    def _reload_configs(self, *args):
-        self._logger.info('Received SIGHUP. Reloading configs')
-        self._app_window.init_theme()
+class myQuickWidget(QQuickWidget):
 
-    def killed(self):
-        """
-        :rtype: bool
-        """
-        return self._exit_event.is_set()
+    def event(self, arg__1: PySide2.QtCore.QEvent) -> bool:
 
-    def _exit_gracefully(self, signum, frame):
-        self._exit_event.set()
+        if isinstance(arg__1, QKeyEvent):
+            if arg__1.key() == Qt.Key_Tab or arg__1.modifiers() == Qt.ShiftModifier:
+                if arg__1.type() == QEvent.KeyRelease:
+                    if QApplication.keyboardModifiers() == Qt.ShiftModifier:
+                        print("s pressed")
+                        e = QKeyEvent(QEvent.KeyPress, Qt.Key_Up, Qt.NoModifier, autorep=False)
+                    else:
+                        e = QKeyEvent(QEvent.KeyPress, Qt.Key_Down, Qt.NoModifier, autorep=False)
+                    QApplication.sendEvent(self, e)
+                return False
+        return super().event(arg__1)
 
 
 def main():
@@ -126,9 +148,10 @@ def main():
     QApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
     QApplication.setApplicationName(APPLICATION_NAME)
 
-
     # engine = QQmlApplicationEngine()
-    view = QQuickWidget()
+    view = myQuickWidget()
+    view.setWindowFlags(Qt.WindowStaysOnTopHint)
+    # view.installEventFilter()
     view.setWindowFlags(QtCore.Qt.WindowCloseButtonHint \
                         | QtCore.Qt.FramelessWindowHint)
     # view.setWindowTitle(QObject.tr("EveryLauncher"))
@@ -145,11 +168,11 @@ def main():
 
     tray = SystemTray.get_instance(view)
 
-    desktop_servers=QDesktopServices()
+    desktop_servers = QDesktopServices()
     engine.rootContext().setContextProperty("queryModel", model)
     engine.rootContext().setContextProperty("filterModel", proxy)
     engine.rootContext().setContextProperty("systemTray", tray)
-    engine.rootContext().setContextProperty("desktopServices",desktop_servers)
+    engine.rootContext().setContextProperty("desktopServices", desktop_servers)
 
     EveryLauncherDbusService(tray)
     if not options.hide_window:
@@ -158,16 +181,16 @@ def main():
     # if not engine.rootObjects():
     #     sys.exit(-1)
 
-    view.setSource(QUrl("ui/QML/main.qml"))
+    dir =os.path.dirname(os.path.abspath(__file__))
+    view.setSource(QUrl(os.path.join(dir,"ui/QML/main.qml")))
 
     setting = QSettings()
     setting.beginGroup("General")
     if trans_to_bool(setting.value(SHOW_INDICATOR, True)):
         tray.show()
-    if trans_to_bool(setting.value(SHOW_WINDOW_ON_START,True)):
+    if trans_to_bool(setting.value(SHOW_WINDOW_ON_START, True)):
         view.show()
     setting.endGroup()
-
 
     # w=PreferenceWindow()
     # w.show()

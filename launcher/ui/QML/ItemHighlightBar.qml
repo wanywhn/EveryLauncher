@@ -8,5 +8,5 @@ import QtQuick.Controls 2.0
         width:resListView.width; height: 60
         color: "#FFFF88"
         y:resListView.currentItem.y;
-        Behavior on y { SpringAnimation { spring: 2; damping: 0.1 } }
+        Behavior on y { SpringAnimation{ spring: 2; damping: 0.1 } }
     }

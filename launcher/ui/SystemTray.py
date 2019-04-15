@@ -54,9 +54,12 @@ class SystemTray(QSystemTrayIcon):
 
     @Slot(bool)
     def showMainWindow(self, f):
+        if f is None:
+            f = not self._readMainWindowVisiable()
         print("visibility change to ", f)
         self._writeMainWindowVisiable(f)
-        if f == True:
+        if f:
             self.parent().show()
+            self.parent().activateWindow()
         else:
             self.parent().hide()
