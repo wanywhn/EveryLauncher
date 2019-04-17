@@ -58,32 +58,6 @@ class EveryLauncherDbusService(dbus.service.Object):
         self.tray.showMainWindow(None)
 
 
-# class SignalHandler(object):
-#     _exit_event = None
-#     _app_window = None
-#     _logger = None
-#
-#     def __init__(self, app_window):
-#         self._exit_event = Event()
-#         self._app_window = app_window
-#         self._logger = logging.getLogger('everylauncher')
-#         signal.signal(signal.SIGINT, self._exit_gracefully)
-#         signal.signal(signal.SIGTERM, self._exit_gracefully)
-#         signal.signal(signal.SIGHUP, self._reload_configs)
-#
-#     def _reload_configs(self, *args):
-#         self._logger.info('Received SIGHUP. Reloading configs')
-#         self._app_window.init_theme()
-#
-#     def killed(self):
-#         """
-#         :rtype: bool
-#         """
-#         return self._exit_event.is_set()
-#
-#     def _exit_gracefully(self, signum, frame):
-#         self._exit_event.set()
-
 
 class myQuickWidget(QQuickWidget):
 
@@ -151,12 +125,11 @@ def main():
     # engine = QQmlApplicationEngine()
     view = myQuickWidget()
     view.setWindowFlags(Qt.WindowStaysOnTopHint)
-    # view.installEventFilter()
     view.setWindowFlags(QtCore.Qt.WindowCloseButtonHint \
                         | QtCore.Qt.FramelessWindowHint)
     # view.setWindowTitle(QObject.tr("EveryLauncher"))
     # TODO hide when lise focus
-    view.move((QApplication.desktop().width() - view.width()) / 2, QApplication.desktop().height() / 2 - view.height())
+    view.move((QApplication.desktop().width() - view.width()) / 2, QApplication.desktop().height() / 1.7 - view.height())
     engine = view.engine()
 
     model = recollQueryModel(RECOLL_CONFIG_DIR, [])

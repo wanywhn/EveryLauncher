@@ -1,5 +1,6 @@
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.3
 import QtQuick 2.0
+import QtQuick.Controls.Material 2.12
 
 Rectangle{
     id:root
@@ -67,6 +68,11 @@ Rectangle{
         }
     }
     Button{
+        background: Rectangle{
+            radius: 10
+            color:  "#FF9800"
+        }
+
         id:btnSettings
         anchors{
             top:parent.top

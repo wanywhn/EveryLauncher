@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.0
-
+import QtQuick.Controls.Material 2.12
 
 
 Rectangle{
@@ -11,7 +11,6 @@ Rectangle{
 //    height:mpage.height+32
 
     Keys.onDownPressed: {
-        console.log("down pressed")
         var o=resListView.currentIndex
         resListView.incrementCurrentIndex()
         if (o===resListView.currentIndex){
@@ -22,10 +21,7 @@ Rectangle{
     Keys.onUpPressed: {
         resListView.decrementCurrentIndex()
     }
-//    }
 
-    onHeightChanged: {
-    }
     Behavior on height{
         PropertyAnimation{duration: 100}
     }
@@ -85,6 +81,7 @@ Rectangle{
                 rightMargin: 16
             }
             highlight:ItemHighlightBar{
+
             }
 
             onCountChanged: {
@@ -92,12 +89,11 @@ Rectangle{
 
                 // get QQuickItem which is a root element which hosts delegate items
                 var fchild=resListView.visibleChildren[0]
-                var count=resListView.count>10?10:resListView.count
-                var mheight=count*60
+                var count=resListView.count>7?7:resListView.count
+                var mheight=count*80
 
                 resListView.height =mheight
-                //                resListView.width = listViewWidth
-                root.height=resListView.height+queryHeader.height+70+16
+                root.height=resListView.height+queryHeader.height+80+16
                 mpage.height=resListView.height
             }
 
@@ -116,7 +112,7 @@ Rectangle{
 
             delegate:ResItemDelegate{
                 color: "transparent"
-                height: 60
+                height: 80
                 width: parent.width
             }
 

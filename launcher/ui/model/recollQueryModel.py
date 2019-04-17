@@ -85,6 +85,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
     Role_FILE_ICON=Qt.UserRole+6
     Role_FILE_EXEC=Qt.UserRole+7
     Role_DESKTOP_NAME=Qt.UserRole+8
+    Role_DESKTOP_DESC=Qt.UserRole+9
 
 
     @Signal
@@ -94,6 +95,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
     @Slot(int)
     def openFile(self,idx):
 
+    ##FIXME open desktop file
         item=str(self.getdoc(idx)["url"])
         if item.endswith("desktop"):
             desktop=getDesktopFile(item)
@@ -133,7 +135,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
         self.query = None
         self.qtext = ""
         self.searchResults = []
-        self.pagelen = 10
+        self.pagelen = 6
         self.attrs = ("filename", "title", "mtime", "url", "ipath")
         # TODO read from config and prepare db
 
@@ -155,7 +157,8 @@ class recollQueryModel(QtCore.QAbstractListModel):
             recollQueryModel.Role_FILE_STATUS: QByteArray(b'fileStatus'),
             recollQueryModel.Role_FILE_ICON:QByteArray(b'fileIcon'),
             recollQueryModel.Role_FILE_EXEC:QByteArray(b'fileExec'),
-            recollQueryModel.Role_DESKTOP_NAME:QByteArray(b'desktopName')
+            recollQueryModel.Role_DESKTOP_NAME:QByteArray(b'desktopName'),
+            recollQueryModel.Role_DESKTOP_DESC:QByteArray(b'desktopDesc'),
         }
         return roles
 
@@ -176,6 +179,10 @@ class recollQueryModel(QtCore.QAbstractListModel):
         # print("RecollQuery.setquery():")
         # Get query object
         if q.strip() == "":
+            self.beginResetModel()
+            self.searchResults.clear()
+            self.endResetModel()
+
             return
         self.query = db.query()
         if sortfield:
@@ -233,8 +240,6 @@ class recollQueryModel(QtCore.QAbstractListModel):
         d = self.getdoc(index)
         # d = self.searchResults[index.row()]
         if role == recollQueryModel.Role_FILE_NAME:
-            # print("RecollQuery.data: row %d, col %d role: %s" % \
-            #     (index.row(), index.column() role))
             return d['filename']
         elif role == recollQueryModel.Role_LOCATION:
             return d['url']
@@ -257,8 +262,9 @@ class recollQueryModel(QtCore.QAbstractListModel):
             if desktop is None:
                 return ""
             icon=desktop.getIcon()
-            # print("icon:",icon)
             path=getIconPath(icon)
+
+            print("path:",path)
             # print("path:",path)
             return path
 
@@ -272,6 +278,15 @@ class recollQueryModel(QtCore.QAbstractListModel):
             if desktop is None:
                 return ""
             return desktop.getName()
+        elif role==recollQueryModel.Role_DESKTOP_DESC:
+            desktop=getDesktopFile(d['url'])
+            if desktop is None:
+                return ""
+            desc=desktop.getComment()
+            if len(desc.strip())==0:
+                desc=desktop.getGenericName()
+            return desc
+
 
 
         return ""
@@ -309,7 +324,6 @@ class recollQueryModel(QtCore.QAbstractListModel):
         self.beginInsertRows(QtCore.QModelIndex(), len(self.searchResults),
                              len(self.searchResults) + len(titem)- 1)
         self.searchResults.extend(titem)
-
         self.endInsertRows()
 
     def startQuery(self):
