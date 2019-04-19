@@ -176,8 +176,6 @@ class recollQueryModel(QtCore.QAbstractListModel):
 
     def setquery(self, db, q, sortfield="", ascending=True):
         """Parse and execute query on open db"""
-        # print("RecollQuery.setquery():")
-        # Get query object
         if q.strip() == "":
             self.beginResetModel()
             self.searchResults.clear()

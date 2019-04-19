@@ -1,19 +1,24 @@
 from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import QDialog, QTabWidget, QDialogButtonBox, QVBoxLayout, QMessageBox, QWidget, QHBoxLayout, \
-    QFormLayout, QCheckBox
+    QFormLayout, QCheckBox, QGroupBox, QLabel
 
 from launcher.config import SHOW_WINDOW_ON_START, SHOW_INDICATOR, ORGANIZATION_NAME, APPLICATION_NAME
+from launcher.ui.ConfigListWidget import ConfigListWidget
+from launcher.ui.IndexSche import IndexSche
 from launcher.utils.utils import trans_to_bool
 
 
 #TODO check state in main.py
 class PreferenceWindow(QDialog):
+
+
     def __init__(self, parent):
         super().__init__(parent)
         self._setting = QSettings()  # ORGANIZATION_NAME, APPLICATION_NAME)
         self._tabWidget = QTabWidget()
         self._tabGeneral = QWidget()
         self._tabIndex = QWidget()
+        self._tabIndexSche=QWidget()
 
         self._ckb_show_window_on_start = QCheckBox()
         self._ckb_show_indicator = QCheckBox()
@@ -53,18 +58,24 @@ class PreferenceWindow(QDialog):
         general_hmlayout.addLayout(general_right_formlayout)
         self._tabGeneral.setLayout(general_hmlayout)
 
-        index_hmlayout = QHBoxLayout()
 
-        index_left_formlayout = QFormLayout()
+        self._index_vlayout=QVBoxLayout()
+        self._topDir=ConfigListWidget(showGroupName="TopDir",groupName="topdirs")
+        self._skipDir=ConfigListWidget(showGroupName="SkipDir",groupName="skippedPaths")
+        # self._cigen=ConfigListWidget("CiGen")
+        self._index_vlayout.addWidget(self._topDir)
+        self._index_vlayout.addWidget(self._skipDir)
+        # self._index_vlayout.addWidget(self._cigen)
+        self._tabIndex.setLayout(self._index_vlayout)
 
-        index_right_formlayout = QFormLayout()
 
-        index_hmlayout.addLayout(index_left_formlayout)
-        index_hmlayout.addLayout(index_right_formlayout)
-        self._tabIndex.setLayout(index_hmlayout)
+        self._tabIndexSche=IndexSche()
+
+        # self._tabIndex.setLayout(index_vmlayout)
 
         self._tabWidget.addTab(self._tabGeneral, self.tr("General"))
-        self._tabWidget.addTab(self._tabIndex, self.tr("Index"))
+        self._tabWidget.addTab(self._tabIndex, self.tr("Global Index"))
+        self._tabWidget.addTab(self._tabIndexSche,self.tr("Sched"))
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(self._tabWidget)
@@ -77,6 +88,8 @@ class PreferenceWindow(QDialog):
 
     def accept_changes(self):
         self._write_settings()
+        self._skipDir.save_values()
+        self._topDir.save_values()
         self.close()
 
     def reject_changes(self):
