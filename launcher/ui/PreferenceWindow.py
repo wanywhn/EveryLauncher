@@ -1,6 +1,6 @@
 from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import QDialog, QTabWidget, QDialogButtonBox, QVBoxLayout, QMessageBox, QWidget, QHBoxLayout, \
-    QFormLayout, QCheckBox, QGroupBox, QLabel
+    QFormLayout, QCheckBox, QGroupBox, QLabel, QPushButton
 
 from launcher.config import SHOW_WINDOW_ON_START, SHOW_INDICATOR, ORGANIZATION_NAME, APPLICATION_NAME
 from launcher.ui.ConfigListWidget import ConfigListWidget
@@ -45,28 +45,43 @@ class PreferenceWindow(QDialog):
         self._setting.endGroup()
 
     def _init_ui(self):
-        general_hmlayout = QHBoxLayout()
+        vmlayout=QVBoxLayout()
+        self._tabGeneral.setLayout(vmlayout)
+
+        general_group_box=QGroupBox(self.tr("General"))
+        vmlayout.addWidget(general_group_box)
+
+        # general_hmlayout = QHBoxLayout()
 
         general_left_formlayout = QFormLayout()
+        general_group_box.setLayout(general_left_formlayout)
 
         general_left_formlayout.addRow(self.tr("Show Window on Start"), self._ckb_show_window_on_start)
         general_left_formlayout.addRow(self.tr("Show Indicator"), self._ckb_show_indicator)
 
-        general_right_formlayout = QFormLayout()
+        general_group_index=QGroupBox(self.tr("Index"))
+        vmlayout.addWidget(general_group_index)
 
-        general_hmlayout.addLayout(general_left_formlayout)
-        general_hmlayout.addLayout(general_right_formlayout)
-        self._tabGeneral.setLayout(general_hmlayout)
+        general_index_formlayout=QFormLayout()
+        general_group_index.setLayout(general_index_formlayout)
+
+        self._general_index_update=QPushButton(self.tr("Update Index"))
+        self._general_index_reindex=QPushButton(self.tr("Reindex"))
+
+        general_index_formlayout.addWidget(self._general_index_update)
+        general_index_formlayout.addWidget(self._general_index_reindex)
 
 
-        self._index_vlayout=QVBoxLayout()
+
+        index_vlayout=QVBoxLayout()
+        self._tabIndex.setLayout(index_vlayout)
+
         self._topDir=ConfigListWidget(showGroupName="TopDir",groupName="topdirs")
         self._skipDir=ConfigListWidget(showGroupName="SkipDir",groupName="skippedPaths")
         # self._cigen=ConfigListWidget("CiGen")
-        self._index_vlayout.addWidget(self._topDir)
-        self._index_vlayout.addWidget(self._skipDir)
+        index_vlayout.addWidget(self._topDir)
+        index_vlayout.addWidget(self._skipDir)
         # self._index_vlayout.addWidget(self._cigen)
-        self._tabIndex.setLayout(self._index_vlayout)
 
 
         self._tabIndexSche=IndexSche()
