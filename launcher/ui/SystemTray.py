@@ -1,7 +1,10 @@
+import subprocess
+
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
 from PySide2.QtCore import Property, Signal, Slot
 
+from launcher.config import RECOLL_CONFIG_DIR
 from launcher.ui.PreferenceWindow import PreferenceWindow
 
 
@@ -51,6 +54,14 @@ class SystemTray(QSystemTrayIcon):
     def preferenceActionTriggered(self):
         pw = PreferenceWindow(self.parent())
         pw.show()
+
+    def fileChanged(self,file_list:list):
+        #TODO index new file
+        if len(file_list)<=0:
+            return 
+        print("command arg is " " -c " ,RECOLL_CONFIG_DIR," -i " ,' '.join(file_list));
+
+        subprocess.Popen(['recollindex',' -c '+RECOLL_CONFIG_DIR+ ' -i '+' '.join(file_list)]);
 
     @Slot(bool)
     def showMainWindow(self, f):

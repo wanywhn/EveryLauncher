@@ -61,7 +61,9 @@ Rectangle{
             var t=btnText.text
             for (var i=0;i<t.length;++i){
                 str+=t.charAt(i)
+                if(t.charAt(i)>='a'&&t.charAt(i)<='z'){
                 str+="*"
+                }
             }
 
             root.modifiedText=str

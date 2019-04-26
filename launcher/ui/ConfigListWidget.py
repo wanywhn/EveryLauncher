@@ -14,12 +14,12 @@ class ConfigListWidget(QGroupBox):
 
     _confParser=configparser.ConfigParser()
     _confParser.optionxform=str
-    with open(RECOLL_CONFIG_FILE) as f:
-        file_content = '[DEFAULT]\n' + f.read()
-    _confParser.read_string(file_content)
     def __init__(self, parent=None, showGroupName: str = None, section="DEFAULT",
                  groupName: str = None):
         super().__init__(showGroupName, parent)
+        with open(RECOLL_CONFIG_FILE) as f:
+            file_content = '[DEFAULT]\n' + f.read()
+        ConfigListWidget._confParser.read_string(file_content)
         self._groupName = groupName
         self._section = section
         self.init_ui()

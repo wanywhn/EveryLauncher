@@ -28,7 +28,9 @@ from launcher.ui.model.recollQueryModel import recollQueryModel
 from launcher.utils.utils import trans_to_bool
 
 DBUS_SERVICE = 'com.gitee.wanywhn.everylauncher'
-DBUS_PATH = '/com/gitee/wanywhn/evertlauncher'
+DBUS_PATH = '/com/gitee/wanywhn/everylauncher'
+MONITOR_DBUS_SERVICE='com.gitee.wanywhn.everylauncherMonitor'
+
 
 
 # TODO create index config file
@@ -50,12 +52,21 @@ def _create_dirs():
 class EveryLauncherDbusService(dbus.service.Object):
     def __init__(self, window):
         self.tray = window
-        bus_name = dbus.service.BusName(DBUS_SERVICE, bus=dbus.SessionBus())
-        super(EveryLauncherDbusService, self).__init__(bus_name, DBUS_PATH)
+        bus=dbus.SessionBus()
+        bus_name = dbus.service.BusName(DBUS_SERVICE, bus=bus)
+        bus.add_signal_receiver(self.fileWrited,dbus_interface=MONITOR_DBUS_SERVICE,signal_name='fileWrited')
+
+        super(EveryLauncherDbusService, self).__init__(bus_name=bus_name, object_path=DBUS_PATH)
 
     @dbus.service.method(DBUS_SERVICE)
     def toggle_window(self):
         self.tray.showMainWindow(None)
+
+    @dbus.service.method(DBUS_SERVICE,in_signature='as')
+    def fileWrited(self,strlst):
+        print("file Writed",strlst)
+        self.tray.fileChanged(strlst)
+        return "hellp"
 
 
 
@@ -77,6 +88,7 @@ class myQuickWidget(QQuickWidget):
 
 
 def main():
+    _create_dirs()
     """
     Main function that starts everything
     """
@@ -101,7 +113,6 @@ def main():
         toggle_window()
         # return
 
-    _create_dirs()
 
     options = get_options()
     # setup_logging(options)

@@ -119,6 +119,7 @@ class recollQueryModel(QtCore.QAbstractListModel):
 
     def set_query_text(self, val):
         if (self.qtext != val):
+            print("query change to:\""+val+"\"")
             self.qtext = val
             self.startQuery()
             self.queryTextChanged.emit()
