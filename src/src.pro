@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = EveryLauncher
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += -std=c++11
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -22,6 +23,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+LIBS += -lrecoll -L/usr/lib/recoll
+INCLUDEPATH+=../../recoll1-code/src/query\
+                ../../recoll1-code/src/utils\
+                ../../recoll1-code/src/rcldb\
+                ../../recoll1-code/src/internfile\
+                ../../recoll1-code/src/unac\
+                ../../recoll1-code/src/common
 
 SOURCES += \
         main.cpp \
@@ -30,7 +38,9 @@ SOURCES += \
     preferencewindow.cpp \
     configlistwidget.cpp \
     indexsche.cpp \
-    recollquerymodel.cpp
+    reslistwidget.cpp\
+#        ../../recoll1-code/src/query/docseqdb.cpp\
+    searchline.cpp
 
 HEADERS += \
         widget.h \
@@ -39,7 +49,9 @@ HEADERS += \
     preferencewindow.h \
     configlistwidget.h \
     indexsche.h \
-    recollquerymodel.h
+    reslistwidget.h\
+#        ../../recoll1-code/src/query/docseq.h
+    searchline.h
 
 FORMS += \
         widget.ui
