@@ -5,7 +5,9 @@
 #include <QMenu>
 #include <QObject>
 #include <QSystemTrayIcon>
+#include <rclconfig.h>
 
+extern RclConfig *theconfig;
 class SystemTray : public QSystemTrayIcon
 {
     Q_OBJECT
@@ -16,6 +18,8 @@ public:
         return instance;
 
     }
+public slots:
+    void showWindow();
 private:
     void init_ui();
     void init_conn();

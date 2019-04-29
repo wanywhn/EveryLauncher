@@ -4,13 +4,18 @@
 #include "reslistwidget.h"
 #include "searchline.h"
 
+#include <QSet>
 #include <QLabel>
+#include <QMutex>
+#include <QProcess>
+#include <QTimer>
 #include <QWidget>
 #include <execmd.h>
 
 namespace Ui {
 class Widget;
 }
+class IndexWorker;
 
 class Widget : public QWidget
 {
@@ -23,19 +28,32 @@ public:
     public slots:
 virtual void startSearch(std::shared_ptr<Rcl::SearchData> sdata, bool issimple);
     virtual void initiateQuery();
+    void IndexSomeFiles(QStringList paths);
 signals:
     void resultsReady();
     void docSourceChanged(std::shared_ptr<DocSequence>);
     void searchReset();
+//private slots:
+//    void pfinished(int );
 private:
     void init_ui();
     void init_conn();
+    virtual bool checkIdxPaths();
+    virtual void toggleIndexing();
 private:
-    ExecCmd          *m_idxproc{0}; // Indexing process
+    QThread *idxWorkerThread;
+    IndexWorker *worker;
+    QTimer	*idxTimer;
+
     std::shared_ptr<DocSequence> m_source;
     ResTable *restable;
     SSearch *searchLine;
+    QSet<QString> tobeIndex;
+    QMutex mtxTobeIndex;
+    QProcess *idxProcess;
     bool m_queryActive;
+    bool m_indexAvtive;
+    bool m_indexed;
 };
 
 #endif // WIDGET_H
