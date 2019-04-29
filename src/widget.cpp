@@ -159,6 +159,7 @@ void Widget::init_conn() {
           restable, SLOT(setDocSource(std::shared_ptr<DocSequence>)));
   connect(this, SIGNAL(searchReset()), restable, SLOT(resetSource()));
   connect(this, SIGNAL(resultsReady()), restable, SLOT(readDocSource()));
+
   //    connect(this, SIGNAL(sortDataChanged(DocSeqSortSpec)),
   //        restable, SLOT(onSortDataChanged(DocSeqSortSpec)));
 }

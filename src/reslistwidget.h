@@ -2,6 +2,7 @@
 #define RESLISTWIDGET_H
 
 #include <QAbstractListModel>
+#include <QLabel>
 #include <QListView>
 #include <QWidget>
 
@@ -32,6 +33,7 @@ public:
         Role_FILE_NAME = Qt::UserRole + 1,
         Role_LOCATION = Qt::UserRole + 2,
 //        Role_MIMI_AUTHOR=Qt::UserRole+3,
+        Role_ICON=Qt::UserRole+3,
         Role_FILE_SIMPLE_CONTENT = Qt::UserRole + 4,
         Role_MIME_TYPE = Qt::UserRole + 5,
         Role_RELEVANCY=Qt::UserRole+6,
@@ -104,6 +106,7 @@ public:
 
 private:
   void init_ui();
+  void init();
 public slots:
   virtual void onTableView_currentChanged(const QModelIndex &);
   virtual void on_tableView_entered(const QModelIndex &index);
@@ -117,7 +120,6 @@ public slots:
   //    friend class ResTablePager;
   //    friend class ResTableDetailArea;
 private:
-  void init();
   QListView *listview;
   RecollModel *m_model;
   //    ResTableDetailArea *m_detail;
@@ -126,6 +128,8 @@ private:
   int m_popcolumn;
   //    RclMain *m_rclmain;
   bool m_ismainres;
+    //TODO multi
+    QLabel *detailedWidget;
 };
 
 #endif // RESLISTWIDGET_H

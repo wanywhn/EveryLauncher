@@ -78,6 +78,7 @@ void _create_dirs(){
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setAttribute( Qt::AA_EnableHighDpiScaling);
     a.setQuitOnLastWindowClosed(false);
     a.setApplicationName(AppName);
     _create_dirs();

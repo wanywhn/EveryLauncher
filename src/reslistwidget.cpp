@@ -1,3 +1,4 @@
+#include "listitemwidget.h"
 #include "reslistwidget.h"
 
 #include <QHeaderView>
@@ -8,6 +9,7 @@
 #include <QTextDocument>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QDebug>
 #define TEXTINCELLVTRANS -1
 
 class PlainToRichQtReslist : public PlainToRich {
@@ -34,6 +36,15 @@ static QString gengetter(const string &fld, const Rcl::Doc &doc) {
   return QString::fromStdString(it->second);
 }
 
+static QPixmap picgetter(const Rcl::Doc &doc){
+  const auto it = doc.meta.find("mtype");
+  if (it == doc.meta.end()) {
+    return QPixmap();
+  }
+  return QPixmap();
+
+
+}
 static QString sizegetter(const string &fld, const Rcl::Doc &doc) {
   const auto it = doc.meta.find(fld);
   if (it == doc.meta.end()) {
@@ -213,6 +224,11 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
   case Role_RELEVANCY:
     var = gengetter("relevancyrating", doc);
     break;
+  case Role_ICON:
+
+      var=picgetter(doc);
+
+      break;
   default:
     return "error Role";
   }
@@ -272,7 +288,24 @@ public:
              const QModelIndex &index) const {
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
-    QVariant value = index.data(RecollModel::ModelRoles::Role_FILE_NAME);
+    auto filename= index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
+    auto icon=index.data(RecollModel::ModelRoles::Role_ICON).value<QPixmap>();
+//    this->liw.setIcon(icon.value<QPixmap>());
+//    this->liw.setTitle(filename.toString());
+//    auto toRender=const_cast<ListItemWidget&>(this->liw).grab();
+    QRectF recf(opt.rect);
+//    qDebug()<<filename;
+//    QRectF recf(0,0,50,50);
+    if(opt.state&QStyle::State_Selected){
+          painter->fillRect(opt.rect, opt.palette.highlight());
+    }
+    painter->drawPixmap(recf,icon,icon.rect());
+//    painter->setPen(opt.palette.text().color());
+    auto textpos=QPointF(icon.size().width(),recf.y()+recf.height()/2);
+    painter->drawText(textpos,filename);
+//    QStyledItemDelegate::paint(painter,option,index);
+
+    /*
     if (value.isValid() && !value.isNull()) {
       QString text = value.toString();
       if (!text.isEmpty()) {
@@ -305,6 +338,18 @@ public:
       }
     }
     QStyledItemDelegate::paint(painter, option, index);
+    */
+  }
+private:
+  ListItemWidget liw;
+
+  // QAbstractItemDelegate interface
+public:
+  QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override
+  {
+
+//    auto icon=index.data(RecollModel::ModelRoles::Role_ICON).value<QPixmap>();
+      return {50,50};
   }
 };
 
@@ -321,6 +366,7 @@ void ResTable::init() {
   listview->setModel(m_model);
   listview->setMouseTracking(true);
   listview->setSelectionBehavior(QAbstractItemView::SelectRows);
+  listview->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
   listview->setItemDelegate(new ResTableDelegate(this));
   listview->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -399,6 +445,7 @@ void ResTable::setRclMain(RclMain *m, bool ismain)
 ResTable::ResTable(QWidget *parent)
     : QWidget(parent), m_model(nullptr), m_detaildocnum(-1), m_ismainres(true) {
   this->listview = new QListView();
+    this->detailedWidget=new QLabel();
   init_ui();
   init();
 }
@@ -411,10 +458,23 @@ int ResTable::getDetailDocNumOrTopRow() {
 }
 
 void ResTable::init_ui() {
-  auto vlayout = new QVBoxLayout();
-  this->setLayout(vlayout);
 
+    auto hlayout=new QHBoxLayout();
+  this->setLayout(hlayout);
+
+  auto vlayout = new QVBoxLayout();
+  //TODO here add multi view ,using different filter proxy model
   vlayout->addWidget(this->listview);
+  this->listview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+  hlayout->addLayout(vlayout);
+  hlayout->addWidget(this->detailedWidget);
+  hlayout->setStretchFactor(vlayout,1);
+  hlayout->setStretchFactor(this->detailedWidget,2);
+
+  this->detailedWidget->setVisible(false);
+  this->detailedWidget->setWordWrap(true);
+
 }
 
 void ResTable::makeRowVisible(int row) {
@@ -436,6 +496,9 @@ void ResTable::onTableView_currentChanged(const QModelIndex &index) {
   if (m_model->getDocSource()->getDoc(index.row(), doc)) {
     m_detaildocnum = index.row();
     m_detaildoc = doc;
+    auto t=this->m_model->data(index,RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT).toString();
+    this->detailedWidget->setText(t);
+    this->detailedWidget->setVisible(true);
   } else {
     m_detaildocnum = -1;
   }

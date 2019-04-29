@@ -40,7 +40,8 @@ SOURCES += \
     indexsche.cpp \
     reslistwidget.cpp\
 #        ../../recoll1-code/src/query/docseqdb.cpp\
-    searchline.cpp
+    searchline.cpp \
+    listitemwidget.cpp
 
 HEADERS += \
         widget.h \
@@ -51,7 +52,8 @@ HEADERS += \
     indexsche.h \
     reslistwidget.h\
 #        ../../recoll1-code/src/query/docseq.h
-    searchline.h
+    searchline.h \
+    listitemwidget.h
 
 FORMS += \
         widget.ui

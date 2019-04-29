@@ -4,6 +4,7 @@
 #include "reslistwidget.h"
 #include "searchline.h"
 
+#include <QLabel>
 #include <QWidget>
 #include <execmd.h>
 
