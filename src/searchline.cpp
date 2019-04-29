@@ -1,35 +1,36 @@
 #include "searchline.h"
 
-
-#include <sstream>
-#include <set>
-#include <vector>
-#include <string>
 #include <memory>
+#include <set>
+#include <sstream>
+#include <string>
+#include <vector>
 
-#include <qapplication.h>
-#include <qinputdialog.h>
-#include <qvariant.h>
-#include <qpushbutton.h>
-#include <qcombobox.h>
-#include <qlayout.h>
-#include <qtooltip.h>
-#include <qwhatsthis.h>
-#include <qmessagebox.h>
-#include <qevent.h>
-#include <QCompleter>
 #include <QAbstractItemView>
 #include <QAbstractListModel>
-#include <QModelIndex>
-#include <QTimer>
+#include <QCompleter>
+#include <QKeySequence>
 #include <QListView>
+#include <QModelIndex>
+#include <QShortcut>
+#include <QTimer>
+#include <qapplication.h>
+#include <qcombobox.h>
+#include <qevent.h>
+#include <qinputdialog.h>
+#include <qlayout.h>
+#include <qmessagebox.h>
+#include <qpushbutton.h>
+#include <qtooltip.h>
+#include <qvariant.h>
+#include <qwhatsthis.h>
 
 #include "log.h"
+#include "rcldb.h"
 #include "searchdata.h"
+#include "smallut.h"
 #include "textsplit.h"
 #include "wasatorcl.h"
-#include "smallut.h"
-#include "rcldb.h"
 
 using namespace std;
 
@@ -40,149 +41,140 @@ static const int maxdbtermmatch = 20;
 // Visible rows for the completer listview
 static const int completervisibleitems = 20;
 
-void RclCompleterModel::init()
-{
-//    if (!clockPixmap.load(":/images/clock.png") ||
-//        !interroPixmap.load(":/images/interro.png")) {
-//        LOGERR("SSearch: pixmap loading failed\n");
-//    }
+void RclCompleterModel::init() {
+  //    if (!clockPixmap.load(":/images/clock.png") ||
+  //        !interroPixmap.load(":/images/interro.png")) {
+  //        LOGERR("SSearch: pixmap loading failed\n");
+  //    }
 }
 
-int RclCompleterModel::rowCount(const QModelIndex &) const
-{
-    LOGDEB1("RclCompleterModel::rowCount: " << currentlist.size() << "\n");
-    return currentlist.size();
+int RclCompleterModel::rowCount(const QModelIndex &) const {
+  LOGDEB1("RclCompleterModel::rowCount: " << currentlist.size() << "\n");
+  return currentlist.size();
 }
 
-QVariant RclCompleterModel::data(const QModelIndex &index, int role) const
-{
-    LOGDEB1("RclCompleterModel::data: row: " << index.row() << " role " <<
-           role << "\n");
-    if (role != Qt::DisplayRole && role != Qt::EditRole &&
-        role != Qt::DecorationRole) {
-        return QVariant();
-    }
-    if (index.row() < 0 || index.row() >= int(currentlist.size())) {
-        return QVariant();
-    }
+QVariant RclCompleterModel::data(const QModelIndex &index, int role) const {
+  LOGDEB1("RclCompleterModel::data: row: " << index.row() << " role " << role
+                                           << "\n");
+  if (role != Qt::DisplayRole && role != Qt::EditRole &&
+      role != Qt::DecorationRole) {
+    return QVariant();
+  }
+  if (index.row() < 0 || index.row() >= int(currentlist.size())) {
+    return QVariant();
+  }
 
-    if (role == Qt::DecorationRole) {
-        LOGDEB1("RclCompleterModel::data: returning pixmap\n");
-        return index.row() < firstfromindex ? QVariant(clockPixmap) :
-            QVariant(interroPixmap);
+  if (role == Qt::DecorationRole) {
+    LOGDEB1("RclCompleterModel::data: returning pixmap\n");
+    return index.row() < firstfromindex ? QVariant(clockPixmap)
+                                        : QVariant(interroPixmap);
+  } else {
+    LOGDEB1("RclCompleterModel::data: return: "
+            << qs2u8s(currentlist[index.row()]) << endl);
+    return QVariant(currentlist[index.row()]);
+  }
+}
+
+void RclCompleterModel::onPartialWord(int tp, const QString &_qtext,
+                                      const QString &qpartial) {
+  string partial = qpartial.toStdString();
+  QString qtext = _qtext.trimmed();
+  bool onlyspace = qtext.isEmpty();
+  LOGDEB1("RclCompleterModel::onPartialWord: [" << partial << "] onlyspace "
+                                                << onlyspace << "\n");
+
+  currentlist.clear();
+  beginResetModel();
+  //    if ((prefs.ssearchNoComplete && !onlyspace) || tp == SSearch::SST_FNM) {
+  // Nocomplete: only look at history by entering space
+  // Filename: no completion for now. We'd need to termatch with
+  // the right prefix?
+  //        endResetModel();
+  //        return;
+  //    }
+
+  int histmatch = 0;
+  // Look for matches between the full entry and the search history
+  // (anywhere in the string)
+  /*
+  for (int i = 0; i < prefs.ssearchHistory.count(); i++) {
+      LOGDEB1("[" << qs2u8s(prefs.ssearchHistory[i]) << "] contains [" <<
+              qs2u8s(qtext) << "] ?\n");
+      // If there is current text, only show a limited count of
+      // matching entries, else show the full history.
+      if (onlyspace ||
+          prefs.ssearchHistory[i].contains(qtext, Qt::CaseInsensitive)) {
+          currentlist.push_back(prefs.ssearchHistory[i]);
+          if (!onlyspace && ++histmatch >= maxhistmatch)
+              break;
+      }
+  }
+  */
+  firstfromindex = currentlist.size();
+
+  // Look for Recoll terms beginning with the partial word
+  if (!qpartial.trimmed().isEmpty()) {
+    Rcl::TermMatchResult rclmatches;
+    if (!rcldb->termMatch(Rcl::Db::ET_WILD, string(), partial + "*", rclmatches,
+                          maxdbtermmatch)) {
+      LOGDEB1("RclCompleterModel: termMatch failed: [" << partial + "*"
+                                                       << "]\n");
     } else {
-        LOGDEB1("RclCompleterModel::data: return: " <<
-                qs2u8s(currentlist[index.row()]) << endl);
-        return QVariant(currentlist[index.row()]);
+      LOGDEB1("RclCompleterModel: termMatch cnt: " << rclmatches.entries.size()
+                                                   << endl);
     }
-}
-
-void RclCompleterModel::onPartialWord(
-    int tp, const QString& _qtext, const QString& qpartial)
-{
-    string partial = qpartial.toStdString();
-    QString qtext = _qtext.trimmed();
-    bool onlyspace = qtext.isEmpty();
-    LOGDEB1("RclCompleterModel::onPartialWord: [" << partial << "] onlyspace "<<
-            onlyspace << "\n");
-
-    currentlist.clear();
-    beginResetModel();
-//    if ((prefs.ssearchNoComplete && !onlyspace) || tp == SSearch::SST_FNM) {
-        // Nocomplete: only look at history by entering space
-        // Filename: no completion for now. We'd need to termatch with
-        // the right prefix?
-//        endResetModel();
-//        return;
-//    }
-
-    int histmatch = 0;
-    // Look for matches between the full entry and the search history
-    // (anywhere in the string)
-    /*
-    for (int i = 0; i < prefs.ssearchHistory.count(); i++) {
-        LOGDEB1("[" << qs2u8s(prefs.ssearchHistory[i]) << "] contains [" <<
-                qs2u8s(qtext) << "] ?\n");
-        // If there is current text, only show a limited count of
-        // matching entries, else show the full history.
-        if (onlyspace ||
-            prefs.ssearchHistory[i].contains(qtext, Qt::CaseInsensitive)) {
-            currentlist.push_back(prefs.ssearchHistory[i]);
-            if (!onlyspace && ++histmatch >= maxhistmatch)
-                break;
-        }
+    for (const auto &entry : rclmatches.entries) {
+      LOGDEB1("RclCompleterModel: match " << entry.term << endl);
+      string data = entry.term;
+      currentlist.push_back(QString::fromStdString(data));
     }
-    */
-    firstfromindex = currentlist.size();
-
-    // Look for Recoll terms beginning with the partial word
-    if (!qpartial.trimmed().isEmpty()) {
-        Rcl::TermMatchResult rclmatches;
-        if (!rcldb->termMatch(Rcl::Db::ET_WILD, string(),
-                              partial + "*", rclmatches, maxdbtermmatch)) {
-            LOGDEB1("RclCompleterModel: termMatch failed: [" << partial + "*" <<
-                    "]\n");
-        } else {
-            LOGDEB1("RclCompleterModel: termMatch cnt: " <<
-                    rclmatches.entries.size() << endl);
-        }
-        for (const auto& entry : rclmatches.entries) {
-            LOGDEB1("RclCompleterModel: match " << entry.term << endl);
-            string data = entry.term;
-            currentlist.push_back(QString::fromStdString(data));
-        }
-    }
-    endResetModel();
+  }
+  endResetModel();
 }
 
-SSearch::SSearch(QWidget *parent, const char *)
-    : QWidget(parent) {
-    queryText=new QLineEdit(this);
-    init_ui();
-    init_conn();
+SSearch::SSearch(QWidget *parent, const char *) : QWidget(parent) {
+  queryText = new MLineEdit(this);
+  queryText->installEventFilter(this);
+  QTimer::singleShot(0, queryText, SLOT(setFocus()));
+  init_ui();
+  init_conn();
 }
 
-void SSearch::init_conn()
-{
-    // See enum in .h and keep in order !
-    connect(queryText, SIGNAL(returnPressed()), this, SLOT(startSimpleSearch()));
-    connect(queryText, &QLineEdit::textChanged,
-            this, &SSearch::searchTextChanged);
-    connect(queryText, &QLineEdit::textEdited,
-            this, &SSearch::searchTextEdited);
+void SSearch::init_conn() {
+  // See enum in .h and keep in order !
+  connect(queryText, SIGNAL(returnPressed()), this, SLOT(startSimpleSearch()));
+  connect(queryText, &QLineEdit::textChanged, this,
+          &SSearch::searchTextChanged);
+  connect(queryText, &QLineEdit::textEdited, this, &SSearch::searchTextEdited);
 
-    m_completermodel = new RclCompleterModel(this);
-    QCompleter *completer = new QCompleter(m_completermodel, this);
-    completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setMaxVisibleItems(completervisibleitems);
-    queryText->setCompleter(completer);
-    connect(this, &SSearch::partialWord,
-            m_completermodel,
-            &RclCompleterModel::onPartialWord);
-    connect(completer, SIGNAL(activated(const QString&)), this,
-            SLOT(onCompletionActivated(const QString&)));
+  m_completermodel = new RclCompleterModel(this);
+  QCompleter *completer = new QCompleter(m_completermodel, this);
+  completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+  completer->setFilterMode(Qt::MatchContains);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  completer->setMaxVisibleItems(completervisibleitems);
+  queryText->setCompleter(completer);
+  connect(this, &SSearch::partialWord, m_completermodel,
+          &RclCompleterModel::onPartialWord);
+  connect(completer, SIGNAL(activated(const QString &)), this,
+          SLOT(onCompletionActivated(const QString &)));
+  //    auto s=new QShortcut(tr("ESC"),queryText);
+  //    connect(s,&QShortcut::activated,this,&SSearch::clearAll);
+  connect(this->queryText,&MLineEdit::tabPressed,this,&SSearch::tabPressed);
+  connect(this->queryText,&MLineEdit::stabPressed,this,&SSearch::stabPressed);
 }
 
-void SSearch::takeFocus()
-{
-    LOGDEB1("SSearch: take focus\n");
-    queryText->setFocus(Qt::ShortcutFocusReason);
-    // If the focus was already in the search entry, the text is not selected.
-    // Do it for consistency
-    queryText->selectAll();
+void SSearch::takeFocus() {
+  LOGDEB1("SSearch: take focus\n");
+  queryText->setFocus(Qt::ShortcutFocusReason);
+  // If the focus was already in the search entry, the text is not selected.
+  // Do it for consistency
+  queryText->selectAll();
 }
 
-QString SSearch::currentText()
-{
-    return queryText->text();
-}
+QString SSearch::currentText() { return queryText->text(); }
 
-void SSearch::clearAll()
-{
-    queryText->clear();
-}
+void SSearch::clearAll() { queryText->clear(); }
 
 // onCompletionActivated() is called when an entry is selected in the
 // popup, but the edit text is going to be replaced in any case if
@@ -198,226 +190,216 @@ void SSearch::clearAll()
 //    so that the effect is different if there is a space at the end
 //    of the entry or not: pure concatenation vs replacement of the
 //    last (partial) word.
-void SSearch::restoreText()
-{
-    LOGDEB("SSearch::restoreText: savedEdit: " <<m_savedEditText.toStdString() <<
-           endl);
-    if (!m_savedEditText.trimmed().isEmpty()) {
-        // If the popup text begins with the saved text, just let it replace
-        if (currentText().lastIndexOf(m_savedEditText) != 0) {
-            queryText->setText(m_savedEditText.trimmed() + " " + currentText());
-        }
-        m_savedEditText = "";
+void SSearch::restoreText() {
+  LOGDEB("SSearch::restoreText: savedEdit: " << m_savedEditText.toStdString()
+                                             << endl);
+  if (!m_savedEditText.trimmed().isEmpty()) {
+    // If the popup text begins with the saved text, just let it replace
+    if (currentText().lastIndexOf(m_savedEditText) != 0) {
+      queryText->setText(m_savedEditText.trimmed() + " " + currentText());
     }
+    m_savedEditText = "";
+  }
+  queryText->setFocus();
+  //    if (prefs.ssearchStartOnComplete) {
+  //        QTimer::singleShot(0, this, SLOT(startSimpleSearch()));
+  //    }
+}
+void SSearch::onCompletionActivated(const QString &text) {
+  //    LOGDEB("SSearch::onCompletionActivated: queryText [" <<
+  //           qs2u8s(currentText()) << "] text [" << qs2u8s(text) << "]\n");
+  queryText->setText(text);
+  QTimer::singleShot(0, this, SLOT(restoreText()));
+}
+
+void SSearch::onHistoryClicked() {
+  if (m_completermodel) {
+    m_completermodel->onPartialWord(SST_LANG, "", "");
+    queryText->completer()->complete();
+  }
+}
+
+void SSearch::init_ui() {
+  auto hLayout = new QHBoxLayout();
+  this->setLayout(hLayout);
+
+  hLayout->addWidget(this->queryText);
+}
+
+void SSearch::searchTextEdited(const QString &text) {
+  LOGDEB1("SSearch::searchTextEdited: text [" << qs2u8s(text) << "]\n");
+  QString pword;
+  int cs = getPartialWord(pword);
+  //    int tp = searchTypCMB->currentIndex();
+
+  m_savedEditText = text.left(cs);
+  LOGDEB1("SSearch::searchTextEdited: cs " << cs << " pword [" << qs2u8s(pword)
+                                           << "] savedEditText ["
+                                           << qs2u8s(m_savedEditText) << "]\n");
+  if (cs >= 0) {
+    //        emit partialWord(tp, currentText(), pword);
+  } else {
+    //        emit partialWord(tp, currentText(), " ");
+  }
+}
+
+void SSearch::searchTextChanged(const QString &text) {
+  LOGDEB1("SSearch::searchTextChanged: text [" << qs2u8s(text) << "]\n");
+
+  if (text.isEmpty()) {
     queryText->setFocus();
-//    if (prefs.ssearchStartOnComplete) {
-//        QTimer::singleShot(0, this, SLOT(startSimpleSearch()));
-//    }
-}
-void SSearch::onCompletionActivated(const QString& text)
-{
-//    LOGDEB("SSearch::onCompletionActivated: queryText [" <<
-//           qs2u8s(currentText()) << "] text [" << qs2u8s(text) << "]\n");
-    queryText->setText(text);
-    QTimer::singleShot(0, this, SLOT(restoreText()));
+    emit clearSearch();
+  } else {
+  }
 }
 
-void SSearch::onHistoryClicked()
-{
-     if (m_completermodel) {
-        m_completermodel->onPartialWord(SST_LANG, "", "");
-        queryText->completer()->complete();
-     }
+void SSearch::searchTypeChanged(int typ) {
+  LOGDEB1("Search type now " << typ << "\n");
+  // Adjust context help
+  if (typ == SST_LANG) {
+    //        HelpClient::installMap((const char *)this->objectName().toUtf8(),
+    //                               "RCL.SEARCH.LANG");
+  } else {
+    //        HelpClient::installMap((const char *)this->objectName().toUtf8(),
+    //                               "RCL.SEARCH.GUI.SIMPLE");
+  }
+  // Also fix tooltips
+  switch (typ) {
+  case SST_LANG:
+    queryText->setToolTip(
+        tr("Enter query language expression. Cheat sheet:<br>\n"
+           "<i>term1 term2</i> : 'term1' and 'term2' in any field.<br>\n"
+           "<i>field:term1</i> : 'term1' in field 'field'.<br>\n"
+           " Standard field names/synonyms:<br>\n"
+           "  title/subject/caption, author/from, recipient/to, filename, "
+           "ext.<br>\n"
+           " Pseudo-fields: dir, mime/format, type/rclcat, date, size.<br>\n"
+           " Two date interval exemples: 2009-03-01/2009-05-20  "
+           "2009-03-01/P2M.<br>\n"
+           "<i>term1 term2 OR term3</i> : term1 AND (term2 OR term3).<br>\n"
+           "  You can use parentheses to make things clearer.<br>\n"
+           "<i>\"term1 term2\"</i> : phrase (must occur exactly). Possible "
+           "modifiers:<br>\n"
+           "<i>\"term1 term2\"p</i> : unordered proximity search with default "
+           "distance.<br>\n"
+           "Use <b>Show Query</b> link when in doubt about result and see "
+           "manual (&lt;F1>) for more detail.\n"));
+    break;
+  case SST_FNM:
+    queryText->setToolTip(tr("Enter file name wildcard expression."));
+    break;
+  case SST_ANY:
+  case SST_ALL:
+  default:
+    queryText->setToolTip(tr("Enter search terms here. Type ESC SPC for "
+                             "completions of current term."));
+  }
 }
 
-void SSearch::init_ui()
-{
-   auto hLayout=new QHBoxLayout();
-   this->setLayout(hLayout);
+void SSearch::startSimpleSearch() {
+  if (queryText->completer()->popup()->isVisible()) {
+    return;
+  }
+  string u8 = queryText->text().toStdString();
+  trimstring(u8);
+  if (u8.length() == 0)
+    return;
 
-   hLayout->addWidget(this->queryText);
+  if (!startSimpleSearch(u8))
+    return;
 
+  // Search terms history.
+  // New text at the front and erase any older identical entry
+  QString txt = currentText().trimmed();
+  if (txt.isEmpty())
+    return;
 }
 
-void SSearch::searchTextEdited(const QString& text)
-{
-    LOGDEB1("SSearch::searchTextEdited: text [" << qs2u8s(text) << "]\n");
-    QString pword;
-    int cs = getPartialWord(pword);
-//    int tp = searchTypCMB->currentIndex();
+void SSearch::setPrefs() {}
 
-    m_savedEditText = text.left(cs);
-    LOGDEB1("SSearch::searchTextEdited: cs " <<cs<<" pword ["<< qs2u8s(pword) <<
-            "] savedEditText [" << qs2u8s(m_savedEditText) << "]\n");
-    if (cs >= 0) {
-//        emit partialWord(tp, currentText(), pword);
-    } else {
-//        emit partialWord(tp, currentText(), " ");
-    }
-}
-
-void SSearch::searchTextChanged(const QString& text)
-{
-    LOGDEB1("SSearch::searchTextChanged: text [" << qs2u8s(text) << "]\n");
-
-    if (text.isEmpty()) {
-        queryText->setFocus();
-        emit clearSearch();
-    } else {
-    }
-}
-
-void SSearch::searchTypeChanged(int typ)
-{
-    LOGDEB1("Search type now " << typ << "\n");
-    // Adjust context help
-    if (typ == SST_LANG) {
-//        HelpClient::installMap((const char *)this->objectName().toUtf8(),
-//                               "RCL.SEARCH.LANG");
-    } else {
-//        HelpClient::installMap((const char *)this->objectName().toUtf8(),
-//                               "RCL.SEARCH.GUI.SIMPLE");
-    }
-    // Also fix tooltips
-    switch (typ) {
-    case SST_LANG:
-        queryText->setToolTip(
-            tr(
-"Enter query language expression. Cheat sheet:<br>\n"
-"<i>term1 term2</i> : 'term1' and 'term2' in any field.<br>\n"
-"<i>field:term1</i> : 'term1' in field 'field'.<br>\n"
-" Standard field names/synonyms:<br>\n"
-"  title/subject/caption, author/from, recipient/to, filename, ext.<br>\n"
-" Pseudo-fields: dir, mime/format, type/rclcat, date, size.<br>\n"
-" Two date interval exemples: 2009-03-01/2009-05-20  2009-03-01/P2M.<br>\n"
-"<i>term1 term2 OR term3</i> : term1 AND (term2 OR term3).<br>\n"
-"  You can use parentheses to make things clearer.<br>\n"
-"<i>\"term1 term2\"</i> : phrase (must occur exactly). Possible modifiers:<br>\n"
-"<i>\"term1 term2\"p</i> : unordered proximity search with default distance.<br>\n"
-"Use <b>Show Query</b> link when in doubt about result and see manual (&lt;F1>) for more detail.\n"
-                ));
-        break;
-    case SST_FNM:
-        queryText->setToolTip(tr("Enter file name wildcard expression."));
-        break;
-    case SST_ANY:
-    case SST_ALL:
-    default:
-        queryText->setToolTip(
-            tr(
-        "Enter search terms here. Type ESC SPC for completions of current term."
-                ));
-    }
-}
-
-void SSearch::startSimpleSearch()
-{
-    if (queryText->completer()->popup()->isVisible()) {
-        return;
-    }
-    string u8 =queryText->text().toStdString();
-    trimstring(u8);
-    if (u8.length() == 0)
-        return;
-
-    if (!startSimpleSearch(u8))
-        return;
-
-    // Search terms history.
-    // New text at the front and erase any older identical entry
-    QString txt = currentText().trimmed();
-    if (txt.isEmpty())
-        return;
-}
-
-void SSearch::setPrefs()
-{
-}
-
-string SSearch::asXML()
-{
-    return m_xml;
-}
+// string SSearch::asXML()
+//{
+//    //return m_xml;
+//}
 #define LOGGER_STATICVERBOSITY 5
 #define LOGGER_LEVEL 7
-bool SSearch::startSimpleSearch(const string& u8, int maxexp)
-{
-    LOGDEB("SSearch::startSimpleSearch(" << u8 << ")\n");
-    //TODO
-    string stemlang = "english";//prefs.stemlang();
+bool SSearch::startSimpleSearch(const string &u8, int maxexp) {
+  LOGDEB("SSearch::startSimpleSearch(" << u8 << ")\n");
+  // TODO
+  string stemlang = "english"; // prefs.stemlang();
 
-//    ostringstream xml;
-//    xml << "<SD type='ssearch'>\n";
-//    xml << "  <SL>" << stemlang << "</SL>\n";
-    //TODO
-//    xml << "  <T>" << base64_encode(u8) << "</T>\n";
+  //    ostringstream xml;
+  //    xml << "<SD type='ssearch'>\n";
+  //    xml << "  <SL>" << stemlang << "</SL>\n";
+  // TODO
+  //    xml << "  <T>" << base64_encode(u8) << "</T>\n";
 
-//    SSearchType tp = (SSearchType)searchTypCMB->currentIndex();
-    Rcl::SearchData *sdata = nullptr;
+  //    SSearchType tp = (SSearchType)searchTypCMB->currentIndex();
+  Rcl::SearchData *sdata = nullptr;
 
-    /*
-    if (tp == SST_LANG) {
-        xml << "  <SM>QL</SM>\n";
-        string reason;
-        if (prefs.autoSuffsEnable) {
-            sdata = wasaStringToRcl(theconfig, stemlang, u8, reason,
-                                    (const char *)prefs.autoSuffs.toUtf8());
-            if (!prefs.autoSuffs.isEmpty()) {
-                xml <<  "  <AS>" << qs2u8s(prefs.autoSuffs) << "</AS>\n";
-            }
-        } else {
-            sdata = wasaStringToRcl(theconfig, stemlang, u8, reason);
-        }
-        if (sdata == 0) {
-            QMessageBox::warning(0, "Recoll", tr("Bad query string") + ": " +
-                                 QString::fromUtf8(reason.c_str()));
-            return false;
-        }
-    } else {
-    */
-        sdata = new Rcl::SearchData(Rcl::SCLT_OR, stemlang);
-        if (sdata == 0) {
-            QMessageBox::warning(0, "Recoll", tr("Out of memory"));
-            return false;
-        }
-        Rcl::SearchDataClause *clp = 0;
-//        if (tp == SST_FNM) {
-//            xml << "  <SM>FN</SM>\n";
-//            clp = new Rcl::SearchDataClauseFilename(u8);
-//        } else {
-            // ANY or ALL, several words.
-//            if (tp == SST_ANY) {
-//                xml << "  <SM>OR</SM>\n";
-                clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_OR, u8);
-//            } else {
-//                xml << "  <SM>AND</SM>\n";
-//                clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_AND, u8);
-//            }
-//        }
-        sdata->addClause(clp);
-//    }
+  /*
+  if (tp == SST_LANG) {
+      xml << "  <SM>QL</SM>\n";
+      string reason;
+      if (prefs.autoSuffsEnable) {
+          sdata = wasaStringToRcl(theconfig, stemlang, u8, reason,
+                                  (const char *)prefs.autoSuffs.toUtf8());
+          if (!prefs.autoSuffs.isEmpty()) {
+              xml <<  "  <AS>" << qs2u8s(prefs.autoSuffs) << "</AS>\n";
+          }
+      } else {
+          sdata = wasaStringToRcl(theconfig, stemlang, u8, reason);
+      }
+      if (sdata == 0) {
+          QMessageBox::warning(0, "Recoll", tr("Bad query string") + ": " +
+                               QString::fromUtf8(reason.c_str()));
+          return false;
+      }
+  } else {
+  */
+  sdata = new Rcl::SearchData(Rcl::SCLT_OR, stemlang);
+  if (sdata == 0) {
+    QMessageBox::warning(0, "Recoll", tr("Out of memory"));
+    return false;
+  }
+  Rcl::SearchDataClause *clp = 0;
+  //        if (tp == SST_FNM) {
+  //            xml << "  <SM>FN</SM>\n";
+  //            clp = new Rcl::SearchDataClauseFilename(u8);
+  //        } else {
+  // ANY or ALL, several words.
+  //            if (tp == SST_ANY) {
+  //                xml << "  <SM>OR</SM>\n";
+  clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_OR, u8);
+  //            } else {
+  //                xml << "  <SM>AND</SM>\n";
+  //                clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_AND, u8);
+  //            }
+  //        }
+  sdata->addClause(clp);
+  //    }
 
-//    if (prefs.ssearchAutoPhrase && rcldb) {
-//        xml << "  <AP/>\n";
-//        sdata->maybeAddAutoPhrase(*rcldb,
-//                                  prefs.ssearchAutoPhraseThreshPC / 100.0);
-//    }
-//    if (maxexp != -1) {
-//        sdata->setMaxExpand(maxexp);
-//    }
+  //    if (prefs.ssearchAutoPhrase && rcldb) {
+  //        xml << "  <AP/>\n";
+  //        sdata->maybeAddAutoPhrase(*rcldb,
+  //                                  prefs.ssearchAutoPhraseThreshPC / 100.0);
+  //    }
+  //    if (maxexp != -1) {
+  //        sdata->setMaxExpand(maxexp);
+  //    }
 
-//    for (const auto& dbdir : prefs.activeExtraDbs) {
-//        xml << "  <EX>" << base64_encode(dbdir) << "</EX>";
-//    }
+  //    for (const auto& dbdir : prefs.activeExtraDbs) {
+  //        xml << "  <EX>" << base64_encode(dbdir) << "</EX>";
+  //    }
 
-//    xml << "</SD>\n";
-//    m_xml = xml.str();
-//    LOGDEB("SSearch::startSimpleSearch:xml:[" << m_xml << "]\n");
+  //    xml << "</SD>\n";
+  //    m_xml = xml.str();
+  //    LOGDEB("SSearch::startSimpleSearch:xml:[" << m_xml << "]\n");
 
-    std::shared_ptr<Rcl::SearchData> rsdata(sdata);
-    emit setDescription(QString::fromStdString(u8));
-    emit startSearch(rsdata, true);
-    return true;
+  std::shared_ptr<Rcl::SearchData> rsdata(sdata);
+  emit setDescription(QString::fromStdString(u8));
+  emit startSearch(rsdata, true);
+  return true;
 }
 
 /*
@@ -479,15 +461,9 @@ bool SSearch::fromXML(const SSearchDef& fxml)
 }
 */
 
-void SSearch::setSearchString(const QString& txt)
-{
-    queryText->setText(txt);
-}
+void SSearch::setSearchString(const QString &txt) { queryText->setText(txt); }
 
-bool SSearch::hasSearchString()
-{
-    return !currentText().isEmpty();
-}
+bool SSearch::hasSearchString() { return !currentText().isEmpty(); }
 
 // Add term to simple search. Term comes out of double-click in
 // reslist or preview.
@@ -496,77 +472,73 @@ bool SSearch::hasSearchString()
 // (which is different because it format is explicit richtext
 // instead of auto as for preview, needed because it's built by
 // fragments?).
-static const char* punct = " \t()<>\"'[]{}!^*.,:;\n\r";
-void SSearch::addTerm(QString term)
-{
-    LOGDEB("SSearch::AddTerm: [" << term.toStdString() << "]\n");
-    string t = (const char *)term.toUtf8();
-    string::size_type pos = t.find_last_not_of(punct);
-    if (pos == string::npos)
-        return;
-    t = t.substr(0, pos+1);
-    pos = t.find_first_not_of(punct);
-    if (pos != string::npos)
-        t = t.substr(pos);
-    if (t.empty())
-        return;
-    term = QString::fromUtf8(t.c_str());
+static const char *punct = " \t()<>\"'[]{}!^*.,:;\n\r";
+void SSearch::addTerm(QString term) {
+  LOGDEB("SSearch::AddTerm: [" << term.toStdString() << "]\n");
+  string t = (const char *)term.toUtf8();
+  string::size_type pos = t.find_last_not_of(punct);
+  if (pos == string::npos)
+    return;
+  t = t.substr(0, pos + 1);
+  pos = t.find_first_not_of(punct);
+  if (pos != string::npos)
+    t = t.substr(pos);
+  if (t.empty())
+    return;
+  term = QString::fromUtf8(t.c_str());
 
-    QString text = currentText();
-    text += QString::fromLatin1(" ") + term;
-    queryText->setText(text);
+  QString text = currentText();
+  text += QString::fromLatin1(" ") + term;
+  queryText->setText(text);
 }
 
-void SSearch::onWordReplace(const QString& o, const QString& n)
-{
-    LOGDEB("SSearch::onWordReplace: o [" << o.toStdString() << "] n [" <<
-           n.toStdString() << "]\n");
-    QString txt = currentText();
-    QRegExp exp = QRegExp(QString("\\b") + o + QString("\\b"));
-    exp.setCaseSensitivity(Qt::CaseInsensitive);
-    txt.replace(exp, n);
-    queryText->setText(txt);
-    Qt::KeyboardModifiers mods = QApplication::keyboardModifiers ();
-    if (mods == Qt::NoModifier)
-        startSimpleSearch();
+void SSearch::onWordReplace(const QString &o, const QString &n) {
+  LOGDEB("SSearch::onWordReplace: o [" << o.toStdString() << "] n ["
+                                       << n.toStdString() << "]\n");
+  QString txt = currentText();
+  QRegExp exp = QRegExp(QString("\\b") + o + QString("\\b"));
+  exp.setCaseSensitivity(Qt::CaseInsensitive);
+  txt.replace(exp, n);
+  queryText->setText(txt);
+  Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
+  if (mods == Qt::NoModifier)
+    startSimpleSearch();
 }
-
 
 // If text does not end with space, return last (partial) word and >0
 // else return -1
-int SSearch::getPartialWord(QString& word)
-{
-    // Extract last word in text
-    QString txt = currentText();
-    if (txt.isEmpty()) {
-        return -1;
-    }
-    int lstidx = txt.size()-1;
+int SSearch::getPartialWord(QString &word) {
+  // Extract last word in text
+  QString txt = currentText();
+  if (txt.isEmpty()) {
+    return -1;
+  }
+  int lstidx = txt.size() - 1;
 
-    // If the input ends with a space or dquote (phrase input), or
-    // dquote+qualifiers, no partial word.
-    if (txt[lstidx] == ' ') {
-        return -1;
+  // If the input ends with a space or dquote (phrase input), or
+  // dquote+qualifiers, no partial word.
+  if (txt[lstidx] == ' ') {
+    return -1;
+  }
+  int cs = txt.lastIndexOf("\"");
+  if (cs > 0) {
+    bool dquoteToEndNoSpace{true};
+    for (int i = cs; i <= lstidx; i++) {
+      if (txt[i] == ' ') {
+        dquoteToEndNoSpace = false;
+        break;
+      }
     }
-    int cs = txt.lastIndexOf("\"");
-    if (cs > 0) {
-        bool dquoteToEndNoSpace{true};
-        for (int i = cs; i <= lstidx; i++) {
-            if (txt[i] == ' ') {
-                dquoteToEndNoSpace = false;
-                break;
-            }
-        }
-        if (dquoteToEndNoSpace) {
-            return -1;
-        }
+    if (dquoteToEndNoSpace) {
+      return -1;
     }
+  }
 
-    cs = txt.lastIndexOf(" ");
-    if (cs < 0)
-        cs = 0;
-    else
-        cs++;
-    word = txt.right(txt.size() - cs);
-    return cs;
+  cs = txt.lastIndexOf(" ");
+  if (cs < 0)
+    cs = 0;
+  else
+    cs++;
+  word = txt.right(txt.size() - cs);
+  return cs;
 }

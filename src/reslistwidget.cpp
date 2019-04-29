@@ -1,6 +1,6 @@
-#include "listitemwidget.h"
 #include "reslistwidget.h"
 
+#include <QDebug>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPainter>
@@ -9,7 +9,6 @@
 #include <QTextDocument>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QDebug>
 #define TEXTINCELLVTRANS -1
 
 class PlainToRichQtReslist : public PlainToRich {
@@ -36,14 +35,12 @@ static QString gengetter(const string &fld, const Rcl::Doc &doc) {
   return QString::fromStdString(it->second);
 }
 
-static QPixmap picgetter(const Rcl::Doc &doc){
+static QPixmap picgetter(const Rcl::Doc &doc) {
   const auto it = doc.meta.find("mtype");
   if (it == doc.meta.end()) {
     return QPixmap();
   }
   return QPixmap();
-
-
 }
 static QString sizegetter(const string &fld, const Rcl::Doc &doc) {
   const auto it = doc.meta.find(fld);
@@ -151,7 +148,7 @@ RecollModel::~RecollModel() {}
 int RecollModel::rowCount(const QModelIndex &) const {
   if (!m_source)
     return 0;
-  auto cnt= m_source->getResCnt();
+  auto cnt = m_source->getResCnt();
   return cnt;
 }
 
@@ -195,10 +192,12 @@ QVariant RecollModel::headerData(int idx, Qt::Orientation orientation,
 QVariant RecollModel::data(const QModelIndex &index, int role) const {
   //    LOGDEB2("RecollModel::data: row " << index.row() << " col " <<
   //            index.column() << " role " << role << "\n");
-  if (!m_source || !index.isValid()||role<Qt::UserRole) {
+  if (!m_source || !index.isValid() || role < Qt::UserRole) {
+//  if (!m_source || !index.isValid() || role != Qt::DisplayRole) {
     //      index.column() >= int(m_fields.size())) {
     return QVariant();
   }
+//  return QVariant("test");
 
   Rcl::Doc doc;
   if (!m_source->getDoc(index.row(), doc)) {
@@ -226,9 +225,9 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
     break;
   case Role_ICON:
 
-      var=picgetter(doc);
+    var = picgetter(doc);
 
-      break;
+    break;
   default:
     return "error Role";
   }
@@ -288,22 +287,23 @@ public:
              const QModelIndex &index) const {
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
-    auto filename= index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
-    auto icon=index.data(RecollModel::ModelRoles::Role_ICON).value<QPixmap>();
-//    this->liw.setIcon(icon.value<QPixmap>());
-//    this->liw.setTitle(filename.toString());
-//    auto toRender=const_cast<ListItemWidget&>(this->liw).grab();
+    auto filename =
+        index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
+    auto icon = index.data(RecollModel::ModelRoles::Role_ICON).value<QPixmap>();
+    //    this->liw.setIcon(icon.value<QPixmap>());
+    //    this->liw.setTitle(filename.toString());
+    //    auto toRender=const_cast<ListItemWidget&>(this->liw).grab();
     QRectF recf(opt.rect);
-//    qDebug()<<filename;
-//    QRectF recf(0,0,50,50);
-    if(opt.state&QStyle::State_Selected){
-          painter->fillRect(opt.rect, opt.palette.highlight());
+    //    qDebug()<<filename;
+    //    QRectF recf(0,0,50,50);
+    if (opt.state & QStyle::State_Selected) {
+      painter->fillRect(opt.rect, opt.palette.highlight());
     }
-    painter->drawPixmap(recf,icon,icon.rect());
-//    painter->setPen(opt.palette.text().color());
-    auto textpos=QPointF(icon.size().width(),recf.y()+recf.height()/2);
-    painter->drawText(textpos,filename);
-//    QStyledItemDelegate::paint(painter,option,index);
+    painter->drawPixmap(recf, icon, icon.rect());
+    //    painter->setPen(opt.palette.text().color());
+    auto textpos = QPointF(icon.size().width(), recf.y() + recf.height() / 2);
+    painter->drawText(textpos, filename);
+    //    QStyledItemDelegate::paint(painter,option,index);
 
     /*
     if (value.isValid() && !value.isNull()) {
@@ -340,35 +340,25 @@ public:
     QStyledItemDelegate::paint(painter, option, index);
     */
   }
-private:
-  ListItemWidget liw;
 
+private:
   // QAbstractItemDelegate interface
 public:
-  QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override
-  {
+  QSize sizeHint(const QStyleOptionViewItem &option,
+                 const QModelIndex &index) const override {
 
-//    auto icon=index.data(RecollModel::ModelRoles::Role_ICON).value<QPixmap>();
-      return {50,50};
+    //    auto
+    //    icon=index.data(RecollModel::ModelRoles::Role_ICON).value<QPixmap>();
+    return {50, 50};
   }
 };
 
 static PlainToRichQtReslist g_hiliter;
 
 void ResTable::init() {
-  QStringList fields;
-  fields << "url"
-         << "title"
-         << "mtype"
-         << "abstract";
-  if (!(m_model = new RecollModel(fields, this)))
-    return;
-  listview->setModel(m_model);
-  listview->setMouseTracking(true);
-  listview->setSelectionBehavior(QAbstractItemView::SelectRows);
-  listview->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-  listview->setItemDelegate(new ResTableDelegate(this));
-  listview->setContextMenuPolicy(Qt::CustomContextMenu);
+//  listViewProgram->setModel(m_model);
+//  listViewProgram->setMouseTracking(true);
+//  listViewProgram->setContextMenuPolicy(Qt::CustomContextMenu);
 
   //    QHeaderView *header = listview->horizontalHeader();
   //    if (header) {
@@ -394,13 +384,15 @@ void ResTable::init() {
   //                      ROWHEIGHTPAD);
   //    }
 
-  QKeySequence seq("Esc");
-  QShortcut *sc = new QShortcut(seq, this);
+//  QKeySequence seq("Esc");
+//  QShortcut *sc = new QShortcut(seq, this);
   //    connect(sc, &QShortcut::activated,
   //        listview->selectionModel(), &QItemSelectionModel::clear);
   // TODO here emit signal to dispay right widget
-  connect(listview->selectionModel(), &QItemSelectionModel::currentChanged,
-          this, &ResTable::onTableView_currentChanged);
+
+//  connect(listViewProgram->selectionModel(), &QItemSelectionModel::currentChanged,
+//          this, &ResTable::onTableView_currentChanged);
+
   //    connect(listview, &QAbstractItemView::doubleClicked,
   //            this, &ResTable::onDoubleClick);
 
@@ -444,8 +436,24 @@ void ResTable::setRclMain(RclMain *m, bool ismain)
 
 ResTable::ResTable(QWidget *parent)
     : QWidget(parent), m_model(nullptr), m_detaildocnum(-1), m_ismainres(true) {
-  this->listview = new QListView();
-    this->detailedWidget=new QLabel();
+//  this->listViewProgram = new QListView();
+//    this->listViewDoc=new QListView();
+    //Store the reg of type
+    filterString =new QStringList({"application/x-all","text/.*"});
+    for(auto i=0;i!=filterString->size();++i){
+    vm.push_back(QPair<QListView*,QSortFilterProxyModel*>(new QListView,new QSortFilterProxyModel( this)));
+    }
+
+  this->detailedWidget = new QLabel();
+  currentListViewIndex = 0;
+  currentlistViewItemIndex = -1;
+  QStringList fields;
+  fields << "url"
+         << "title"
+         << "mtype"
+         << "abstract";
+  if (!(m_model = new RecollModel(fields, this)))
+    return;
   init_ui();
   init();
 }
@@ -453,35 +461,48 @@ ResTable::ResTable(QWidget *parent)
 int ResTable::getDetailDocNumOrTopRow() {
   if (m_detaildocnum >= 0)
     return m_detaildocnum;
-  QModelIndex modelIndex = listview->indexAt(QPoint(0, 0));
-  return modelIndex.row();
+  return 0;
+//  QModelIndex modelIndex = listViewProgram->indexAt(QPoint(0, 0));
+//  return modelIndex.row();
 }
 
 void ResTable::init_ui() {
 
-    auto hlayout=new QHBoxLayout();
+  auto hlayout = new QHBoxLayout();
   this->setLayout(hlayout);
 
-  auto vlayout = new QVBoxLayout();
-  //TODO here add multi view ,using different filter proxy model
-  vlayout->addWidget(this->listview);
-  this->listview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  llayout = new QVBoxLayout();
+  // TODO here add multi view ,using different filter proxy model
+  for(auto i=0;i!=filterString->size();++i){
 
-  hlayout->addLayout(vlayout);
+  llayout->addWidget(vm.at(i).first);
+  vm.at(i).first->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  vm.at(i).second->setSourceModel(this->m_model);
+  vm.at(i).second->setFilterRole(RecollModel::ModelRoles::Role_MIME_TYPE);
+  vm.at(i).second->setFilterRegExp(filterString->at(i));
+  vm.at(i).second->setFilterWildcard(filterString->at(i));
+  vm.at(i).second->setDynamicSortFilter(true);
+  vm.at(i).first->setModel(vm.at(i).second);
+//  vm.at(i).first->setModel(this->m_model);
+  vm.at(i).first->setSelectionBehavior(QAbstractItemView::SelectRows);
+  vm.at(i).first->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+  vm.at(i).first->setItemDelegate(new ResTableDelegate(this));
+  }
+
+  hlayout->addLayout(llayout);
   hlayout->addWidget(this->detailedWidget);
-  hlayout->setStretchFactor(vlayout,1);
-  hlayout->setStretchFactor(this->detailedWidget,2);
+  hlayout->setStretchFactor(llayout, 1);
+  hlayout->setStretchFactor(this->detailedWidget, 2);
 
   this->detailedWidget->setVisible(false);
   this->detailedWidget->setWordWrap(true);
-
 }
 
 void ResTable::makeRowVisible(int row) {
   //    LOGDEB("ResTable::showRow(" << row << ")\n");
   QModelIndex modelIndex = m_model->index(row, 0);
-  listview->scrollTo(modelIndex, QAbstractItemView::PositionAtTop);
-  listview->selectionModel()->clear();
+//  listViewProgram->scrollTo(modelIndex, QAbstractItemView::PositionAtTop);
+//  listViewProgram->selectionModel()->clear();
   m_detaildocnum = -1;
 }
 
@@ -496,7 +517,10 @@ void ResTable::onTableView_currentChanged(const QModelIndex &index) {
   if (m_model->getDocSource()->getDoc(index.row(), doc)) {
     m_detaildocnum = index.row();
     m_detaildoc = doc;
-    auto t=this->m_model->data(index,RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT).toString();
+    auto t =
+        this->m_model
+            ->data(index, RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT)
+            .toString();
     this->detailedWidget->setText(t);
     this->detailedWidget->setVisible(true);
   } else {
@@ -507,13 +531,74 @@ void ResTable::onTableView_currentChanged(const QModelIndex &index) {
 void ResTable::on_tableView_entered(const QModelIndex &index) {
   //    LOGDEB2("ResTable::on_listview_entered(" << index.row() << ", "  <<
   //            index.column() << ")\n");
-  if (!listview->selectionModel()->hasSelection())
+//  if (!listViewProgram->selectionModel()->hasSelection())
     onTableView_currentChanged(index);
 }
 
 void ResTable::takeFocus() {
   //    LOGDEB("resTable: take focus\n");
-  listview->setFocus(Qt::ShortcutFocusReason);
+//  listViewProgram->setF/*o*/cus(Qt::ShortcutFocusReason);
+}
+
+void ResTable::moveToNextResoule() {
+  qDebug() << "move to next";
+  //  auto childerns = llayout->children();
+  //  auto childerns = llayout->
+  auto listIndex = currentListViewIndex;
+  auto itemIndex =
+      currentlistViewItemIndex == -1 ? 0 : currentlistViewItemIndex + 1;
+  int targetListViewIdex = -1;
+  for (int idx = listIndex; idx < llayout->count(); ++idx) {
+    auto view = qobject_cast<QListView *>(llayout->itemAt(idx)->widget());
+    if (itemIndex < view->model()->rowCount()) {
+      // find
+      targetListViewIdex = idx;
+      break;
+    } else {
+      // current listview end,goto next and start from 0
+      itemIndex = 0;
+    }
+  }
+
+  if (targetListViewIdex == -1) {
+    // iterate to end still not found,
+    bool ffnz = false;
+    for (auto i = 0; i != llayout->count(); ++i) {
+      auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
+      if (ffnz) {
+        view->clearFocus();
+        continue;
+      }
+      if (view->model()->rowCount() > 0) {
+        auto ci = view->model()->index(0, 0);
+        view->setCurrentIndex(ci);
+        currentListViewIndex=i;
+        currentlistViewItemIndex=0;
+        ffnz = true;
+        continue;
+      }
+    }
+    if(ffnz){
+    }else{
+       currentListViewIndex=0;
+       currentlistViewItemIndex=-1;
+
+    }
+
+  } else {
+      //find the "next"
+    currentListViewIndex = targetListViewIdex;
+    currentlistViewItemIndex = itemIndex;
+    for (auto i = 0; i != llayout->count(); ++i) {
+      auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
+      if (i != currentListViewIndex) {
+        view->clearFocus();
+        continue;
+      }
+      auto ci = view->model()->index(currentlistViewItemIndex, 0);
+      view->setCurrentIndex(ci);
+    }
+  }
 }
 
 void ResTable::setDocSource(std::shared_ptr<DocSequence> nsource) {

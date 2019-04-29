@@ -14,7 +14,7 @@ from xdg.BaseDirectory import xdg_config_home, xdg_cache_home, xdg_data_dirs
 # Use ulauncher_cache dir because of the WebKit bug
 # https://bugs.webkit.org/show_bug.cgi?id=151646
 CACHE_DIR = os.path.join(xdg_cache_home, 'everylauncher_cache')
-CONFIG_DIR = os.path.join(xdg_config_home, 'everylauncher')
+CONFIG_DIR = os.path.join(xdg_config_home, 'EveryLauncher')
 SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, 'settings.json')
 RECOLL_CONFIG_DIR=os.path.join(CONFIG_DIR,"recoll")
 RECOLL_CONFIG_FILE=os.path.join(RECOLL_CONFIG_DIR,"recoll.conf")

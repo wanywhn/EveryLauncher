@@ -1,12 +1,12 @@
 #include "widget.h"
 #include "ui_widget.h"
 
+#include <QDebug>
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QThread>
 #include <QVBoxLayout>
 #include <docseqdb.h>
-#include <QDebug>
 
 extern std::shared_ptr<Rcl::Db> rcldb;
 extern bool maybeOpenDb(string &reason, bool force, bool *maindberror);
@@ -31,7 +31,7 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   // If indexing is being performed, we reopen the db at each query.
   bool b;
   if (!maybeOpenDb(reason, m_indexed, &b)) {
-      m_indexed=false;
+    m_indexed = false;
     QMessageBox::critical(0, "Recoll", QString(reason.c_str()),
                           QMessageBox::Ok);
     m_queryActive = false;
@@ -135,51 +135,46 @@ void Widget::initiateQuery() {
   emit(resultsReady());
 }
 
-void Widget::IndexSomeFiles(QStringList paths)
-{
-    QMutexLocker locker(&mtxTobeIndex);
-    auto t=QSet<QString>::fromList(paths);
-    tobeIndex.unite(t);
+void Widget::IndexSomeFiles(QStringList paths) {
+  QMutexLocker locker(&mtxTobeIndex);
+  auto t = QSet<QString>::fromList(paths);
+  tobeIndex.unite(t);
 }
 
-
-class IndexWorker:public QObject{
-    Q_OBJECT
+class IndexWorker : public QObject {
+  Q_OBJECT
 public:
-    IndexWorker(QSet<QString>&origin,QMutex &m,QObject *parent):QObject(parent),tobtIndex(origin),mutex(m){
-
-    }
+  IndexWorker(QSet<QString> &origin, QMutex &m, QObject *parent)
+      : QObject(parent), tobtIndex(origin), mutex(m) {}
 public slots:
-    void startIndex(){
-        QSet<QString> s;
-        {
-            QMutexLocker locker(&mutex);
-            s.unite(tobtIndex);
-            tobtIndex.clear();
-        }
-        //TODO index
-
+  void startIndex() {
+    QSet<QString> s;
+    {
+      QMutexLocker locker(&mutex);
+      s.unite(tobtIndex);
+      tobtIndex.clear();
     }
-private:
-    QSet<QString> &tobtIndex;
-    QMutex &mutex;
+    // TODO index
+  }
 
+private:
+  QSet<QString> &tobtIndex;
+  QMutex &mutex;
 };
 Widget::Widget(QWidget *parent) : QWidget(parent) {
   this->restable = new ResTable(this);
   this->searchLine = new SSearch();
-    this->idxProcess=new QProcess(this);
-//    this->idxWorkerThread=new QThread(this);
-//    this->worker=new IndexWorker(this->tobeIndex,this->mtxTobeIndex,this);
-    this->idxTimer=new QTimer;
-    this->m_indexAvtive=false;
-    this->m_indexed=false;
+  this->idxProcess = new QProcess(this);
+  //    this->idxWorkerThread=new QThread(this);
+  //    this->worker=new IndexWorker(this->tobeIndex,this->mtxTobeIndex,this);
+  this->idxTimer = new QTimer;
+  this->m_indexAvtive = false;
+  this->m_indexed = false;
   init_ui();
   init_conn();
-//  this->worker->moveToThread(this->idxWorkerThread);
-  //TODO configure
+  //  this->worker->moveToThread(this->idxWorkerThread);
+  // TODO configure
   this->idxTimer->setInterval(20000);
-
 }
 
 Widget::~Widget() {}
@@ -190,9 +185,9 @@ void Widget::init_ui() {
   this->setLayout(mvLayout);
   mvLayout->addWidget(searchLine);
   mvLayout->addWidget(this->restable);
-//  auto mhLayout = new QHBoxLayout();
-//  mhLayout->addWidget(this->restable);
-//  mvLayout->addLayout(mhLayout);
+  //  auto mhLayout = new QHBoxLayout();
+  //  mhLayout->addWidget(this->restable);
+  //  mvLayout->addLayout(mhLayout);
 }
 
 void Widget::init_conn() {
@@ -200,57 +195,58 @@ void Widget::init_conn() {
   //    restable->setRclMain(this, true);
   connect(this, SIGNAL(docSourceChanged(std::shared_ptr<DocSequence>)),
           restable, SLOT(setDocSource(std::shared_ptr<DocSequence>)));
-  connect(this,SIGNAL(searchReset()), restable, SLOT(resetSource()));
-  connect(this,SIGNAL(resultsReady()), restable, SLOT(readDocSource()));
-  connect(this->idxTimer,&QTimer::timeout,this,&Widget::toggleIndexing);
-  connect(this->idxProcess,static_cast<void(QProcess::*)(int)>(&QProcess::finished),[this](){
-      this->m_indexAvtive=false;
-      this->m_indexed=true;
-});
-  connect(this->idxProcess,&QProcess::started,[this](){
-      this->m_indexAvtive=true;
+  connect(this, SIGNAL(searchReset()), restable, SLOT(resetSource()));
+  connect(this, SIGNAL(resultsReady()), restable, SLOT(readDocSource()));
+  connect(this->idxTimer, &QTimer::timeout, this, &Widget::toggleIndexing);
+  connect(this->idxProcess,
+          static_cast<void (QProcess::*)(int)>(&QProcess::finished), [this]() {
+            this->m_indexAvtive = false;
+            this->m_indexed = true;
+          });
+  connect(this->idxProcess, &QProcess::started,
+          [this]() { this->m_indexAvtive = true; });
+  connect(this->searchLine,&SSearch::tabPressed,this->restable,&ResTable::moveToNextResoule);
+
+  connect(this->searchLine,&SSearch::stabPressed,[](){
+      qDebug()<<"shift tab press";
   });
-
-
 }
 
-bool Widget::checkIdxPaths()
-{
-    string badpaths;
-    vector<string> args {"recollindex", "-c", theconfig->getConfDir(), "-E"};
-    ExecCmd::backtick(args, badpaths);
-    if (!badpaths.empty()) {
-        int rep = QMessageBox::warning(
-            0, tr("Bad paths"), tr("Bad paths in configuration file:\n") +
-            QString::fromLocal8Bit(badpaths.c_str()),
-            QMessageBox::Ok, QMessageBox::Cancel, QMessageBox::NoButton);
-        if (rep == QMessageBox::Cancel)
-            return false;
-    }
-    return true;
+bool Widget::checkIdxPaths() {
+  string badpaths;
+  vector<string> args{"recollindex", "-c", theconfig->getConfDir(), "-E"};
+  ExecCmd::backtick(args, badpaths);
+  if (!badpaths.empty()) {
+    int rep = QMessageBox::warning(0, tr("Bad paths"),
+                                   tr("Bad paths in configuration file:\n") +
+                                       QString::fromLocal8Bit(badpaths.c_str()),
+                                   QMessageBox::Ok, QMessageBox::Cancel,
+                                   QMessageBox::NoButton);
+    if (rep == QMessageBox::Cancel)
+      return false;
+  }
+  return true;
 }
 
 // This gets called when the "update index" action is activated. It executes
 // the requested action, and disables the menu entry. This will be
 // re-enabled by the indexing status check
-void Widget::toggleIndexing()
-{
-    if(m_indexAvtive){
-        qDebug()<<"already indexing";
-        return ;
-    }
-    qDebug()<<"start Index";
-    QStringList sl;
-    {
-        QMutexLocker locker(&mtxTobeIndex);
-        sl=QStringList::fromSet(tobeIndex);
-        tobeIndex.clear();
-    }
+void Widget::toggleIndexing() {
+  if (m_indexAvtive) {
+    qDebug() << "already indexing";
+    return;
+  }
+  qDebug() << "start Index";
+  QStringList sl;
+  {
+    QMutexLocker locker(&mtxTobeIndex);
+    sl = QStringList::fromSet(tobeIndex);
+    tobeIndex.clear();
+  }
 
-    QStringList args;
-    args<<" -c "+QString::fromStdString(theconfig->getConfDir());
-    args<<" -i "+sl.join(" ");
+  QStringList args;
+  args << " -c " + QString::fromStdString(theconfig->getConfDir());
+  args << " -i " + sl.join(" ");
 
-    idxProcess->start("recollindex",args);
-
+  idxProcess->start("recollindex", args);
 }

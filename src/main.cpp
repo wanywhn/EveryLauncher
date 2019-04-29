@@ -130,6 +130,14 @@ int main(int argc, char *argv[]) {
   auto desktop = QApplication::desktop();
   w.move((desktop->width() - w.width()) / 2,
          (desktop->height() - w.height()) / 3);
+
+  auto fixdwid=desktop->width()/2;
+  fixdwid=fixdwid>600?600:fixdwid;
+  auto fixhei=desktop->height()/2;
+  fixhei=fixhei>500?500:fixhei;
+
+  w.setMinimumSize(fixdwid,fixhei);
+  w.setMaximumSize(fixdwid,fixhei);
   w.show();
 
   return a.exec();

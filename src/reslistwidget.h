@@ -4,6 +4,8 @@
 #include <QAbstractListModel>
 #include <QLabel>
 #include <QListView>
+#include <QSortFilterProxyModel>
+#include <QVBoxLayout>
 #include <QWidget>
 
 #include "docseq.h"
@@ -116,11 +118,18 @@ public slots:
 //  virtual void onSortDataChanged(DocSeqSortSpec);
   virtual void makeRowVisible(int row);
   virtual void takeFocus();
+  void moveToNextResoule();
 
   //    friend class ResTablePager;
   //    friend class ResTableDetailArea;
 private:
-  QListView *listview;
+  QVector<QPair<QListView *, QSortFilterProxyModel *> > vm;
+  QMap<int,QString> vmIndex;
+  QStringList *filterString;
+//  QListView *listViewProgram;
+//  QListView *listViewDoc;
+  //!! only store listview etc
+  QVBoxLayout *llayout;
   RecollModel *m_model;
   //    ResTableDetailArea *m_detail;
   int m_detaildocnum;
@@ -130,6 +139,8 @@ private:
   bool m_ismainres;
     //TODO multi
     QLabel *detailedWidget;
+    int currentListViewIndex;
+    int currentlistViewItemIndex;
 };
 
 #endif // RESLISTWIDGET_H

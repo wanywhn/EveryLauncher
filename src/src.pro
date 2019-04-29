@@ -62,7 +62,6 @@ SOURCES += \
         ../../recoll1-code/src/qtgui/confgui/confguiindex.cpp\
         ../../recoll1-code/src/qtgui/guiutils.cpp\
     searchline.cpp \
-    listitemwidget.cpp \
     dbusproxy.cpp\
         everylaunchermonitor_interface.cpp
 
@@ -79,7 +78,6 @@ HEADERS += \
         ../../recoll1-code/src/qtgui/confgui/confguiindex.h\
         ../../recoll1-code/src/qtgui/guiutils.h\
     searchline.h \
-    listitemwidget.h \
     dbusproxy.h\
         everylaunchermonitor_interface.h
 
