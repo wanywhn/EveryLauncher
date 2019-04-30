@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui dbus
+QT       += core gui dbus webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -65,7 +65,13 @@ SOURCES += \
     dbusproxy.cpp\
         everylaunchermonitor_interface.cpp \
     msortfilterproxymodel.cpp \
-    detailedwidget.cpp
+    detailedwidget.cpp \
+    recollmodel.cpp \
+    Detailed/detailedtext.cpp \
+    Detailed/preview_w.cpp \
+    Detailed/preview_load.cpp \
+    Detailed/preview_plaintorich.cpp \
+    Detailed/previewtextedit.cpp
 
 HEADERS += \
         widget.h \
@@ -83,7 +89,13 @@ HEADERS += \
     dbusproxy.h\
         everylaunchermonitor_interface.h \
     msortfilterproxymodel.h \
-    detailedwidget.h
+    detailedwidget.h \
+    recollmodel.h \
+    Detailed/detailedtext.h \
+    Detailed/preview_w.h \
+    Detailed/preview_load.h \
+    Detailed/preview_plaintorich.h \
+    Detailed/previewtextedit.h
 
 FORMS += \
         widget.ui

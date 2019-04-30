@@ -304,9 +304,18 @@ void SSearch::startSimpleSearch() {
     return;
   }
   auto str=queryText->text();
+  if(str.trimmed().isEmpty()){
+      emit clearSearch();
+      return ;
+
+  }
   QString s("");
   for(auto tmp:str){
-      s+=tmp+QString("*");
+      if((tmp>'a'&&tmp<'z')||(tmp>'A'&&tmp<'Z')){
+        s+=tmp+QString("*");
+      }else{
+          s+=tmp;
+      }
   }
   string u8=s.toStdString();
   trimstring(u8);

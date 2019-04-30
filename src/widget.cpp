@@ -192,6 +192,8 @@ void Widget::init_ui() {
 
 void Widget::init_conn() {
   connect(this->searchLine, &SSearch::startSearch, this, &Widget::startSearch);
+  connect(this->searchLine,&SSearch::tabPressed,this->restable,&ResTable::moveToNextResoule);
+  connect(this->searchLine,&SSearch::clearSearch,this->restable,&ResTable::clearSeach);
   //    restable->setRclMain(this, true);
   connect(this, SIGNAL(docSourceChanged(std::shared_ptr<DocSequence>)),
           restable, SLOT(setDocSource(std::shared_ptr<DocSequence>)));
@@ -205,11 +207,7 @@ void Widget::init_conn() {
           });
   connect(this->idxProcess, &QProcess::started,
           [this]() { this->m_indexAvtive = true; });
-  connect(this->searchLine,&SSearch::tabPressed,this->restable,&ResTable::moveToNextResoule);
 
-  connect(this->searchLine,&SSearch::stabPressed,[](){
-      qDebug()<<"shift tab press";
-  });
 }
 
 bool Widget::checkIdxPaths() {
