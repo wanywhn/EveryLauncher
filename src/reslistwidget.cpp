@@ -193,11 +193,11 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
   //    LOGDEB2("RecollModel::data: row " << index.row() << " col " <<
   //            index.column() << " role " << role << "\n");
   if (!m_source || !index.isValid() || role < Qt::UserRole) {
-//  if (!m_source || !index.isValid() || role != Qt::DisplayRole) {
+    //  if (!m_source || !index.isValid() || role != Qt::DisplayRole) {
     //      index.column() >= int(m_fields.size())) {
     return QVariant();
   }
-//  return QVariant("test");
+  //  return QVariant("test");
 
   Rcl::Doc doc;
   if (!m_source->getDoc(index.row(), doc)) {
@@ -352,13 +352,12 @@ public:
     return {50, 50};
   }
 };
-
 static PlainToRichQtReslist g_hiliter;
 
 void ResTable::init() {
-//  listViewProgram->setModel(m_model);
-//  listViewProgram->setMouseTracking(true);
-//  listViewProgram->setContextMenuPolicy(Qt::CustomContextMenu);
+  //  listViewProgram->setModel(m_model);
+  //  listViewProgram->setMouseTracking(true);
+  //  listViewProgram->setContextMenuPolicy(Qt::CustomContextMenu);
 
   //    QHeaderView *header = listview->horizontalHeader();
   //    if (header) {
@@ -384,14 +383,15 @@ void ResTable::init() {
   //                      ROWHEIGHTPAD);
   //    }
 
-//  QKeySequence seq("Esc");
-//  QShortcut *sc = new QShortcut(seq, this);
+  //  QKeySequence seq("Esc");
+  //  QShortcut *sc = new QShortcut(seq, this);
   //    connect(sc, &QShortcut::activated,
   //        listview->selectionModel(), &QItemSelectionModel::clear);
   // TODO here emit signal to dispay right widget
 
-//  connect(listViewProgram->selectionModel(), &QItemSelectionModel::currentChanged,
-//          this, &ResTable::onTableView_currentChanged);
+  //  connect(listViewProgram->selectionModel(),
+  //  &QItemSelectionModel::currentChanged,
+  //          this, &ResTable::onTableView_currentChanged);
 
   //    connect(listview, &QAbstractItemView::doubleClicked,
   //            this, &ResTable::onDoubleClick);
@@ -436,15 +436,17 @@ void ResTable::setRclMain(RclMain *m, bool ismain)
 
 ResTable::ResTable(QWidget *parent)
     : QWidget(parent), m_model(nullptr), m_detaildocnum(-1), m_ismainres(true) {
-//  this->listViewProgram = new QListView();
-//    this->listViewDoc=new QListView();
-    //Store the reg of type
-    filterString =new QStringList({"application/x-all","text/.*"});
-    for(auto i=0;i!=filterString->size();++i){
-    vm.push_back(QPair<QListView*,QSortFilterProxyModel*>(new QListView,new QSortFilterProxyModel( this)));
-    }
+  //  this->listViewProgram = new QListView();
+  //    this->listViewDoc=new QListView();
+  // Store the reg of type
+  //  filterString = new QStringList({"application/x-all", "text/*"});
+  filterString = new QStringList({"*"});
+  for (auto i = 0; i != filterString->size(); ++i) {
+    vm.push_back(QPair<QListView *, MSortFilterProxyModel *>(
+        new QListView, new MSortFilterProxyModel(this)));
+  }
 
-  this->detailedWidget = new QLabel();
+  this->dtw = new DetailedWidget();
   currentListViewIndex = 0;
   currentlistViewItemIndex = -1;
   QStringList fields;
@@ -462,8 +464,8 @@ int ResTable::getDetailDocNumOrTopRow() {
   if (m_detaildocnum >= 0)
     return m_detaildocnum;
   return 0;
-//  QModelIndex modelIndex = listViewProgram->indexAt(QPoint(0, 0));
-//  return modelIndex.row();
+  //  QModelIndex modelIndex = listViewProgram->indexAt(QPoint(0, 0));
+  //  return modelIndex.row();
 }
 
 void ResTable::init_ui() {
@@ -473,71 +475,78 @@ void ResTable::init_ui() {
 
   llayout = new QVBoxLayout();
   // TODO here add multi view ,using different filter proxy model
-  for(auto i=0;i!=filterString->size();++i){
+  for (auto i = 0; i != filterString->size(); ++i) {
 
-  llayout->addWidget(vm.at(i).first);
-  vm.at(i).first->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  vm.at(i).second->setSourceModel(this->m_model);
-  vm.at(i).second->setFilterRole(RecollModel::ModelRoles::Role_MIME_TYPE);
-  vm.at(i).second->setFilterRegExp(filterString->at(i));
-  vm.at(i).second->setFilterWildcard(filterString->at(i));
-  vm.at(i).second->setDynamicSortFilter(true);
-  vm.at(i).first->setModel(vm.at(i).second);
-//  vm.at(i).first->setModel(this->m_model);
-  vm.at(i).first->setSelectionBehavior(QAbstractItemView::SelectRows);
-  vm.at(i).first->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-  vm.at(i).first->setItemDelegate(new ResTableDelegate(this));
+    llayout->addWidget(vm.at(i).first);
+    vm.at(i).first->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    vm.at(i).first->setSelectionBehavior(QAbstractItemView::SelectRows);
+    vm.at(i).first->setSelectionMode(
+        QAbstractItemView::SelectionMode::SingleSelection);
+    vm.at(i).first->setItemDelegate(new ResTableDelegate(this));
+
+//    vm.at(i).first->setModel(this->m_model);
+
+    //    vm.at(i).second->setSourceModel(this->m_model);
+    //    vm.at(i).second->setFilterRole(RecollModel::ModelRoles::Role_MIME_TYPE);
+    //    vm.at(i).second->setFilterRegExp(filterString->at(i));
+        vm.at(i).second->setFilterWildcard(filterString->at(i));
+    //    vm.at(i).second->setSortRole(RecollModel::ModelRoles::Role_RELEVANCY);
+    //    vm.at(i).second->setDynamicSortFilter(false);
+        vm.at(i).first->setModel(vm.at(i).second);
+
+    connect(vm.at(i).second, &MSortFilterProxyModel::itemCountChanged,
+            [this, i](int count) {
+              qDebug() << "se cout:" << count;
+              auto view = this->vm.at(i).first;
+              // TODO height?
+              view->resize(view->width(), count * 70);
+            });
   }
 
   hlayout->addLayout(llayout);
-  hlayout->addWidget(this->detailedWidget);
+  hlayout->addWidget(this->dtw);
   hlayout->setStretchFactor(llayout, 1);
-  hlayout->setStretchFactor(this->detailedWidget, 2);
+  hlayout->setStretchFactor(this->dtw, 2);
 
-  this->detailedWidget->setVisible(false);
-  this->detailedWidget->setWordWrap(true);
+  this->dtw->setVisible(false);
+  //  this->detailedWidget->setWordWrap(true);
 }
 
 void ResTable::makeRowVisible(int row) {
   //    LOGDEB("ResTable::showRow(" << row << ")\n");
   QModelIndex modelIndex = m_model->index(row, 0);
-//  listViewProgram->scrollTo(modelIndex, QAbstractItemView::PositionAtTop);
-//  listViewProgram->selectionModel()->clear();
+  //  listViewProgram->scrollTo(modelIndex, QAbstractItemView::PositionAtTop);
+  //  listViewProgram->selectionModel()->clear();
   m_detaildocnum = -1;
 }
 
-void ResTable::onTableView_currentChanged(const QModelIndex &index) {
+void ResTable::onTableView_currentChanged() {
   //    LOGDEB2("ResTable::onTableView_currentChanged(" << index.row() << ", "
   //    <<
   //            index.column() << ")\n");
 
   if (!m_model || !m_model->getDocSource())
     return;
-  Rcl::Doc doc;
-  if (m_model->getDocSource()->getDoc(index.row(), doc)) {
-    m_detaildocnum = index.row();
-    m_detaildoc = doc;
-    auto t =
-        this->m_model
-            ->data(index, RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT)
-            .toString();
-    this->detailedWidget->setText(t);
-    this->detailedWidget->setVisible(true);
-  } else {
-    m_detaildocnum = -1;
-  }
-}
-
-void ResTable::on_tableView_entered(const QModelIndex &index) {
-  //    LOGDEB2("ResTable::on_listview_entered(" << index.row() << ", "  <<
-  //            index.column() << ")\n");
-//  if (!listViewProgram->selectionModel()->hasSelection())
-    onTableView_currentChanged(index);
+  auto proxyModel=vm.at(currentListViewIndex).second;
+  auto index=proxyModel->index(currentlistViewItemIndex,0);
+  index=proxyModel->mapToSource(index);
+//  Rcl::Doc doc;
+//  m_model->getDocSource()->getDoc(index.row(), doc);
+  this->dtw->showDocDetail(index);
+//    m_detaildocnum = index.row();
+//    m_detaildoc = doc;
+//    auto t =
+//        this->m_model
+//            ->data(index, RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT)
+//            .toString();
+//    this->detailedWidget->setText(t);
+    this->dtw->setVisible(true);
+//  }
 }
 
 void ResTable::takeFocus() {
   //    LOGDEB("resTable: take focus\n");
-//  listViewProgram->setF/*o*/cus(Qt::ShortcutFocusReason);
+  //  listViewProgram->setF/*o*/cus(Qt::ShortcutFocusReason);
 }
 
 void ResTable::moveToNextResoule() {
@@ -545,8 +554,7 @@ void ResTable::moveToNextResoule() {
   //  auto childerns = llayout->children();
   //  auto childerns = llayout->
   auto listIndex = currentListViewIndex;
-  auto itemIndex =
-      currentlistViewItemIndex == -1 ? 0 : currentlistViewItemIndex + 1;
+  auto itemIndex = currentlistViewItemIndex + 1;
   int targetListViewIdex = -1;
   for (int idx = listIndex; idx < llayout->count(); ++idx) {
     auto view = qobject_cast<QListView *>(llayout->itemAt(idx)->widget());
@@ -566,39 +574,39 @@ void ResTable::moveToNextResoule() {
     for (auto i = 0; i != llayout->count(); ++i) {
       auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
       if (ffnz) {
-        view->clearFocus();
+        view->setCurrentIndex(view->model()->index(-1, 0));
         continue;
       }
       if (view->model()->rowCount() > 0) {
-        auto ci = view->model()->index(0, 0);
+        auto ci = view->model()->index(i, 0);
         view->setCurrentIndex(ci);
-        currentListViewIndex=i;
-        currentlistViewItemIndex=0;
+        targetListViewIdex = i;
+        itemIndex = 0;
         ffnz = true;
         continue;
       }
     }
-    if(ffnz){
-    }else{
-       currentListViewIndex=0;
-       currentlistViewItemIndex=-1;
-
-    }
-
-  } else {
-      //find the "next"
-    currentListViewIndex = targetListViewIdex;
-    currentlistViewItemIndex = itemIndex;
-    for (auto i = 0; i != llayout->count(); ++i) {
-      auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
-      if (i != currentListViewIndex) {
-        view->clearFocus();
-        continue;
-      }
-      auto ci = view->model()->index(currentlistViewItemIndex, 0);
-      view->setCurrentIndex(ci);
-    }
+    //    if (ffnz) {
+    //    } else {
+    //      currentListViewIndex = 0;
+    //      currentlistViewItemIndex = -1;
+    //    }
   }
+  //  } else {
+  // find the "next"
+  currentListViewIndex = targetListViewIdex;
+  currentlistViewItemIndex = itemIndex;
+  for (auto i = 0; i != llayout->count(); ++i) {
+    auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
+    if (i != currentListViewIndex) {
+      view->setCurrentIndex(view->model()->index(-1, 0));
+      continue;
+    }
+    auto ci = view->model()->index(currentlistViewItemIndex, 0);
+    view->setCurrentIndex(ci);
+    //    }
+  }
+  onTableView_currentChanged();
 }
 
 void ResTable::setDocSource(std::shared_ptr<DocSequence> nsource) {
@@ -647,6 +655,10 @@ void ResTable::readDocSource(bool resetPos) {
   //    if (resetPos)
   //    listview->verticalScrollBar()->setSliderPosition(0);
 
+  //  for (auto i = 0; i != filterString->size(); ++i) {
+  //      vm.at(i).second->setSourceModel(this->m_model);
+  //      vm.at(i).first->setModel(vm.at(i).second);
+  //  }
   m_model->readDocSource();
   m_detaildocnum = -1;
 }

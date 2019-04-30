@@ -136,8 +136,8 @@ int main(int argc, char *argv[]) {
   auto fixhei=desktop->height()/2;
   fixhei=fixhei>500?500:fixhei;
 
-  w.setMinimumSize(fixdwid,fixhei);
-  w.setMaximumSize(fixdwid,fixhei);
+//  w.setMinimumSize(fixdwid,fixhei);
+//  w.setMaximumSize(fixdwid,fixhei);
   w.show();
 
   return a.exec();

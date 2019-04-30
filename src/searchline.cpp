@@ -142,10 +142,13 @@ SSearch::SSearch(QWidget *parent, const char *) : QWidget(parent) {
 
 void SSearch::init_conn() {
   // See enum in .h and keep in order !
-  connect(queryText, SIGNAL(returnPressed()), this, SLOT(startSimpleSearch()));
-  connect(queryText, &QLineEdit::textChanged, this,
-          &SSearch::searchTextChanged);
-  connect(queryText, &QLineEdit::textEdited, this, &SSearch::searchTextEdited);
+//  connect(queryText, SIGNAL(returnPressed()), this, SLOT(startSimpleSearch()));
+//  connect(queryText,SLOT(textChanged(const QString &)),this,SLOT(startSimpleSearch()));
+    connect(queryText,&QLineEdit::textChanged,this,static_cast<void(SSearch::*)(void)>(&SSearch::startSimpleSearch));
+//  connect(queryText, &QLineEdit::textChanged, this,
+//          &SSearch::searchTextChanged);
+//  connect(queryText, &QLineEdit::textEdited, this, &SSearch::searchTextEdited);
+  connect(queryText,&MLineEdit::returnPressed,this,&SSearch::returnPressed);
 
   m_completermodel = new RclCompleterModel(this);
   QCompleter *completer = new QCompleter(m_completermodel, this);
@@ -300,7 +303,12 @@ void SSearch::startSimpleSearch() {
   if (queryText->completer()->popup()->isVisible()) {
     return;
   }
-  string u8 = queryText->text().toStdString();
+  auto str=queryText->text();
+  QString s("");
+  for(auto tmp:str){
+      s+=tmp+QString("*");
+  }
+  string u8=s.toStdString();
   trimstring(u8);
   if (u8.length() == 0)
     return;
@@ -321,31 +329,21 @@ void SSearch::setPrefs() {}
 //{
 //    //return m_xml;
 //}
-#define LOGGER_STATICVERBOSITY 5
-#define LOGGER_LEVEL 7
-bool SSearch::startSimpleSearch(const string &u8, int maxexp) {
+bool SSearch::startSimpleSearch(const string &u8) {
   LOGDEB("SSearch::startSimpleSearch(" << u8 << ")\n");
   // TODO
   string stemlang = "english"; // prefs.stemlang();
-
-  //    ostringstream xml;
-  //    xml << "<SD type='ssearch'>\n";
-  //    xml << "  <SL>" << stemlang << "</SL>\n";
-  // TODO
-  //    xml << "  <T>" << base64_encode(u8) << "</T>\n";
 
   //    SSearchType tp = (SSearchType)searchTypCMB->currentIndex();
   Rcl::SearchData *sdata = nullptr;
 
   /*
   if (tp == SST_LANG) {
-      xml << "  <SM>QL</SM>\n";
       string reason;
       if (prefs.autoSuffsEnable) {
           sdata = wasaStringToRcl(theconfig, stemlang, u8, reason,
                                   (const char *)prefs.autoSuffs.toUtf8());
           if (!prefs.autoSuffs.isEmpty()) {
-              xml <<  "  <AS>" << qs2u8s(prefs.autoSuffs) << "</AS>\n";
           }
       } else {
           sdata = wasaStringToRcl(theconfig, stemlang, u8, reason);
@@ -364,15 +362,12 @@ bool SSearch::startSimpleSearch(const string &u8, int maxexp) {
   }
   Rcl::SearchDataClause *clp = 0;
   //        if (tp == SST_FNM) {
-  //            xml << "  <SM>FN</SM>\n";
   //            clp = new Rcl::SearchDataClauseFilename(u8);
   //        } else {
   // ANY or ALL, several words.
   //            if (tp == SST_ANY) {
-  //                xml << "  <SM>OR</SM>\n";
   clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_OR, u8);
   //            } else {
-  //                xml << "  <SM>AND</SM>\n";
   //                clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_AND, u8);
   //            }
   //        }
@@ -380,7 +375,6 @@ bool SSearch::startSimpleSearch(const string &u8, int maxexp) {
   //    }
 
   //    if (prefs.ssearchAutoPhrase && rcldb) {
-  //        xml << "  <AP/>\n";
   //        sdata->maybeAddAutoPhrase(*rcldb,
   //                                  prefs.ssearchAutoPhraseThreshPC / 100.0);
   //    }
@@ -389,12 +383,8 @@ bool SSearch::startSimpleSearch(const string &u8, int maxexp) {
   //    }
 
   //    for (const auto& dbdir : prefs.activeExtraDbs) {
-  //        xml << "  <EX>" << base64_encode(dbdir) << "</EX>";
   //    }
 
-  //    xml << "</SD>\n";
-  //    m_xml = xml.str();
-  //    LOGDEB("SSearch::startSimpleSearch:xml:[" << m_xml << "]\n");
 
   std::shared_ptr<Rcl::SearchData> rsdata(sdata);
   emit setDescription(QString::fromStdString(u8));
@@ -402,64 +392,6 @@ bool SSearch::startSimpleSearch(const string &u8, int maxexp) {
   return true;
 }
 
-/*
-bool SSearch::fromXML(const SSearchDef& fxml)
-{
-    string asString;
-    set<string> cur;
-    set<string> stored;
-
-    // Retrieve current list of stemlangs. prefs returns a
-    // space-separated list Warn if stored differs from current,
-    // but don't change the latter.
-    stringToStrings(prefs.stemlang(), cur);
-    stored = set<string>(fxml.stemlangs.begin(), fxml.stemlangs.end());
-    stringsToString(fxml.stemlangs, asString);
-    if (cur != stored) {
-        QMessageBox::warning(
-            0, "Recoll", tr("Stemming languages for stored query: ") +
-            QString::fromUtf8(asString.c_str()) +
-            tr(" differ from current preferences (kept)"));
-    }
-
-    // Same for autosuffs
-    stringToStrings(qs2u8s(prefs.autoSuffs), cur);
-    stored = set<string>(fxml.autosuffs.begin(), fxml.autosuffs.end());
-    stringsToString(fxml.stemlangs, asString);
-    if (cur != stored) {
-        QMessageBox::warning(
-            0, "Recoll", tr("Auto suffixes for stored query: ") +
-            QString::fromUtf8(asString.c_str()) +
-            tr(" differ from current preferences (kept)"));
-    }
-
-    cur = set<string>(prefs.activeExtraDbs.begin(), prefs.activeExtraDbs.end());
-    stored = set<string>(fxml.extindexes.begin(), fxml.extindexes.end());
-    stringsToString(fxml.extindexes, asString);
-    if (cur != stored) {
-        QMessageBox::warning(
-            0, "Recoll", tr("External indexes for stored query: ") +
-            QString::fromUtf8(asString.c_str()) +
-            tr(" differ from current preferences (kept)"));
-    }
-
-    if (prefs.ssearchAutoPhrase && !fxml.autophrase) {
-        QMessageBox::warning(
-            0, "Recoll",
-            tr("Autophrase is set but it was unset for stored query"));
-    } else if (!prefs.ssearchAutoPhrase && fxml.autophrase) {
-        QMessageBox::warning(
-            0, "Recoll",
-            tr("Autophrase is unset but it was set for stored query"));
-    }
-    setSearchString(QString::fromUtf8(fxml.text.c_str()));
-    // We used to use prefs.ssearchTyp here. Not too sure why?
-    // Minimize user surprise factor ? Anyway it seems cleaner to
-    // restore the saved search type
-    searchTypCMB->setCurrentIndex(fxml.mode);
-    return true;
-}
-*/
 
 void SSearch::setSearchString(const QString &txt) { queryText->setText(txt); }
 
@@ -541,4 +473,22 @@ int SSearch::getPartialWord(QString &word) {
     cs++;
   word = txt.right(txt.size() - cs);
   return cs;
+}
+
+MLineEdit::MLineEdit(QWidget *parent) : QLineEdit(parent) {
+    //      connect(this,&QLineEdit::textChanged,this,&MLineEdit::textChanged);
+}
+
+bool MLineEdit::event(QEvent *event) {
+    if (event->type() != QEvent::KeyPress) {
+        return QLineEdit::event(event);
+    }
+    auto kev = static_cast<QKeyEvent *>(event);
+    if (kev->key() != Qt::Key_Tab) {
+        return QLineEdit::event(event);
+    }
+    emit tabPressed();
+    //    qDebug() << "tab";
+    return true;
+    //    return QLineEdit::event(event);
 }

@@ -63,7 +63,9 @@ SOURCES += \
         ../../recoll1-code/src/qtgui/guiutils.cpp\
     searchline.cpp \
     dbusproxy.cpp\
-        everylaunchermonitor_interface.cpp
+        everylaunchermonitor_interface.cpp \
+    msortfilterproxymodel.cpp \
+    detailedwidget.cpp
 
 HEADERS += \
         widget.h \
@@ -79,7 +81,9 @@ HEADERS += \
         ../../recoll1-code/src/qtgui/guiutils.h\
     searchline.h \
     dbusproxy.h\
-        everylaunchermonitor_interface.h
+        everylaunchermonitor_interface.h \
+    msortfilterproxymodel.h \
+    detailedwidget.h
 
 FORMS += \
         widget.ui

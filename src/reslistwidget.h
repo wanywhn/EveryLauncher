@@ -7,8 +7,10 @@
 #include <QSortFilterProxyModel>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <detailedwidget.h>
 
 #include "docseq.h"
+#include "msortfilterproxymodel.h"
 #include "plaintorich.h"
 
 #include <map>
@@ -109,9 +111,8 @@ public:
 private:
   void init_ui();
   void init();
+  virtual void onTableView_currentChanged();
 public slots:
-  virtual void onTableView_currentChanged(const QModelIndex &);
-  virtual void on_tableView_entered(const QModelIndex &index);
   virtual void setDocSource(std::shared_ptr<DocSequence> nsource);
   virtual void resetSource();
   virtual void readDocSource(bool resetPos = true);
@@ -123,7 +124,7 @@ public slots:
   //    friend class ResTablePager;
   //    friend class ResTableDetailArea;
 private:
-  QVector<QPair<QListView *, QSortFilterProxyModel *> > vm;
+  QVector<QPair<QListView *, MSortFilterProxyModel *> > vm;
   QMap<int,QString> vmIndex;
   QStringList *filterString;
 //  QListView *listViewProgram;
@@ -138,7 +139,7 @@ private:
   //    RclMain *m_rclmain;
   bool m_ismainres;
     //TODO multi
-    QLabel *detailedWidget;
+    DetailedWidget *dtw;
     int currentListViewIndex;
     int currentlistViewItemIndex;
 };

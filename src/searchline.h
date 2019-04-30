@@ -46,28 +46,18 @@ private:
 class MLineEdit : public QLineEdit {
   Q_OBJECT
 public:
-  MLineEdit(QWidget *parent) : QLineEdit(parent) {}
+  MLineEdit(QWidget *parent);
   ~MLineEdit() {}
 
   // QObject interface
 public:
-  bool event(QEvent *event) {
-    if (event->type() != QEvent::KeyPress) {
-      return QLineEdit::event(event);
-    }
-    auto kev = static_cast<QKeyEvent *>(event);
-    if (kev->key() != Qt::Key_Tab) {
-      return QLineEdit::event(event);
-    }
-    emit tabPressed();
-//    qDebug() << "tab";
-    return true;
-    //    return QLineEdit::event(event);
-  }
+  bool event(QEvent *event);
 
 signals:
   void tabPressed();
   void stabPressed();
+
+//  void textChanged();
 };
 
 class SSearch : public QWidget {
@@ -112,6 +102,7 @@ signals:
   void partialWord(int, const QString &text, const QString &partial);
   void tabPressed();
   void stabPressed();
+  void returnPressed();
 
 private:
   void init_ui();
@@ -119,7 +110,7 @@ private:
 
 private:
   int getPartialWord(QString &word);
-  bool startSimpleSearch(const string &q, int maxexp = -1);
+  bool startSimpleSearch(const string &q);
   MLineEdit *queryText;
 
   /* We save multiword entries because the completer replaces them with
