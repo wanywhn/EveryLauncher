@@ -1,6 +1,7 @@
 #include "detailedwidget.h"
 #include "reslistwidget.h"
 #include <QDebug>
+#include <Detailed/desktoppreview.h>
 #include <Detailed/preview_w.h>
 
 static QMap<QString,int> str2idx({
@@ -14,7 +15,7 @@ DetailedWidget::DetailedWidget(QWidget *parent) :QStackedWidget(parent)
 {
     insertWidget(0,new DetailedW);
     insertWidget(1,new Preview);
-    insertWidget(3,new DetailedW);
+    insertWidget(2,new DesktopPreview);
 //    std::vector<std::string> cat;
 //    theconfig->getMimeCategories(cat);
 //    for(auto item:cat){
@@ -25,11 +26,11 @@ DetailedWidget::DetailedWidget(QWidget *parent) :QStackedWidget(parent)
 
 void DetailedWidget::showDocDetail(QModelIndex index, Rcl::Doc doc, HighlightData hl)
 {
-   qDebug()<<"mtype:"<<index.data(RecollModel::ModelRoles::Role_MIME_TYPE);
    auto wid=str2idx[index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString()];
    this->setCurrentIndex(wid);
    auto curr=qobject_cast<DetailedW *>( this->currentWidget());
    curr->setHighlightData(hl);
+   curr->setIndex(index);
    curr->showDoc(doc);
 
 }

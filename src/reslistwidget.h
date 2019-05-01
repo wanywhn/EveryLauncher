@@ -14,6 +14,7 @@
 #include "plaintorich.h"
 #include "recollmodel.h"
 
+#include <DtkWidgets>
 #include <map>
 #include <memory>
 #include <string>
@@ -32,7 +33,9 @@ extern RclConfig *theconfig;
 class QUrl;
 // class RclMain;
 
-class ResTable : public QWidget {
+DWIDGET_USE_NAMESPACE
+class ResTable : public QWidget{
+
   Q_OBJECT
 
 public:
@@ -62,7 +65,7 @@ public slots:
   //    friend class ResTablePager;
   //    friend class ResTableDetailArea;
 private:
-  QVector<QPair<QListView *, MSortFilterProxyModel *> > vm;
+  QVector<QPair<DListView *, MSortFilterProxyModel *> > vm;
   QMap<int,QString> vmIndex;
   QStringList *filterString;
 //  QListView *listViewProgram;

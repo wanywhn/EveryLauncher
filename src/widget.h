@@ -11,13 +11,16 @@
 #include <QTimer>
 #include <QWidget>
 #include <execmd.h>
+#include <DtkWidgets>
+#include <DMainWindow>
 
+DWIDGET_USE_NAMESPACE
 namespace Ui {
 class Widget;
 }
 class IndexWorker;
 
-class Widget : public QWidget
+class Widget : public DMainWindow
 {
     Q_OBJECT
 

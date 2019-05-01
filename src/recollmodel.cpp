@@ -4,6 +4,7 @@
 #include <bits/stl_map.h>
 
 #include <QDebug>
+#include <QIcon>
 #include <QMessageBox>
 #include <QPixmap>
 #include <plaintorich.h>
@@ -205,48 +206,53 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
   }
   QVariant var;
   switch (role) {
-  case Role_FILE_NAME:
+  case Role_FILE_NAME: {
     var = gengetter("filename", doc);
     break;
-
-  case Role_LOCATION:
+  }
+  case Role_LOCATION: {
     var = gengetter("url", doc);
-
     break;
-  case Role_FILE_SIMPLE_CONTENT:
+  }
+  case Role_FILE_SIMPLE_CONTENT: {
     var = gengetter("abstract", doc);
     g_hiliter.plaintorich(var.toString().toStdString(), lr, m_hdata);
     var = QString::fromUtf8(lr.front().c_str());
-
     break;
-  case Role_MIME_TYPE:
+  }
+  case Role_MIME_TYPE: {
     var = gengetter("mtype", doc);
     break;
-  case Role_RELEVANCY:
+  }
+  case Role_RELEVANCY: {
     var = gengetter("relevancyrating", doc);
     break;
-  case Role_ICON_PATH:
-    //    auto mtype = gengetter("mtype", doc);
-    //    auto iconPath = theconfig->getMimeIconPath()''
-
-    std::string apptag;
-    doc.getmeta(Rcl::Doc::keyapptg, &apptag);
-    var = QString::fromStdString(
-        theconfig->getMimeIconPath(doc.mimetype, apptag));
+  }
+    // the default cat icon
+  case Role_ICON_PATH: {
+    auto mtype = gengetter("mtype", doc);
+    if (mtype != "application/x-all") {
+      std::string apptag;
+      doc.getmeta(Rcl::Doc::keyapptg, &apptag);
+      var = QString::fromStdString(
+          theconfig->getMimeIconPath(doc.mimetype, apptag));
+    } else {
+        qDebug()<<"AppIcon:"<<gengetter("appicon",doc);
+      var = gengetter("appicon", doc);
+    }
     break;
-
-//    default:
-//    var="err";
+  }
+  case Role_APP_NAME: {
+    var = gengetter("appname", doc);
+    break;
+  }
+  case Role_APP_COMMENT: {
+    var = gengetter("appcomment", doc);
+    break;
+  }
   }
   return var;
-
-  //  string colname = m_fields[index.column()];
-
-  //  string data = m_getters[index.column()](colname, doc);
-
-  // TODO highlight
 }
-
 // This gets called when the column headers are clicked
 void RecollModel::sort(int column, Qt::SortOrder order) {
   if (m_ignoreSort) {

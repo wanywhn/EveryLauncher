@@ -1,6 +1,7 @@
 #ifndef DETAILEDTEXT_H
 #define DETAILEDTEXT_H
 
+#include <QModelIndex>
 #include <QTextEdit>
 #include <QWidget>
 #include <hldata.h>
@@ -14,11 +15,14 @@ public:
 
     virtual void showDoc(Rcl::Doc doc);
     void setHighlightData(HighlightData hl);
+    void setIndex(const QModelIndex &value);
+
 signals:
 
 public slots:
 protected:
     HighlightData m_hData;
+    QModelIndex index;
 };
 
 #endif // DETAILEDTEXT_H

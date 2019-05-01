@@ -14,3 +14,8 @@ void DetailedW::setHighlightData(HighlightData hl)
 {
     this->m_hData=hl;
 }
+
+void DetailedW::setIndex(const QModelIndex &value)
+{
+    index = value;
+}

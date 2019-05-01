@@ -23,6 +23,8 @@ public:
         Role_FILE_SIMPLE_CONTENT = Qt::UserRole + 4,
         Role_MIME_TYPE = Qt::UserRole + 5,
         Role_RELEVANCY=Qt::UserRole+6,
+        Role_APP_COMMENT=Qt::UserRole+7,
+        Role_APP_NAME=Qt::UserRole+8,
 //        Role_FILE_ICON=Qt::UserRole+6;
 //        Role_FILE_EXEC=Qt::UserRole+7;
 //        Role_DESKTOP_NAME=Qt::UserRole+8;

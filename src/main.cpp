@@ -1,4 +1,5 @@
-#include <QApplication>
+#include <DApplication>
+//#include <QApplication>
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDebug>
@@ -82,7 +83,8 @@ void _create_dirs() {
   }
 }
 int main(int argc, char *argv[]) {
-  QApplication a(argc, argv);
+    DApplication::loadDXcbPlugin();
+  DApplication a(argc, argv);
   a.setAttribute(Qt::AA_EnableHighDpiScaling);
   a.setQuitOnLastWindowClosed(false);
   a.setApplicationName(AppName);
@@ -132,9 +134,9 @@ int main(int argc, char *argv[]) {
          (desktop->height() - w.height()) / 3);
 
   auto fixdwid=desktop->width()/2;
-  fixdwid=fixdwid>600?600:fixdwid;
+  fixdwid=fixdwid>1000?1000:fixdwid;
   auto fixhei=desktop->height()/2;
-  fixhei=fixhei>500?500:fixhei;
+  fixhei=fixhei>800?800:fixhei;
 
   w.setMinimumSize(fixdwid,fixhei);
   w.setMaximumSize(fixdwid,fixhei);

@@ -11,7 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = EveryLauncher
 TEMPLATE = app
 
-CONFIG += c++11
+CONFIG += c++11 link_pkgconfig
+PKGCONFIG += dtkwidget
 QMAKE_CXXFLAGS += -std=c++11
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -70,7 +71,8 @@ SOURCES += \
     Detailed/previewtextedit.cpp\
         confgui/confgui.cpp\
         confgui/confguiindex.cpp\
-        guiutils.cpp
+        guiutils.cpp \
+    Detailed/desktoppreview.cpp
 
 HEADERS += \
         widget.h \
@@ -93,7 +95,8 @@ HEADERS += \
     Detailed/previewtextedit.h\
         confgui/confgui.h\
         confgui/confguiindex.h\
-        guiutilsh
+        guiutils.h \
+    Detailed/desktoppreview.h
 
 FORMS += \
         widget.ui

@@ -33,6 +33,7 @@
 
 #include <string>
 #include <list>
+#include <DtkWidgets>
 using std::string;
 using std::list;
 
@@ -41,9 +42,10 @@ class RclConfig;
 class ConfParamW;
 class ConfParamDNLW;
 
+DTK_USE_NAMESPACE
 namespace confgui {
 
-class ConfIndexW : public QDialog {
+class ConfIndexW : public  DDialog{
     Q_OBJECT
 public:
     ConfIndexW(QWidget *parent, RclConfig *config);
@@ -54,8 +56,8 @@ public slots:
 private:
     RclConfig *m_rclconf;
     ConfNull  *m_conf;
-    list<QWidget *> m_widgets;
-    QTabWidget       *tabWidget;
+    QVector<QWidget *> m_widgets;
+    QTabWidget *tabWidget;
     QDialogButtonBox *buttonBox;
 };
 
@@ -63,7 +65,7 @@ private:
  * A panel with the top-level parameters which can't be redefined in 
  * subdirectoriess:
  */
-class ConfTopPanelW : public QWidget {
+class ConfTopPanelW : public QWidget{
     Q_OBJECT
 public:
     ConfTopPanelW(QWidget *parent, ConfNull *config);

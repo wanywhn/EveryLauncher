@@ -9,8 +9,8 @@
 #include <QTextDocument>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <dlistview.h>
 #define TEXTINCELLVTRANS -1
-
 
 ///////////////////////////
 // ResTable panel methods
@@ -32,69 +32,32 @@ public:
     initStyleOption(&opt, index);
     auto filename =
         index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
-    QString iconPath;
-    if(index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString()=="application/x-all"){
-        //TODO find app icon
-
-    iconPath = index.data(RecollModel::ModelRoles::Role_ICON_PATH).toString();
-    }else{
-    iconPath = index.data(RecollModel::ModelRoles::Role_ICON_PATH).toString();
+    if (index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString() ==
+        "application/x-all") {
+      // TODO find app icon
+      filename = index.data(RecollModel::ModelRoles::Role_APP_NAME).toString();
     }
+     auto iconpath=index.data(RecollModel::ModelRoles::Role_ICON_PATH).toString();
     //    this->liw.setIcon(icon.value<QPixmap>());
     //    this->liw.setTitle(filename.toString());
     //    auto toRender=const_cast<ListItemWidget&>(this->liw).grab();
-    QPixmap icon(iconPath);
+     QPixmap icon(iconpath);
+     icon=icon.scaled(this->sizeHint(option,index));
     QRectF recf(opt.rect);
     //    qDebug()<<filename;
     //    QRectF recf(0,0,50,50);
     if (opt.state & QStyle::State_Selected) {
       painter->fillRect(opt.rect, opt.palette.highlight());
     }
-    QRectF iconRectf(recf);
+    QRectF iconRectf(opt.rect);
     iconRectf.setSize(icon.size());
 
-    painter->drawPixmap(iconRectf, icon, icon.rect());
-    //    painter->setPen(opt.palette.text().color());
-    auto textPos=QPointF(iconRectf.topRight());
-    textPos.ry()+=iconRectf.height()/2;
-//    auto textpos = QPointF(icon.size().width(), recf.y() + recf.height() / 2);
-    painter->drawText(textPos, filename);
-    //    QStyledItemDelegate::paint(painter,option,index);
+    painter->drawPixmap(iconRectf,icon,icon.rect());
 
-    /*
-    if (value.isValid() && !value.isNull()) {
-      QString text = value.toString();
-      if (!text.isEmpty()) {
-        QTextDocument document;
-        painter->save();
-        if (opt.state & QStyle::State_Selected) {
-          painter->fillRect(opt.rect, opt.palette.highlight());
-          // Set the foreground color. The pen approach does
-          // not seem to work, probably it's reset by the
-          // textdocument. Couldn't use
-          // setdefaultstylesheet() either. the div thing is
-          // an ugly hack. Works for now
-#if 0
-            QPen pen = painter->pen();
-            pen.setBrush(opt.palette.brush(QPalette::HighlightedText));
-            painter->setPen(pen);
-#else
-          text = QString::fromUtf8("<div style='color: white'> ") + text +
-                 QString::fromUtf8("</div>");
-#endif
-        }
-        painter->setClipRect(option.rect);
-        QPoint where = option.rect.topLeft();
-        where.ry() += TEXTINCELLVTRANS;
-        painter->translate(where);
-        document.setHtml(text);
-        document.drawContents(painter);
-        painter->restore();
-        return;
-      }
-    }
-    QStyledItemDelegate::paint(painter, option, index);
-    */
+    auto textPos = QPointF(iconRectf.topRight());
+
+    textPos.ry() += iconRectf.height() / 2;
+    painter->drawText(textPos, filename);
   }
 
 private:
@@ -197,8 +160,8 @@ ResTable::ResTable(QWidget *parent)
   //  filterString = new QStringList({"application/x-all", "text/*"});
   filterString = new QStringList({"*"});
   for (auto i = 0; i != filterString->size(); ++i) {
-    vm.push_back(QPair<QListView *, MSortFilterProxyModel *>(
-        new QListView, new MSortFilterProxyModel(this)));
+    vm.push_back(QPair<DListView *, MSortFilterProxyModel *>(
+        new DListView(this), new MSortFilterProxyModel(this)));
   }
 
   this->dtw = new DetailedWidget();
@@ -225,8 +188,11 @@ int ResTable::getDetailDocNumOrTopRow() {
 
 void ResTable::init_ui() {
 
+  //    auto cw=new QWidget(this);
+  //    this->setCentralWidget(cw);
   auto hlayout = new QHBoxLayout();
   this->setLayout(hlayout);
+  //  cw->setLayout(hlayout);
 
   llayout = new QVBoxLayout();
   // TODO here add multi view ,using different filter proxy model
@@ -245,10 +211,10 @@ void ResTable::init_ui() {
     //    vm.at(i).second->setSourceModel(this->m_model);
     //    vm.at(i).second->setFilterRole(RecollModel::ModelRoles::Role_MIME_TYPE);
     //    vm.at(i).second->setFilterRegExp(filterString->at(i));
-//        vm.at(i).second->setFilterWildcard(filterString->at(i));
+    //        vm.at(i).second->setFilterWildcard(filterString->at(i));
     //    vm.at(i).second->setSortRole(RecollModel::ModelRoles::Role_RELEVANCY);
     //    vm.at(i).second->setDynamicSortFilter(false);
-//        vm.at(i).first->setModel(vm.at(i).second);
+    //        vm.at(i).first->setModel(vm.at(i).second);
 
     connect(vm.at(i).second, &MSortFilterProxyModel::itemCountChanged,
             [this, i](int count) {
@@ -277,32 +243,34 @@ void ResTable::makeRowVisible(int row) {
 }
 
 void ResTable::onTableView_currentChanged() {
-    //TODO send user input etc. to detailedWidget for highlitht when display?
+  // TODO send user input etc. to detailedWidget for highlitht when display?
   //    LOGDEB2("ResTable::onTableView_currentChanged(" << index.row() << ", "
   //    <<
   //            index.column() << ")\n");
 
   if (!m_model || !m_model->getDocSource())
     return;
-//  auto proxyModel=vm.at(currentListViewIndex).second;
-//  auto index=proxyModel->index(currentlistViewItemIndex,0);
-//  index=proxyModel->mapToSource(index);
-  auto index=vm.at(currentListViewIndex).first->model()->index(currentlistViewItemIndex,0);
+  //  auto proxyModel=vm.at(currentListViewIndex).second;
+  //  auto index=proxyModel->index(currentlistViewItemIndex,0);
+  //  index=proxyModel->mapToSource(index);
+  auto index = vm.at(currentListViewIndex)
+                   .first->model()
+                   ->index(currentlistViewItemIndex, 0);
   Rcl::Doc doc;
-  this->m_model->getDocSource()->getDoc(index.row(),doc);
+  this->m_model->getDocSource()->getDoc(index.row(), doc);
 
   HighlightData hl;
   this->m_model->getDocSource()->getTerms(hl);
-  this->dtw->showDocDetail(index,doc,hl);
-//    m_detaildocnum = index.row();
-//    m_detaildoc = doc;
-//    auto t =
-//        this->m_model
-//            ->data(index, RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT)
-//            .toString();
-//    this->detailedWidget->setText(t);
-    this->dtw->setVisible(true);
-//  }
+  this->dtw->showDocDetail(index, doc, hl);
+  //    m_detaildocnum = index.row();
+  //    m_detaildoc = doc;
+  //    auto t =
+  //        this->m_model
+  //            ->data(index, RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT)
+  //            .toString();
+  //    this->detailedWidget->setText(t);
+  this->dtw->setVisible(true);
+  //  }
 }
 
 void ResTable::takeFocus() {
@@ -352,7 +320,7 @@ void ResTable::moveToNextResoule() {
   }
   //  } else {
   // find the "next"
-  currentListViewIndex = targetListViewIdex;
+  currentListViewIndex = targetListViewIdex == -1 ? 0 : targetListViewIdex;
   currentlistViewItemIndex = itemIndex;
   for (auto i = 0; i != llayout->count(); ++i) {
     auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
@@ -418,14 +386,13 @@ void ResTable::readDocSource(bool resetPos) {
   //      vm.at(i).first->setModel(vm.at(i).second);
   //  }
   m_model->readDocSource();
-//  m_detaildocnum = -1;
-  this->currentListViewIndex=0;
-  this->currentlistViewItemIndex=-1;
+  //  m_detaildocnum = -1;
+  this->currentListViewIndex = 0;
+  this->currentlistViewItemIndex = -1;
   this->dtw->hide();
 }
 
-void ResTable::clearSeach()
-{
-   this->resetSource();
-    this->readDocSource();
+void ResTable::clearSeach() {
+  this->resetSource();
+  this->readDocSource();
 }

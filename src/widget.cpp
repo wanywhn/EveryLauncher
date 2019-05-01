@@ -14,8 +14,8 @@ extern RclConfig *theconfig;
 // Start a db query and set the reslist docsource
 void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
                          bool issimple) {
-  //    LOGDEB("RclMain::startSearch. Indexing " << (m_idxproc?"on":"off") <<
-  //           " Active " << m_queryActive << "\n");
+//      LOGDEB("RclMain::startSearch. Indexing " << (m_idxproc?"on":"off") <<
+//             " Active " << m_queryActive << "\n");
   if (m_queryActive) {
     //    LOGDEB("startSearch: already active\n");
     return;
@@ -161,14 +161,15 @@ private:
   QSet<QString> &tobtIndex;
   QMutex &mutex;
 };
-Widget::Widget(QWidget *parent) : QWidget(parent) {
+Widget::Widget(QWidget *parent) :DMainWindow(parent) {
   this->restable = new ResTable(this);
-  this->searchLine = new SSearch();
+  this->searchLine = new SSearch(this);
   this->idxProcess = new QProcess(this);
   //    this->idxWorkerThread=new QThread(this);
   //    this->worker=new IndexWorker(this->tobeIndex,this->mtxTobeIndex,this);
   this->idxTimer = new QTimer;
   this->m_indexAvtive = false;
+    this->m_queryActive=false;
   this->m_indexed = false;
   init_ui();
   init_conn();
@@ -181,10 +182,15 @@ Widget::~Widget() {}
 
 void Widget::init_ui() {
 
+  auto cw=new QWidget(this);
+  this->setCentralWidget(cw);
+
   auto mvLayout = new QVBoxLayout();
-  this->setLayout(mvLayout);
+  cw->setLayout(mvLayout);
+
+  this->centralWidget()->setLayout(mvLayout);
   mvLayout->addWidget(searchLine);
-  mvLayout->addWidget(this->restable);
+  mvLayout->addWidget(restable);
   //  auto mhLayout = new QHBoxLayout();
   //  mhLayout->addWidget(this->restable);
   //  mvLayout->addLayout(mhLayout);

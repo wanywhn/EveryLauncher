@@ -154,21 +154,23 @@ private:
 
 
 ConfIndexW::ConfIndexW(QWidget *parent, RclConfig *config)
-    : QDialog(parent), m_rclconf(config)
+    :DDialog(parent), m_rclconf(config)
 {
     QString title("Recoll - Index Settings : ");
     title += QString::fromLocal8Bit(config->getConfDir().c_str());
     setWindowTitle(title);
-    tabWidget = new QTabWidget;
+    tabWidget = new QTabWidget(this);
     reloadPanels();
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
 				     | QDialogButtonBox::Cancel);
 
+    auto cw=new QWidget(this);
+    this->addContent(cw);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(tabWidget);
     mainLayout->addWidget(buttonBox);
-    setLayout(mainLayout);
+    cw->setLayout(mainLayout);
 
     resize(QSize(600, 450).expandedTo(minimumSizeHint()));
 
@@ -210,22 +212,22 @@ void ConfIndexW::reloadPanels()
     if ((m_conf = m_rclconf->cloneMainConfig()) == 0) 
 	return;
     m_conf->holdWrites(true);
-    tabWidget->clear();
     m_widgets.clear();
+    tabWidget->clear();
 
     QWidget *w = new ConfTopPanelW(this, m_conf);
     m_widgets.push_back(w);
-    tabWidget->addTab(w, QObject::tr("Global parameters"));
+    tabWidget->addTab( w,QObject::tr("Global parameters"));
 	
     w = new ConfSubPanelW(this, m_conf, m_rclconf);
     m_widgets.push_back(w);
-    tabWidget->addTab(w, QObject::tr("Local parameters"));
+    tabWidget->addTab(w,QObject::tr("Local parameters"));
 
 }
 
 
 ConfTopPanelW::ConfTopPanelW(QWidget *parent, ConfNull *config)
-    : QWidget(parent)
+    :QWidget(parent)
 {
     QWidget *w = 0;
 
@@ -237,19 +239,19 @@ ConfTopPanelW::ConfTopPanelW(QWidget *parent, ConfNull *config)
 
     w = new ConfParamDNLW(this, 
                           ConfLink(new ConfLinkRclRep(config, "topdirs")), 
-                          tr("Top directories"),
-                          tr("The list of directories where recursive "
-                             "indexing starts. Default: your home."));
+                          tr("监控目录"),
+                          tr("进行索引时将递归索引该目录及子目录，"
+                             "默认：家目录"));
     setSzPol(w, QSizePolicy::Preferred, QSizePolicy::Preferred, 1, 3);
     gl1->addWidget(w, gridrow++, 0, 1, 2);
 
     ConfParamSLW *eskp = new 
 	ConfParamSLW(this, 
                      ConfLink(new ConfLinkRclRep(config, "skippedPaths")), 
-                     tr("Skipped paths"),
-		     tr("These are pathnames of directories which indexing "
-			"will not enter.<br>"
-                        "Path elements may contain wildcards. "
+                     tr("略过路径"),
+		     tr("当索引时这些目录将被略过 "
+            "<br>"
+                        " "
 			"The entries must match the paths seen by the indexer "
                         "(e.g.: if topdirs includes '/home/me' and '/home' is "
                         "actually a link "
@@ -265,15 +267,15 @@ ConfTopPanelW::ConfTopPanelW(QWidget *parent, ConfNull *config)
 	 it != cstemlangs.end(); it++) {
 	stemlangs.push_back(QString::fromUtf8(it->c_str()));
     }
-    w = new 
-	ConfParamCSLW(this, 
-                      ConfLink(new ConfLinkRclRep(config, 
-                                                  "indexstemminglanguages")),
-                      tr("Stemming languages"),
-		      tr("The languages for which stemming expansion<br>"
-			 "dictionaries will be built."), stemlangs);
-    setSzPol(w, QSizePolicy::Preferred, QSizePolicy::Preferred, 1, 1);
-    gl1->addWidget(w, gridrow, 0);
+   // w = new
+   //ConfParamCSLW(this,
+   //                   ConfLink(new ConfLinkRclRep(config,
+   //                                               "indexstemminglanguages")),
+   //                   tr("Stemming languages"),
+         //     tr("The languages for which stemming expansion<br>"
+            // "dictionaries will be built."), stemlangs);
+   // setSzPol(w, QSizePolicy::Preferred, QSizePolicy::Preferred, 1, 1);
+   // gl1->addWidget(w, gridrow, 0);
     
 
     w = new ConfParamFNW(this, 
@@ -311,54 +313,54 @@ ConfTopPanelW::ConfTopPanelW(QWidget *parent, ConfNull *config)
                           0, 100);
     gl1->addWidget(w, gridrow++, 0);
 
-    ConfParamBoolW* cpasp =
-        new ConfParamBoolW(this, 
-                           ConfLink(new ConfLinkRclRep(config, "noaspell")), 
-                           tr("No aspell usage"),
-                           tr("Disables use of aspell to generate spelling "
-                              "approximation in the term explorer tool.<br> "
-                              "Useful if aspell is absent or does not work. "));
-    gl1->addWidget(cpasp, gridrow, 0);
+   // ConfParamBoolW* cpasp =
+   //     new ConfParamBoolW(this,
+   //                        ConfLink(new ConfLinkRclRep(config, "noaspell")),
+   //                        tr("No aspell usage"),
+   //                        tr("Disables use of aspell to generate spelling "
+   //                           "approximation in the term explorer tool.<br> "
+   //                           "Useful if aspell is absent or does not work. "));
+   // gl1->addWidget(cpasp, gridrow, 0);
 
-    ConfParamStrW* cpaspl = new 
-        ConfParamStrW(this, 
-                      ConfLink(new ConfLinkRclRep(config, "aspellLanguage")),
-                      tr("Aspell language"),
-                      tr("The language for the aspell dictionary. "
-                         "This should look like 'en' or 'fr' ...<br>"
-                         "If this value is not set, the NLS environment "
-			 "will be used to compute it, which usually works. "
-			 "To get an idea of what is installed on your system, "
-			 "type 'aspell config' and look for .dat files inside "
-			 "the 'data-dir' directory. "));
-    cpaspl->setEnabled(!cpasp->m_cb->isChecked());
-    connect(cpasp->m_cb, SIGNAL(toggled(bool)), cpaspl,SLOT(setDisabled(bool)));
-    gl1->addWidget(cpaspl, gridrow++, 1);
+   // ConfParamStrW* cpaspl = new
+   //     ConfParamStrW(this,
+   //                   ConfLink(new ConfLinkRclRep(config, "aspellLanguage")),
+   //                   tr("Aspell language"),
+   //                   tr("The language for the aspell dictionary. "
+   //                      "This should look like 'en' or 'fr' ...<br>"
+   //                      "If this value is not set, the NLS environment "
+            // "will be used to compute it, which usually works. "
+            // "To get an idea of what is installed on your system, "
+            // "type 'aspell config' and look for .dat files inside "
+            // "the 'data-dir' directory. "));
+   // cpaspl->setEnabled(!cpasp->m_cb->isChecked());
+   // connect(cpasp->m_cb, SIGNAL(toggled(bool)), cpaspl,SLOT(setDisabled(bool)));
+   // gl1->addWidget(cpaspl, gridrow++, 1);
 
-    w = new 
-        ConfParamFNW(this, 
-                     ConfLink(new ConfLinkRclRep(config, "dbdir")),
-                     tr("Database directory name"),
-                     tr("The name for a directory where to store the index<br>"
-			"A non-absolute path is taken relative to the "
-			"configuration directory. The default is 'xapiandb'."
-			), true);
-    gl1->addWidget(w, gridrow++, 0, 1, 2);
+   // w = new
+   //     ConfParamFNW(this,
+   //                  ConfLink(new ConfLinkRclRep(config, "dbdir")),
+   //                  tr("Database directory name"),
+   //                  tr("The name for a directory where to store the index<br>"
+            //"A non-absolute path is taken relative to the "
+            //"configuration directory. The default is 'xapiandb'."
+            //), true);
+   // gl1->addWidget(w, gridrow++, 0, 1, 2);
     
-    w = new 
-	ConfParamStrW(this, 
-                      ConfLink(new ConfLinkRclRep(config, "unac_except_trans")),
-                      tr("Unac exceptions"),
-                      tr("<p>These are exceptions to the unac mechanism "
-                         "which, by default, removes all diacritics, "
-                         "and performs canonic decomposition. You can override "
-                         "unaccenting for some characters, depending on your "
-                         "language, and specify additional decompositions, "
-                         "e.g. for ligatures. In each space-separated entry, "
-                         "the first character is the source one, and the rest "
-                         "is the translation."
-                          ));
-    gl1->addWidget(w, gridrow++, 0, 1, 2);
+   // w = new
+   // ConfParamStrW(this,
+   //                   ConfLink(new ConfLinkRclRep(config, "unac_except_trans")),
+   //                   tr("Unac exceptions"),
+   //                   tr("<p>These are exceptions to the unac mechanism "
+   //                      "which, by default, removes all diacritics, "
+   //                      "and performs canonic decomposition. You can override "
+   //                      "unaccenting for some characters, depending on your "
+   //                      "language, and specify additional decompositions, "
+   //                      "e.g. for ligatures. In each space-separated entry, "
+   //                      "the first character is the source one, and the rest "
+   //                      "is the translation."
+   //                       ));
+   // gl1->addWidget(w, gridrow++, 0, 1, 2);
 }
 
 ConfSubPanelW::ConfSubPanelW(QWidget *parent, ConfNull *config, 
@@ -372,7 +374,7 @@ ConfSubPanelW::ConfSubPanelW(QWidget *parent, ConfNull *config,
     m_subdirs = new 
 	ConfParamDNLW(this, 
                       ConfLink(new ConfLinkNullRep()), 
-		      QObject::tr("<b>Customised subtrees"),
+              QObject::tr("<b>Customised subtrees"),
 		      QObject::tr("The list of subdirectories in the indexed "
 				  "hierarchy <br>where some parameters need "
 				  "to be redefined. Default: empty."));

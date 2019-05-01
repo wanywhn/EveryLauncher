@@ -18,11 +18,22 @@ def main(args):
 
     name =desktop.getName()
     name =''.join(lazy_pinyin(name))
+    AppName=desktop.getName()
+    if len(AppName)==0:
+        AppName=desktop.getGenericName
+    AppComment=desktop.getComment()
+    AppIcon=desktop.getIcon()
+
+
     print('''
 <html><head>
 <title>''' +name+
           ''''</title>
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
+<meta name="AppName" content="'''+AppName+'''" />
+<meta name="AppComment" content="'''+AppComment+'''" />
+<meta name="AppIcon" content="'''+AppIcon+'''" />
+
 </head>
 <body></body>
 </html>
