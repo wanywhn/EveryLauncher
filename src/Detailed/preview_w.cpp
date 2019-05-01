@@ -32,6 +32,7 @@
 extern
 
 RclConfig *theconfig;
+
 void Preview::init()
 {
     setObjectName("Preview");

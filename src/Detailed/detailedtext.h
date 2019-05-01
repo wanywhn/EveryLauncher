@@ -3,6 +3,7 @@
 
 #include <QTextEdit>
 #include <QWidget>
+#include <hldata.h>
 #include <rcldoc.h>
 
 class DetailedW : public QWidget
@@ -12,10 +13,12 @@ public:
     explicit DetailedW(QWidget *parent = nullptr);
 
     virtual void showDoc(Rcl::Doc doc);
+    void setHighlightData(HighlightData hl);
 signals:
 
 public slots:
-private:
+protected:
+    HighlightData m_hData;
 };
 
 #endif // DETAILEDTEXT_H

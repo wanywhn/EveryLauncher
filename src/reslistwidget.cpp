@@ -290,7 +290,10 @@ void ResTable::onTableView_currentChanged() {
   auto index=vm.at(currentListViewIndex).first->model()->index(currentlistViewItemIndex,0);
   Rcl::Doc doc;
   this->m_model->getDocSource()->getDoc(index.row(),doc);
-  this->dtw->showDocDetail(index,doc);
+
+  HighlightData hl;
+  this->m_model->getDocSource()->getTerms(hl);
+  this->dtw->showDocDetail(index,doc,hl);
 //    m_detaildocnum = index.row();
 //    m_detaildoc = doc;
 //    auto t =

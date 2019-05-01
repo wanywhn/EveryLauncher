@@ -38,8 +38,8 @@ class Preview : public DetailedW {
   Q_OBJECT;
 
 public:
-  Preview(const HighlightData &hdata) // Search terms etc. for highlighting
-      : DetailedW(0), m_hData(hdata) {
+  Preview( )// Search terms etc. for highlighting
+      : DetailedW(0) {
     init();
   }
 
@@ -64,7 +64,7 @@ private:
 
   bool m_canBeep{true};
   bool m_loading{false};
-  HighlightData m_hData;
+//  HighlightData m_hData;
   PreviewTextEdit *pvEdit;
 
   void init();

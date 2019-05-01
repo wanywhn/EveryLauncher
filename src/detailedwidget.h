@@ -4,6 +4,7 @@
 #include <QModelIndex>
 #include <QStackedWidget>
 #include <QWidget>
+#include <hldata.h>
 #include <rcldoc.h>
 
 class DetailedWidget : public QStackedWidget
@@ -12,7 +13,7 @@ class DetailedWidget : public QStackedWidget
 public:
     explicit DetailedWidget(QWidget *parent = nullptr);
 
-    void showDocDetail(QModelIndex index,Rcl::Doc doc);
+    void showDocDetail(QModelIndex index,Rcl::Doc doc,HighlightData hl);
 signals:
 
 public slots:

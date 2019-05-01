@@ -48,7 +48,6 @@ INCLUDEPATH+=../../recoll1-code/src/query\
                 ../../recoll1-code/src/unac\
                 ../../recoll1-code/src/common\
                 ../../recoll1-code/src/qtgui\
-#                ../../recoll1-code/src/qtgui\confgui
 
 SOURCES += \
         main.cpp \
@@ -58,9 +57,6 @@ SOURCES += \
     configlistwidget.cpp \
     indexsche.cpp \
     reslistwidget.cpp\
-        ../../recoll1-code/src/qtgui/confgui/confgui.cpp\
-        ../../recoll1-code/src/qtgui/confgui/confguiindex.cpp\
-        ../../recoll1-code/src/qtgui/guiutils.cpp\
     searchline.cpp \
     dbusproxy.cpp\
         everylaunchermonitor_interface.cpp \
@@ -71,7 +67,10 @@ SOURCES += \
     Detailed/preview_w.cpp \
     Detailed/preview_load.cpp \
     Detailed/preview_plaintorich.cpp \
-    Detailed/previewtextedit.cpp
+    Detailed/previewtextedit.cpp\
+        confgui/confgui.cpp\
+        confgui/confguiindex.cpp\
+        guiutils.cpp
 
 HEADERS += \
         widget.h \
@@ -81,10 +80,6 @@ HEADERS += \
     configlistwidget.h \
     indexsche.h \
     reslistwidget.h\
-#        ../../recoll1-code/src/query/docseq.h
-        ../../recoll1-code/src/qtgui/confgui/confgui.h\
-        ../../recoll1-code/src/qtgui/confgui/confguiindex.h\
-        ../../recoll1-code/src/qtgui/guiutils.h\
     searchline.h \
     dbusproxy.h\
         everylaunchermonitor_interface.h \
@@ -95,7 +90,10 @@ HEADERS += \
     Detailed/preview_w.h \
     Detailed/preview_load.h \
     Detailed/preview_plaintorich.h \
-    Detailed/previewtextedit.h
+    Detailed/previewtextedit.h\
+        confgui/confgui.h\
+        confgui/confguiindex.h\
+        guiutilsh
 
 FORMS += \
         widget.ui

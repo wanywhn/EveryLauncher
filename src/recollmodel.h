@@ -9,6 +9,7 @@ extern RclConfig *theconfig;
 typedef QString (FieldGetter)(const std::string &fldname,
                                  const Rcl::Doc &doc);
 
+  class ResTable;
 
 class RecollModel : public QAbstractListModel{
 
@@ -60,6 +61,7 @@ public:
 signals:
   void sortDataChanged(DocSeqSortSpec);
 
+  friend class ResTable;
 private:
   //    ResTable *m_table{nullptr};
   mutable std::shared_ptr<DocSequence> m_source;
