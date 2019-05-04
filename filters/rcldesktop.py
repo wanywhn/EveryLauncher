@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import sys
 from pypinyin import lazy_pinyin
+import os
 
 from xdg.DesktopEntry import DesktopEntry
+from xdg.IconTheme import getIconPath
 
 
 def main(args):
@@ -19,10 +21,30 @@ def main(args):
     name =desktop.getName()
     name =''.join(lazy_pinyin(name))
     AppName=desktop.getName()
+    NoDisplay=False;
     if len(AppName)==0:
         AppName=desktop.getGenericName
     AppComment=desktop.getComment()
     AppIcon=desktop.getIcon()
+    if not os.path.exists(AppIcon):
+        ip=getIconPath(AppIcon,theme="deepin")
+        # if ip is None:
+        #     ip=getIconPath(AppIcon,theme="hicolor")
+    else:
+        ip=AppIcon
+
+    if ip is None:
+        #TODO add default icon
+        pass
+    AppIcon=ip
+
+
+    NoDisplay=desktop.getNoDisplay()
+    if NoDisplay:
+        AppIcon=""
+        AppName=""
+        AppComment=""
+
 
 
     print('''
@@ -33,6 +55,7 @@ def main(args):
 <meta name="AppName" content="'''+AppName+'''" />
 <meta name="AppComment" content="'''+AppComment+'''" />
 <meta name="AppIcon" content="'''+AppIcon+'''" />
+<meta name="AppNoDisplay" content="'''+NoDisplay+'''" />
 
 </head>
 <body></body>
