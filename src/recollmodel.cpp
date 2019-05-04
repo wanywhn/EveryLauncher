@@ -237,7 +237,6 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
       var = QString::fromStdString(
           theconfig->getMimeIconPath(doc.mimetype, apptag));
     } else {
-        qDebug()<<"AppIcon:"<<gengetter("appicon",doc);
       var = gengetter("appicon", doc);
     }
     break;

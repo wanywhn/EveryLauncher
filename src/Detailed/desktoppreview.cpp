@@ -23,13 +23,15 @@ void DesktopPreview::showDoc(Rcl::Doc doc) {
   appName->setText(index.data(RecollModel::Role_APP_NAME).toString());
   comment->setText(index.data(RecollModel::Role_APP_COMMENT).toString());
 
-qDebug() << "path:" << path;
 }
 
 void DesktopPreview::init_ui() {
   auto vlayout = new QVBoxLayout();
   this->setLayout(vlayout);
+  this->comment->setWordWrap(true);
+
   vlayout->addWidget(icon);
   vlayout->addWidget(appName);
   vlayout->addWidget(comment);
+
 }

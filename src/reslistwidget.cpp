@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPainter>
+#include <QProcess>
 #include <QShortcut>
 #include <QStyledItemDelegate>
 #include <QTextDocument>
@@ -394,5 +395,24 @@ void ResTable::readDocSource(bool resetPos) {
 
 void ResTable::clearSeach() {
   this->resetSource();
-  this->readDocSource();
+    this->readDocSource();
+}
+
+void ResTable::returnPressed()
+{
+    auto currentIndex=vm.at(currentListViewIndex).first->currentIndex();
+    auto mime=currentIndex.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
+    auto path=currentIndex.data(RecollModel::ModelRoles::Role_LOCATION).toString();
+    static QProcess p;
+//    QProcess *p=new QProcess(this);
+    if(mime=="application/x-all"){
+        //!!FIXME 打开微信终端下可以，这样貌似不行？
+        p.setProgram("dex");
+    }else{
+        p.setProgram("xdg-open");
+    }
+    p.setArguments(QStringList(path.replace("file://","")));
+    qDebug()<<"P:"<<p.program()<<" Arg:"<<p.arguments();
+    p.start();
+
 }
