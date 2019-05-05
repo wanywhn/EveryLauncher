@@ -65,9 +65,11 @@ public slots:
   //    friend class ResTablePager;
   //    friend class ResTableDetailArea;
 private:
-  QVector<QPair<DListView *, MSortFilterProxyModel *> > vm;
-  QMap<int,QString> vmIndex;
-  QStringList *filterString;
+//  QVector<QPair<DListView *, MSortFilterProxyModel *> > vm;
+  DListView *listview;
+  MSortFilterProxyModel *proxyModel;
+//  QMap<int,QString> vmIndex;
+//  QStringList *filterString;
 //  QListView *listViewProgram;
 //  QListView *listViewDoc;
   //!! only store listview etc
@@ -81,8 +83,6 @@ private:
   bool m_ismainres;
     //TODO multi
     DetailedWidget *dtw;
-    int currentListViewIndex;
-    int currentlistViewItemIndex;
 };
 
 #endif // RESLISTWIDGET_H

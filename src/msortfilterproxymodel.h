@@ -44,6 +44,10 @@ public:
     // QAbstractProxyModel interface
 public:
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
+
+    // QAbstractItemModel interface
+public:
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
 };
 
 #endif // MSORTFILTERPROXYMODEL_H

@@ -36,7 +36,7 @@ bool MSortFilterProxyModel::filterAcceptsRow(
 
   // new group ,add section
   if (prevGroup != lineGroup) {
-      int rawrow=currentItemCount;
+    int rawrow = currentItemCount;
     if (t->ommitTill) {
       // add  previous dot
       t->ommitTill = false;
@@ -45,14 +45,14 @@ bool MSortFilterProxyModel::filterAcceptsRow(
       t->currentItemCount++;
     }
 
-    t->currentGroupCount=0;
+    t->currentGroupCount = 0;
     // this is the section
     t->mapSections.insert(currentItemCount, lineGroup);
     t->currentItemCount++;
     t->prevGroup = lineGroup;
 
     // real item
-    t->mapidx.insert(currentItemCount,rawrow);
+    t->mapidx.insert(currentItemCount, rawrow);
     t->currentItemCount++;
     t->currentGroupCount++;
     return true;
@@ -89,7 +89,8 @@ QVariant MSortFilterProxyModel::data(const QModelIndex &index, int role) const {
       if (role == RecollModel::ModelRoles::Role_VIEW_TYPE) {
         return "ITEM";
       }
-//      auto i = sourceModel()->index(mapidx.value(index.row()), index.column());
+      //      auto i = sourceModel()->index(mapidx.value(index.row()),
+      //      index.column());
       return QSortFilterProxyModel::data(index, role);
     } else {
       if (role == RecollModel::ModelRoles::Role_VIEW_TYPE) {
@@ -103,16 +104,23 @@ QVariant MSortFilterProxyModel::data(const QModelIndex &index, int role) const {
   }
   //	auto i=index.model()->index(index.row()-1,index.column());
   return QVariant();
-//  return QSortFilterProxyModel::data(index, role);
+  //  return QSortFilterProxyModel::data(index, role);
 }
 
 QModelIndex
 MSortFilterProxyModel::mapToSource(const QModelIndex &proxyIndex) const {
-//  auto t = const_cast<MSortFilterProxyModel *>(this);
-  if(mapidx.contains(proxyIndex.row())){
+  //  auto t = const_cast<MSortFilterProxyModel *>(this);
+  if (mapidx.contains(proxyIndex.row())) {
 
-      return sourceModel()->index(mapidx.value(proxyIndex.row()),
-                                    proxyIndex.column());
+    return sourceModel()->index(mapidx.value(proxyIndex.row()),
+                                proxyIndex.column());
   }
   return QModelIndex();
+}
+
+Qt::ItemFlags MSortFilterProxyModel::flags(const QModelIndex &index) const {
+  if (mapidx.contains(index.row())) {
+    return QSortFilterProxyModel::flags(index);
+  }
+  return Qt::ItemFlag::ItemIsSelectable|Qt::ItemFlag::ItemIsEnabled;
 }

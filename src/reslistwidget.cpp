@@ -31,47 +31,55 @@ public:
              const QModelIndex &index) const {
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
-    auto itemType=index.data(RecollModel::ModelRoles::Role_VIEW_TYPE).toString();
-    if(itemType=="SECTION"){
-        painter->drawText(opt.rect,"SECTION");
+    auto itemType =
+        index.data(RecollModel::ModelRoles::Role_VIEW_TYPE).toString();
+    if (itemType == "SECTION") {
+      painter->drawText(opt.rect.adjusted(-1,-1,-1,-1), "SECTION");
 
-    }else if(itemType=="DOT"){
-        painter->drawText(opt.rect,"DOT");
+      if (opt.state & QStyle::State_Selected) {
+        painter->fillRect(opt.rect, opt.palette.highlight());
+      }
+    } else if (itemType == "DOT") {
+      painter->drawText(opt.rect.adjusted(-1,-1,-1,-1), "DOT");
+      if (opt.state & QStyle::State_Selected) {
+        painter->fillRect(opt.rect, opt.palette.highlight());
+      }
 
-    }else if (itemType=="ITEM"){
+    } else if (itemType == "ITEM") {
 
+      auto filename =
+          index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
+      if (index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString() ==
+          "application/x-all") {
+        // TODO find app icon
+        filename =
+            index.data(RecollModel::ModelRoles::Role_APP_NAME).toString();
+      }
+      auto iconpath =
+          index.data(RecollModel::ModelRoles::Role_ICON_PATH).toString();
+      //    this->liw.setIcon(icon.value<QPixmap>());
+      //    this->liw.setTitle(filename.toString());
+      //    auto toRender=const_cast<ListItemWidget&>(this->liw).grab();
+      QPixmap icon(iconpath);
+      if (icon.isNull()) {
+        qDebug() << "null icon:" << iconpath;
+      }
+      icon = icon.scaled(this->sizeHint(option, index));
+      QRectF recf(opt.rect);
+      //    qDebug()<<filename;
+      //    QRectF recf(0,0,50,50);
+      if (opt.state & QStyle::State_Selected) {
+        painter->fillRect(opt.rect, opt.palette.highlight());
+      }
+      QRectF iconRectf(opt.rect);
+      iconRectf.setSize(icon.size());
 
-    auto filename =
-        index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
-    if (index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString() ==
-        "application/x-all") {
-      // TODO find app icon
-      filename = index.data(RecollModel::ModelRoles::Role_APP_NAME).toString();
-    }
-     auto iconpath=index.data(RecollModel::ModelRoles::Role_ICON_PATH).toString();
-    //    this->liw.setIcon(icon.value<QPixmap>());
-    //    this->liw.setTitle(filename.toString());
-    //    auto toRender=const_cast<ListItemWidget&>(this->liw).grab();
-     QPixmap icon(iconpath);
-     if (icon.isNull()){
-         qDebug()<<"null icon:"<<iconpath;
-     }
-     icon=icon.scaled(this->sizeHint(option,index));
-    QRectF recf(opt.rect);
-    //    qDebug()<<filename;
-    //    QRectF recf(0,0,50,50);
-    if (opt.state & QStyle::State_Selected) {
-      painter->fillRect(opt.rect, opt.palette.highlight());
-    }
-    QRectF iconRectf(opt.rect);
-    iconRectf.setSize(icon.size());
+      painter->drawPixmap(iconRectf, icon, icon.rect());
 
-    painter->drawPixmap(iconRectf,icon,icon.rect());
+      auto textPos = QPointF(iconRectf.topRight());
 
-    auto textPos = QPointF(iconRectf.topRight());
-
-    textPos.ry() += iconRectf.height() / 2;
-    painter->drawText(textPos, filename);
+      textPos.ry() += iconRectf.height() / 2;
+      painter->drawText(textPos, filename);
     }
   }
 
@@ -173,15 +181,15 @@ ResTable::ResTable(QWidget *parent)
   //    this->listViewDoc=new QListView();
   // Store the reg of type
   //  filterString = new QStringList({"application/x-all", "text/*"});
-  filterString = new QStringList({"*"});
-  for (auto i = 0; i != filterString->size(); ++i) {
-    vm.push_back(QPair<DListView *, MSortFilterProxyModel *>(
-        new DListView(this), new MSortFilterProxyModel(this)));
-  }
+  //  filterString = new QStringList({"*"});
+  //  for (auto i = 0; i != filterString->size(); ++i) {
+  //    vm.push_back(QPair<DListView *, MSortFilterProxyModel *>(
+  //        new DListView(this), new MSortFilterProxyModel(this)));
+  //  }
+  listview = new DListView(this);
+  proxyModel = new MSortFilterProxyModel(this);
 
   this->dtw = new DetailedWidget();
-  currentListViewIndex = 0;
-  currentlistViewItemIndex = -1;
   QStringList fields;
   fields << "url"
          << "title"
@@ -210,37 +218,15 @@ void ResTable::init_ui() {
   //  cw->setLayout(hlayout);
 
   llayout = new QVBoxLayout();
-  // TODO here add multi view ,using different filter proxy model
-  for (auto i = 0; i != filterString->size(); ++i) {
 
-    llayout->addWidget(vm.at(i).first);
-    vm.at(i).first->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    vm.at(i).first->setAlternatingRowColors(true);
-    vm.at(i).first->setSelectionBehavior(QAbstractItemView::SelectRows);
-    vm.at(i).first->setSelectionMode(
-        QAbstractItemView::SelectionMode::SingleSelection);
-    vm.at(i).first->setItemDelegate(new ResTableDelegate(this));
+  llayout->addWidget(listview);
+  listview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  listview->setSelectionBehavior(QAbstractItemView::SelectRows);
+  listview->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+  listview->setItemDelegate(new ResTableDelegate(this));
+  proxyModel->setSourceModel(this->m_model);
 
-//    vm.at(i).first->setModel(this->m_model);
-
-        vm.at(i).second->setSourceModel(this->m_model);
-    //    vm.at(i).second->setFilterRole(RecollModel::ModelRoles::Role_MIME_TYPE);
-    //    vm.at(i).second->setFilterRegExp(filterString->at(i));
-    //        vm.at(i).second->setFilterWildcard(filterString->at(i));
-    //    vm.at(i).second->setSortRole(RecollModel::ModelRoles::Role_RELEVANCY);
-    //    vm.at(i).second->setDynamicSortFilter(false);
-            vm.at(i).first->setModel(vm.at(i).second);
-
-            /*
-    connect(vm.at(i).second, &MSortFilterProxyModel::itemCountChanged,
-            [this, i](int count) {
-              qDebug() << "se cout:" << count;
-              auto view = this->vm.at(i).first;
-              // TODO height?
-              view->resize(view->width(), count * 70);
-            });
-            */
-  }
+  listview->setModel(proxyModel);
 
   hlayout->addLayout(llayout);
   hlayout->addWidget(this->dtw);
@@ -270,9 +256,7 @@ void ResTable::onTableView_currentChanged() {
   //  auto proxyModel=vm.at(currentListViewIndex).second;
   //  auto index=proxyModel->index(currentlistViewItemIndex,0);
   //  index=proxyModel->mapToSource(index);
-  auto index = vm.at(currentListViewIndex)
-                   .first->model()
-                   ->index(currentlistViewItemIndex, 0);
+  auto index=listview->currentIndex();
   Rcl::Doc doc;
   this->m_model->getDocSource()->getDoc(index.row(), doc);
 
@@ -296,59 +280,36 @@ void ResTable::takeFocus() {
 }
 
 void ResTable::moveToNextResoule() {
-  auto listIndex = currentListViewIndex;
-  auto itemIndex = currentlistViewItemIndex + 1;
-  int targetListViewIdex = -1;
-  for (int idx = listIndex; idx < llayout->count(); ++idx) {
-    auto view = qobject_cast<QListView *>(llayout->itemAt(idx)->widget());
-    if (itemIndex < view->model()->rowCount()) {
-      // find
-      targetListViewIdex = idx;
-      break;
-    } else {
-      // current listview end,goto next and start from 0
-      itemIndex = 0;
-    }
+  //    auto cidx=listview->selectionModel();
+  //    if(!cidx->hasSelection()){
+  //        cidx->select(proxyModel->index(0,0),QItemSelectionModel::Select);
+  //    }
+  //    while(cidx->selectedRows().at(0).data(RecollModel::Role_VIEW_TYPE).toString()!="ITEM"){
+  //        listview->setCurrentIndex();
+  //    }
+  if (listview->count() <= 0) {
+    return;
+  }
+  auto cidx = listview->currentIndex();
+
+  auto r = cidx.row()+1;
+  if (r >= listview->count()) {
+    r = 0;
   }
 
-  if (targetListViewIdex == -1) {
-    // iterate to end still not found,
-    bool ffnz = false;
-    for (auto i = 0; i != llayout->count(); ++i) {
-      auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
-      if (ffnz) {
-        view->setCurrentIndex(view->model()->index(-1, 0));
-        continue;
-      }
-      if (view->model()->rowCount() > 0) {
-        auto ci = view->model()->index(i, 0);
-        view->setCurrentIndex(ci);
-        targetListViewIdex = i;
-        itemIndex = 0;
-        ffnz = true;
-        continue;
-      }
-    }
-    //    if (ffnz) {
-    //    } else {
-    //      currentListViewIndex = 0;
-    //      currentlistViewItemIndex = -1;
-    //    }
+  /*
+  while (listview->model()
+             ->index(r, 0)
+             .data(RecollModel::Role_VIEW_TYPE)
+             .toString() != "ITEM") {
+    ++r;
+  if (r >= listview->count()) {
+    r = 0;
   }
-  //  } else {
-  // find the "next"
-  currentListViewIndex = targetListViewIdex == -1 ? 0 : targetListViewIdex;
-  currentlistViewItemIndex = itemIndex;
-  for (auto i = 0; i != llayout->count(); ++i) {
-    auto view = qobject_cast<QListView *>(llayout->itemAt(i)->widget());
-    if (i != currentListViewIndex) {
-      view->setCurrentIndex(view->model()->index(-1, 0));
-      continue;
-    }
-    auto ci = view->model()->index(currentlistViewItemIndex, 0);
-    view->setCurrentIndex(ci);
-    //    }
   }
+  */
+  listview->setCurrentIndex(listview->model()->index(r, 0));
+
   onTableView_currentChanged();
 }
 
@@ -404,31 +365,29 @@ void ResTable::readDocSource(bool resetPos) {
   //  }
   m_model->readDocSource();
   //  m_detaildocnum = -1;
-  this->currentListViewIndex = 0;
-  this->currentlistViewItemIndex = -1;
   this->dtw->hide();
 }
 
 void ResTable::clearSeach() {
   this->resetSource();
-    this->readDocSource();
+  this->readDocSource();
 }
 
-void ResTable::returnPressed()
-{
-    auto currentIndex=vm.at(currentListViewIndex).first->currentIndex();
-    auto mime=currentIndex.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
-    auto path=currentIndex.data(RecollModel::ModelRoles::Role_LOCATION).toString();
-    static QProcess p;
-//    QProcess *p=new QProcess(this);
-    if(mime=="application/x-all"){
-        //!!FIXME 打开微信终端下可以，这样貌似不行？
-        p.setProgram("dex");
-    }else{
-        p.setProgram("xdg-open");
-    }
-    p.setArguments(QStringList(path.replace("file://","")));
-    qDebug()<<"P:"<<p.program()<<" Arg:"<<p.arguments();
-    p.start();
-
+void ResTable::returnPressed() {
+  auto currentIndex = listview->currentIndex();
+  auto mime =
+      currentIndex.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
+  auto path =
+      currentIndex.data(RecollModel::ModelRoles::Role_LOCATION).toString();
+  static QProcess p;
+  //    QProcess *p=new QProcess(this);
+  if (mime == "application/x-all") {
+    //!!FIXME 打开微信终端下可以，这样貌似不行？
+    p.setProgram("dex");
+  } else {
+    p.setProgram("xdg-open");
+  }
+  p.setArguments(QStringList(path.replace("file://", "")));
+  qDebug() << "P:" << p.program() << " Arg:" << p.arguments();
+  p.start();
 }
