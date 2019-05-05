@@ -249,6 +249,11 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
     var = gengetter("appcomment", doc);
     break;
   }
+  case Role_NODISPLAY:
+  {
+      var=gengetter("appnodisplay",doc);
+      break;
+  }
   }
   return var;
 }

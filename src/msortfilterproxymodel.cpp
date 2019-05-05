@@ -18,25 +18,28 @@ void MSortFilterProxyModel::setMaxItemCount(int value) {
 void MSortFilterProxyModel::resetPar() {
   currentGroupCount = 0;
   currentItemCount = 0;
+  prevGroup="";
+  maxItemCount=4;
   mapidx.clear();
-  mapSections.clear();
   setDot.clear();
+  mapSections.clear();
+  ommitTill=false;
 
-  firstLine = true;
 }
 
 bool MSortFilterProxyModel::filterAcceptsRow(
     int source_row, const QModelIndex &source_parent) const {
   auto t = const_cast<MSortFilterProxyModel *>(this);
   auto sourceIndex = sourceModel()->index(source_row, 0, source_parent);
-  auto lineGroup = sourceModel()
-                       ->index(source_row, 0, source_parent)
+  auto lineGroup = sourceIndex
                        .data(RecollModel::ModelRoles::Role_MIME_TYPE)
                        .toString();
 
+  if(sourceIndex.data(RecollModel::ModelRoles::Role_NODISPLAY).toString().trimmed()=="true"){
+      return false;
+  }
   // new group ,add section
   if (prevGroup != lineGroup) {
-    int rawrow = currentItemCount;
     if (t->ommitTill) {
       // add  previous dot
       t->ommitTill = false;
@@ -52,7 +55,7 @@ bool MSortFilterProxyModel::filterAcceptsRow(
     t->prevGroup = lineGroup;
 
     // real item
-    t->mapidx.insert(currentItemCount, rawrow);
+    t->mapidx.insert(currentItemCount,source_row);
     t->currentItemCount++;
     t->currentGroupCount++;
     return true;

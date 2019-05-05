@@ -27,12 +27,10 @@ private:
     int currentItemCount{0};
     int currentGroupCount{0};
     QString prevGroup;
-    int maxItemCount{2};
-    //proxy to source
+    int maxItemCount{4};
     QMap<int,int> mapidx;
     QSet<int> setDot;
     QMap<int,QString> mapSections;
-    bool firstLine{true};
     bool ommitTill{false};
 
 public:

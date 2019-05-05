@@ -62,24 +62,20 @@ public slots:
   virtual void takeFocus();
   void moveToNextResoule();
 
+signals:
+  void filterChanged(QString filed);
   //    friend class ResTablePager;
   //    friend class ResTableDetailArea;
 private:
 //  QVector<QPair<DListView *, MSortFilterProxyModel *> > vm;
   DListView *listview;
   MSortFilterProxyModel *proxyModel;
-//  QMap<int,QString> vmIndex;
-//  QStringList *filterString;
-//  QListView *listViewProgram;
-//  QListView *listViewDoc;
   //!! only store listview etc
   QVBoxLayout *llayout;
   RecollModel *m_model;
-  //    ResTableDetailArea *m_detail;
   int m_detaildocnum;
   Rcl::Doc m_detaildoc;
   int m_popcolumn;
-  //    RclMain *m_rclmain;
   bool m_ismainres;
     //TODO multi
     DetailedWidget *dtw;

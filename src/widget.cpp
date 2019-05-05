@@ -39,17 +39,6 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
     return;
   }
 
-  //    if (prefs.synFileEnable && !prefs.synFile.isEmpty()) {
-  //        string sf = (const char *)prefs.synFile.toLocal8Bit();
-  //        if (!rcldb->setSynGroupsFile(sf)) {
-  //            QMessageBox::warning(0, "Recoll",
-  //                                 tr("Can't set synonyms file (parse
-  //                                 error?)"));
-  //            return;
-  //        }
-  //    } else {
-  //  rcldb->setSynGroupsFile("");
-  //    }
 
   Rcl::Query *query = new Rcl::Query(rcldb.get());
   query->setCollapseDuplicates(true);
@@ -58,15 +47,11 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   DocSequenceDb *src =
       new DocSequenceDb(/*rcldb,*/ std::shared_ptr<Rcl::Query>(query),
                         string(tr("Query results").toUtf8()), sdata);
-  //      new DocSequenceDb(rcldb, std::shared_ptr<Rcl::Query>(query),
-  //                        string(tr("Query results").toUtf8()), sdata);
   src->setAbstractParams(true, false);
-  //                           prefs.queryReplaceAbstract);
   m_source = std::shared_ptr<DocSequence>(src);
   DocSeqSortSpec dsss;
   dsss.field="mtype";
   DocSeqFiltSpec dsfs;
-//  dsfs.orCrit(DocSeqFiltSpec::DSFS_MIMETYPE,"application/x-all");
   m_source->setSortSpec(dsss);
   m_source->setFiltSpec(dsfs);
 
@@ -142,6 +127,15 @@ void Widget::IndexSomeFiles(QStringList paths) {
   tobeIndex.unite(t);
 }
 
+void Widget::filterChanged(QString field)
+{
+  DocSeqFiltSpec dsfs;
+  dsfs.orCrit(DocSeqFiltSpec::DSFS_MIMETYPE,field.toStdString());
+  m_source->setFiltSpec(dsfs);
+  initiateQuery();
+
+}
+
 class IndexWorker : public QObject {
   Q_OBJECT
 public:
@@ -202,11 +196,13 @@ void Widget::init_conn() {
   connect(this->searchLine,&SSearch::tabPressed,this->restable,&ResTable::moveToNextResoule);
   connect(this->searchLine,&SSearch::clearSearch,this->restable,&ResTable::clearSeach);
   connect(this->searchLine,&SSearch::returnPressed,this->restable,&ResTable::returnPressed);
-  //    restable->setRclMain(this, true);
   connect(this, SIGNAL(docSourceChanged(std::shared_ptr<DocSequence>)),
           restable, SLOT(setDocSource(std::shared_ptr<DocSequence>)));
   connect(this, SIGNAL(searchReset()), restable, SLOT(resetSource()));
   connect(this, SIGNAL(resultsReady()), restable, SLOT(readDocSource()));
+
+  connect(restable,&ResTable::filterChanged,this,&Widget::filterChanged);
+
   connect(this->idxTimer, &QTimer::timeout, this, &Widget::toggleIndexing);
   connect(this->idxProcess,
           static_cast<void (QProcess::*)(int)>(&QProcess::finished), [this]() {

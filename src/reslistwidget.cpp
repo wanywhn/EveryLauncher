@@ -33,14 +33,15 @@ public:
     initStyleOption(&opt, index);
     auto itemType =
         index.data(RecollModel::ModelRoles::Role_VIEW_TYPE).toString();
+    auto mimeType=index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
     if (itemType == "SECTION") {
-      painter->drawText(opt.rect.adjusted(-1,-1,-1,-1), "SECTION");
+      painter->drawText(opt.rect.adjusted(-1, -1, -1, -1), mimeType);
 
       if (opt.state & QStyle::State_Selected) {
         painter->fillRect(opt.rect, opt.palette.highlight());
       }
     } else if (itemType == "DOT") {
-      painter->drawText(opt.rect.adjusted(-1,-1,-1,-1), "DOT");
+      painter->drawText(opt.rect.adjusted(-1, -1, -1, -1), "DOT");
       if (opt.state & QStyle::State_Selected) {
         painter->fillRect(opt.rect, opt.palette.highlight());
       }
@@ -96,96 +97,11 @@ public:
 };
 
 void ResTable::init() {
-  //  listViewProgram->setModel(m_model);
-  //  listViewProgram->setMouseTracking(true);
-  //  listViewProgram->setContextMenuPolicy(Qt::CustomContextMenu);
-
-  //    QHeaderView *header = listview->horizontalHeader();
-  //    if (header) {
-  //    if (int(prefs.restableColWidths.size()) == header->count()) {
-  //        for (int i = 0; i < header->count(); i++) {
-  //        header->resizeSection(i, 12);
-  //        }
-  //    }
-  //    header->setSortIndicatorShown(true);
-  //    header->setSortIndicator(-1, Qt::AscendingOrder);
-  //    header->setContextMenuPolicy(Qt::CustomContextMenu);
-  //    header->setStretchLastSection(1);
-  //    connect(header, SIGNAL(sectionResized(int,int,int)),
-  //        this, SLOT(saveColState()));
-  //    connect(header, SIGNAL(customContextMenuRequested(const QPoint&)),
-  //        this, SLOT(createHeaderPopupMenu(const QPoint&)));
-  //    }
-  //    header->setSectionsMovable(true);
-
-  //    header = listview->verticalHeader();
-  //    if (header) {
-  //    header->setDefaultSectionSize(QApplication::fontMetrics().height() +
-  //                      ROWHEIGHTPAD);
-  //    }
-
-  //  QKeySequence seq("Esc");
-  //  QShortcut *sc = new QShortcut(seq, this);
-  //    connect(sc, &QShortcut::activated,
-  //        listview->selectionModel(), &QItemSelectionModel::clear);
-  // TODO here emit signal to dispay right widget
-
-  //  connect(listViewProgram->selectionModel(),
-  //  &QItemSelectionModel::currentChanged,
-  //          this, &ResTable::onTableView_currentChanged);
-
-  //    connect(listview, &QAbstractItemView::doubleClicked,
-  //            this, &ResTable::onDoubleClick);
-
-  // QSettings settings;
-  // QVariant saved = settings.value("resTableSplitterSizes");
-  // if (saved != QVariant()) {
-  // splitter->restoreState(saved.toByteArray());
-  // } else {
-  // QList<int> sizes;
-  // sizes << 355 << 125;
-  // splitter->setSizes(sizes);
-  // }
-
-  //    delete textBrowser;
-  // m_detail = new ResTableDetailArea(this);
-  // m_detail->setReadOnly(true);
-  // m_detail->setUndoRedoEnabled(false);
-  // m_detail->setOpenLinks(false);
-  // signals and slots connections
-  // connect(m_detail, SIGNAL(anchorClicked(const QUrl &)),
-  //     this, SLOT(linkWasClicked(const QUrl &)));
-  // splitter->addWidget(m_detail);
-  // splitter->setOrientation(Qt::Vertical);
 }
-
-/*
-void ResTable::setRclMain(RclMain *m, bool ismain)
-{
-    m_ismainres = ismain;
-
-    // We allow single selection only in the main table because this
-    // may have a mix of file-level docs and subdocs and multisave
-    // only works for subdocs
-    if (m_ismainres)
-    listview->setSelectionMode(QAbstractItemView::SingleSelection);
-    else
-    listview->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
-}
-*/
 
 ResTable::ResTable(QWidget *parent)
     : QWidget(parent), m_model(nullptr), m_detaildocnum(-1), m_ismainres(true) {
-  //  this->listViewProgram = new QListView();
-  //    this->listViewDoc=new QListView();
-  // Store the reg of type
-  //  filterString = new QStringList({"application/x-all", "text/*"});
-  //  filterString = new QStringList({"*"});
-  //  for (auto i = 0; i != filterString->size(); ++i) {
-  //    vm.push_back(QPair<DListView *, MSortFilterProxyModel *>(
-  //        new DListView(this), new MSortFilterProxyModel(this)));
-  //  }
+
   listview = new DListView(this);
   proxyModel = new MSortFilterProxyModel(this);
 
@@ -198,7 +114,6 @@ ResTable::ResTable(QWidget *parent)
   if (!(m_model = new RecollModel(fields, this)))
     return;
   init_ui();
-  init();
 }
 
 int ResTable::getDetailDocNumOrTopRow() {
@@ -211,8 +126,6 @@ int ResTable::getDetailDocNumOrTopRow() {
 
 void ResTable::init_ui() {
 
-  //    auto cw=new QWidget(this);
-  //    this->setCentralWidget(cw);
   auto hlayout = new QHBoxLayout();
   this->setLayout(hlayout);
   //  cw->setLayout(hlayout);
@@ -256,7 +169,7 @@ void ResTable::onTableView_currentChanged() {
   //  auto proxyModel=vm.at(currentListViewIndex).second;
   //  auto index=proxyModel->index(currentlistViewItemIndex,0);
   //  index=proxyModel->mapToSource(index);
-  auto index=listview->currentIndex();
+  auto index = listview->currentIndex();
   Rcl::Doc doc;
   this->m_model->getDocSource()->getDoc(index.row(), doc);
 
@@ -291,69 +204,29 @@ void ResTable::moveToNextResoule() {
     return;
   }
   auto cidx = listview->currentIndex();
-
-  auto r = cidx.row()+1;
+  auto r = cidx.row() + 1;
   if (r >= listview->count()) {
     r = 0;
   }
 
-  /*
-  while (listview->model()
-             ->index(r, 0)
-             .data(RecollModel::Role_VIEW_TYPE)
-             .toString() != "ITEM") {
-    ++r;
-  if (r >= listview->count()) {
-    r = 0;
-  }
-  }
-  */
   listview->setCurrentIndex(listview->model()->index(r, 0));
 
   onTableView_currentChanged();
 }
 
 void ResTable::setDocSource(std::shared_ptr<DocSequence> nsource) {
-  //    LOGDEB("ResTable::setDocSource\n");
-  if (m_model)
+  if (m_model){
     m_model->setDocSource(nsource);
+    proxyModel->setMaxItemCount(4);
+  }
+
   m_detaildocnum = -1;
 }
 
 void ResTable::resetSource() {
-  //    LOGDEB("ResTable::resetSource\n");
   setDocSource(std::shared_ptr<DocSequence>(nullptr));
 }
 
-/*
-// This is called when the sort order is changed from another widget
-void ResTable::onSortDataChanged(DocSeqSortSpec spec)
-{
-//    LOGDEB("ResTable::onSortDataChanged: [" << spec.field << "] desc " <<
-//           spec.desc << "\n");
-//    QHeaderView *header = listview->horizontalHeader();
-//    if (!header || !m_model)
-//    return;
-
-    // Check if the specified field actually matches one of columns
-    // and set indicator
-    m_model->setIgnoreSort(true);
-    bool matched = false;
-    const vector<string> fields = m_model->getFields();
-    for (unsigned int i = 0; i < fields.size(); i++) {
-    if (!spec.field.compare(m_model->baseField(fields[i]))) {
-//        header->setSortIndicator(i, spec.desc ?
-//                     Qt::DescendingOrder : Qt::AscendingOrder);
-        matched = true;
-    }
-    }
-    if (!matched)
-//    header->setSortIndicator(-1, Qt::AscendingOrder);
-    m_model->setIgnoreSort(false);
-}
-
-
-*/
 void ResTable::readDocSource(bool resetPos) {
   //    LOGDEB("ResTable::readDocSource("  << resetPos << ")\n");
   //    if (resetPos)
@@ -364,7 +237,6 @@ void ResTable::readDocSource(bool resetPos) {
   //      vm.at(i).first->setModel(vm.at(i).second);
   //  }
   m_model->readDocSource();
-  //  m_detaildocnum = -1;
   this->dtw->hide();
 }
 
@@ -375,6 +247,12 @@ void ResTable::clearSeach() {
 
 void ResTable::returnPressed() {
   auto currentIndex = listview->currentIndex();
+  auto vtype=currentIndex.data(RecollModel::Role_VIEW_TYPE).toString();
+  if(vtype=="DOT"||vtype=="SECTION"){
+      emit filterChanged(currentIndex.data(RecollModel::Role_MIME_TYPE).toString());
+      proxyModel->setMaxItemCount(100);
+      return ;
+  }
   auto mime =
       currentIndex.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
   auto path =

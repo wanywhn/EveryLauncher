@@ -26,6 +26,7 @@ public:
         Role_APP_COMMENT=Qt::UserRole+7,
         Role_APP_NAME=Qt::UserRole+8,
         Role_VIEW_TYPE=Qt::UserRole+9,
+        Role_NODISPLAY=Qt::UserRole+10,
 //        Role_FILE_ICON=Qt::UserRole+6;
 //        Role_FILE_EXEC=Qt::UserRole+7;
 //        Role_DESKTOP_NAME=Qt::UserRole+8;

@@ -36,6 +36,8 @@ signals:
     void resultsReady();
     void docSourceChanged(std::shared_ptr<DocSequence>);
     void searchReset();
+public slots:
+    void filterChanged(QString field);
 //private slots:
 //    void pfinished(int );
 private:

@@ -57,7 +57,7 @@ def main(args):
     print('''
 <html><head>
 <title>''' +name+
-          ''''</title>
+          '''</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
 <meta name="AppName" content="'''+AppName+'''" />
 <meta name="AppComment" content="'''+AppComment+'''" />
@@ -65,7 +65,9 @@ def main(args):
 <meta name="AppNoDisplay" content="'''+NoDisplay+'''" />
 
 </head>
-<body></body>
+<body>
+'''+AppName+'''
+</body>
 </html>
 
 ''')
