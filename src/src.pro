@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui dbus webenginewidgets
+QT       += core gui dbus webenginewidgets gui-private
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -97,6 +97,7 @@ HEADERS += \
         confgui/confguiindex.h\
         guiutils.h \
     Detailed/desktoppreview.h
+
 
 FORMS += \
         widget.ui

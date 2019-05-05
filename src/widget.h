@@ -36,6 +36,7 @@ signals:
     void resultsReady();
     void docSourceChanged(std::shared_ptr<DocSequence>);
     void searchReset();
+    void useFilterProxy();
 public slots:
     void filterChanged(QString field);
 //private slots:

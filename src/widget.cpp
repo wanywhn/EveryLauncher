@@ -55,6 +55,7 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   m_source->setSortSpec(dsss);
   m_source->setFiltSpec(dsfs);
 
+  emit useFilterProxy();
   emit docSourceChanged(m_source);
   //    emit sortDataChanged(m_sortspec);
   initiateQuery();
@@ -132,6 +133,7 @@ void Widget::filterChanged(QString field)
   DocSeqFiltSpec dsfs;
   dsfs.orCrit(DocSeqFiltSpec::DSFS_MIMETYPE,field.toStdString());
   m_source->setFiltSpec(dsfs);
+  emit docSourceChanged(m_source);
   initiateQuery();
 
 }
@@ -160,15 +162,12 @@ Widget::Widget(QWidget *parent) :DMainWindow(parent) {
   this->restable = new ResTable(this);
   this->searchLine = new SSearch(this);
   this->idxProcess = new QProcess(this);
-  //    this->idxWorkerThread=new QThread(this);
-  //    this->worker=new IndexWorker(this->tobeIndex,this->mtxTobeIndex,this);
   this->idxTimer = new QTimer;
   this->m_indexAvtive = false;
     this->m_queryActive=false;
   this->m_indexed = false;
   init_ui();
   init_conn();
-  //  this->worker->moveToThread(this->idxWorkerThread);
   // TODO configure
   this->idxTimer->setInterval(20000);
 }
@@ -186,9 +185,6 @@ void Widget::init_ui() {
   this->centralWidget()->setLayout(mvLayout);
   mvLayout->addWidget(searchLine);
   mvLayout->addWidget(restable);
-  //  auto mhLayout = new QHBoxLayout();
-  //  mhLayout->addWidget(this->restable);
-  //  mvLayout->addLayout(mhLayout);
 }
 
 void Widget::init_conn() {
@@ -200,6 +196,7 @@ void Widget::init_conn() {
           restable, SLOT(setDocSource(std::shared_ptr<DocSequence>)));
   connect(this, SIGNAL(searchReset()), restable, SLOT(resetSource()));
   connect(this, SIGNAL(resultsReady()), restable, SLOT(readDocSource()));
+  connect(this,&Widget::useFilterProxy,restable,&ResTable::useFilterProxy);
 
   connect(restable,&ResTable::filterChanged,this,&Widget::filterChanged);
 

@@ -61,6 +61,7 @@ public slots:
   virtual void makeRowVisible(int row);
   virtual void takeFocus();
   void moveToNextResoule();
+  void useFilterProxy();
 
 signals:
   void filterChanged(QString filed);

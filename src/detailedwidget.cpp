@@ -16,12 +16,6 @@ DetailedWidget::DetailedWidget(QWidget *parent) :QStackedWidget(parent)
     insertWidget(0,new DetailedW);
     insertWidget(1,new Preview);
     insertWidget(2,new DesktopPreview);
-//    std::vector<std::string> cat;
-//    theconfig->getMimeCategories(cat);
-//    for(auto item:cat){
-//        qDebug()<<QString::fromStdString(item);
-//    }
-
 }
 
 void DetailedWidget::showDocDetail(QModelIndex index, Rcl::Doc doc, HighlightData hl)

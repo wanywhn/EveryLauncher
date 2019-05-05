@@ -27,16 +27,20 @@ void MSortFilterProxyModel::resetPar() {
 
 }
 
+//!!FIXME qsortfilterproxymodel can only create index with row <than it accepted
 bool MSortFilterProxyModel::filterAcceptsRow(
     int source_row, const QModelIndex &source_parent) const {
   auto t = const_cast<MSortFilterProxyModel *>(this);
   auto sourceIndex = sourceModel()->index(source_row, 0, source_parent);
+  if(sourceIndex.row()<0){
+      return false;
+  }
   auto lineGroup = sourceIndex
                        .data(RecollModel::ModelRoles::Role_MIME_TYPE)
                        .toString();
 
   if(sourceIndex.data(RecollModel::ModelRoles::Role_NODISPLAY).toString().trimmed()=="true"){
-      return false;
+      return true;
   }
   // new group ,add section
   if (prevGroup != lineGroup) {
@@ -61,12 +65,12 @@ bool MSortFilterProxyModel::filterAcceptsRow(
     return true;
   }
   if (t->ommitTill) {
-    return false;
+    return true;
   }
   // same group sa previous
-  if (currentGroupCount > maxItemCount) {
+  if (currentGroupCount >= maxItemCount) {
     t->ommitTill = true;
-    return false;
+    return true;
   }
   // add current
   t->mapidx.insert(currentItemCount, source_row);
@@ -122,8 +126,8 @@ MSortFilterProxyModel::mapToSource(const QModelIndex &proxyIndex) const {
 }
 
 Qt::ItemFlags MSortFilterProxyModel::flags(const QModelIndex &index) const {
-  if (mapidx.contains(index.row())) {
-    return QSortFilterProxyModel::flags(index);
-  }
-  return Qt::ItemFlag::ItemIsSelectable|Qt::ItemFlag::ItemIsEnabled;
+//  if (mapidx.contains(index.row())) {
+//    return QSortFilterProxyModel::flags(index);
+//  }
+    return Qt::ItemFlag::ItemIsSelectable|Qt::ItemFlag::ItemIsEnabled;
 }

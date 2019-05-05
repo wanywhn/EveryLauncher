@@ -140,10 +140,10 @@ int main(int argc, char *argv[]) {
   w.move((desktop->width() - w.width()) / 2,
          (desktop->height() - w.height()) / 3);
 
-  auto fixdwid=desktop->width()/2;
-  fixdwid=fixdwid>1000?1000:fixdwid;
-  auto fixhei=desktop->height()/2;
-  fixhei=fixhei>800?800:fixhei;
+  auto fixdwid=desktop->width()/1.5;
+  fixdwid=fixdwid>1200?1200:fixdwid;
+  auto fixhei=desktop->height()/1.5;
+  fixhei=fixhei>1000?1000:fixhei;
 
   w.setMinimumSize(fixdwid,fixhei);
   w.setMaximumSize(fixdwid,fixhei);

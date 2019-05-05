@@ -33,20 +33,24 @@ public:
     initStyleOption(&opt, index);
     auto itemType =
         index.data(RecollModel::ModelRoles::Role_VIEW_TYPE).toString();
-    auto mimeType=index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
+    auto mimeType =
+        index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
     if (itemType == "SECTION") {
       painter->drawText(opt.rect.adjusted(-1, -1, -1, -1), mimeType);
 
       if (opt.state & QStyle::State_Selected) {
         painter->fillRect(opt.rect, opt.palette.highlight());
       }
+      return ;
     } else if (itemType == "DOT") {
       painter->drawText(opt.rect.adjusted(-1, -1, -1, -1), "DOT");
       if (opt.state & QStyle::State_Selected) {
         painter->fillRect(opt.rect, opt.palette.highlight());
       }
+      return ;
+    }
 
-    } else if (itemType == "ITEM") {
+//    } else if (itemType == "ITEM") {
 
       auto filename =
           index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
@@ -81,7 +85,7 @@ public:
 
       textPos.ry() += iconRectf.height() / 2;
       painter->drawText(textPos, filename);
-    }
+//    }
   }
 
 private:
@@ -96,8 +100,7 @@ public:
   }
 };
 
-void ResTable::init() {
-}
+void ResTable::init() {}
 
 ResTable::ResTable(QWidget *parent)
     : QWidget(parent), m_model(nullptr), m_detaildocnum(-1), m_ismainres(true) {
@@ -133,11 +136,12 @@ void ResTable::init_ui() {
   llayout = new QVBoxLayout();
 
   llayout->addWidget(listview);
-  listview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//  listview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   listview->setSelectionBehavior(QAbstractItemView::SelectRows);
   listview->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
   listview->setItemDelegate(new ResTableDelegate(this));
   proxyModel->setSourceModel(this->m_model);
+//  proxyModel->setDynamicSortFilter(false);
 
   listview->setModel(proxyModel);
 
@@ -159,16 +163,9 @@ void ResTable::makeRowVisible(int row) {
 }
 
 void ResTable::onTableView_currentChanged() {
-  // TODO send user input etc. to detailedWidget for highlitht when display?
-  //    LOGDEB2("ResTable::onTableView_currentChanged(" << index.row() << ", "
-  //    <<
-  //            index.column() << ")\n");
 
   if (!m_model || !m_model->getDocSource())
     return;
-  //  auto proxyModel=vm.at(currentListViewIndex).second;
-  //  auto index=proxyModel->index(currentlistViewItemIndex,0);
-  //  index=proxyModel->mapToSource(index);
   auto index = listview->currentIndex();
   Rcl::Doc doc;
   this->m_model->getDocSource()->getDoc(index.row(), doc);
@@ -176,13 +173,6 @@ void ResTable::onTableView_currentChanged() {
   HighlightData hl;
   this->m_model->getDocSource()->getTerms(hl);
   this->dtw->showDocDetail(index, doc, hl);
-  //    m_detaildocnum = index.row();
-  //    m_detaildoc = doc;
-  //    auto t =
-  //        this->m_model
-  //            ->data(index, RecollModel::ModelRoles::Role_FILE_SIMPLE_CONTENT)
-  //            .toString();
-  //    this->detailedWidget->setText(t);
   this->dtw->setVisible(true);
   //  }
 }
@@ -193,19 +183,15 @@ void ResTable::takeFocus() {
 }
 
 void ResTable::moveToNextResoule() {
-  //    auto cidx=listview->selectionModel();
-  //    if(!cidx->hasSelection()){
-  //        cidx->select(proxyModel->index(0,0),QItemSelectionModel::Select);
-  //    }
-  //    while(cidx->selectedRows().at(0).data(RecollModel::Role_VIEW_TYPE).toString()!="ITEM"){
-  //        listview->setCurrentIndex();
-  //    }
-  if (listview->count() <= 0) {
+
+  if (listview->model()->rowCount() <= 0) {
     return;
   }
   auto cidx = listview->currentIndex();
   auto r = cidx.row() + 1;
-  if (r >= listview->count()) {
+  qDebug()<<"current idx:"<<cidx.row()+1;
+   qDebug()<<"model data"<<listview->model()->index(r,0).data(RecollModel::ModelRoles::Role_MIME_TYPE);
+  if (r >= listview->model()->rowCount()) {
     r = 0;
   }
 
@@ -214,13 +200,18 @@ void ResTable::moveToNextResoule() {
   onTableView_currentChanged();
 }
 
+void ResTable::useFilterProxy()
+{
+
+    listview->setModel(proxyModel);
+}
+
 void ResTable::setDocSource(std::shared_ptr<DocSequence> nsource) {
-  if (m_model){
+  if (m_model) {
     m_model->setDocSource(nsource);
     proxyModel->setMaxItemCount(4);
   }
 
-  m_detaildocnum = -1;
 }
 
 void ResTable::resetSource() {
@@ -228,14 +219,6 @@ void ResTable::resetSource() {
 }
 
 void ResTable::readDocSource(bool resetPos) {
-  //    LOGDEB("ResTable::readDocSource("  << resetPos << ")\n");
-  //    if (resetPos)
-  //    listview->verticalScrollBar()->setSliderPosition(0);
-
-  //  for (auto i = 0; i != filterString->size(); ++i) {
-  //      vm.at(i).second->setSourceModel(this->m_model);
-  //      vm.at(i).first->setModel(vm.at(i).second);
-  //  }
   m_model->readDocSource();
   this->dtw->hide();
 }
@@ -247,11 +230,16 @@ void ResTable::clearSeach() {
 
 void ResTable::returnPressed() {
   auto currentIndex = listview->currentIndex();
-  auto vtype=currentIndex.data(RecollModel::Role_VIEW_TYPE).toString();
-  if(vtype=="DOT"||vtype=="SECTION"){
-      emit filterChanged(currentIndex.data(RecollModel::Role_MIME_TYPE).toString());
-      proxyModel->setMaxItemCount(100);
+  auto vtype = currentIndex.data(RecollModel::Role_VIEW_TYPE).toString();
+  if (vtype == "DOT" || vtype == "SECTION") {
+    emit filterChanged(
+        currentIndex.data(RecollModel::Role_MIME_TYPE).toString());
+    this->listview->setModel(m_model);
       return ;
+//    proxyModel->setMaxItemCount(100);
+//    proxyModel->sort(0);
+    //TODO
+//    proxyModel->setSourceModel(m_model);
   }
   auto mime =
       currentIndex.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
