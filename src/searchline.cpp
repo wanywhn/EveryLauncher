@@ -177,7 +177,7 @@ void SSearch::takeFocus() {
 
 QString SSearch::currentText() { return queryText->text(); }
 
-void SSearch::clearAll() { queryText->clear(); }
+void SSearch::clearAll() { queryText->clear();emit clearSearch(); }
 
 // onCompletionActivated() is called when an entry is selected in the
 // popup, but the edit text is going to be replaced in any case if
@@ -311,7 +311,7 @@ void SSearch::startSimpleSearch() {
   }
   QString s("");
   for(auto tmp:str){
-      if((tmp>'a'&&tmp<'z')||(tmp>'A'&&tmp<'Z')){
+      if((tmp>='a'&&tmp<='z')||(tmp>='A'&&tmp<='Z')){
         s+=tmp+QString("*");
       }else{
           s+=tmp;
@@ -325,75 +325,22 @@ void SSearch::startSimpleSearch() {
   if (!startSimpleSearch(u8))
     return;
 
-  // Search terms history.
-  // New text at the front and erase any older identical entry
-  QString txt = currentText().trimmed();
-  if (txt.isEmpty())
-    return;
 }
 
 void SSearch::setPrefs() {}
 
-// string SSearch::asXML()
-//{
-//    //return m_xml;
-//}
 bool SSearch::startSimpleSearch(const string &u8) {
   LOGDEB("SSearch::startSimpleSearch(" << u8 << ")\n");
   // TODO
   string stemlang = "english"; // prefs.stemlang();
 
-  //    SSearchType tp = (SSearchType)searchTypCMB->currentIndex();
+
+
+
   Rcl::SearchData *sdata = nullptr;
 
-  /*
-  if (tp == SST_LANG) {
-      string reason;
-      if (prefs.autoSuffsEnable) {
-          sdata = wasaStringToRcl(theconfig, stemlang, u8, reason,
-                                  (const char *)prefs.autoSuffs.toUtf8());
-          if (!prefs.autoSuffs.isEmpty()) {
-          }
-      } else {
-          sdata = wasaStringToRcl(theconfig, stemlang, u8, reason);
-      }
-      if (sdata == 0) {
-          QMessageBox::warning(0, "Recoll", tr("Bad query string") + ": " +
-                               QString::fromUtf8(reason.c_str()));
-          return false;
-      }
-  } else {
-  */
-  sdata = new Rcl::SearchData(Rcl::SCLT_OR, stemlang);
-  if (sdata == 0) {
-    QMessageBox::warning(0, "Recoll", tr("Out of memory"));
-    return false;
-  }
-  Rcl::SearchDataClause *clp = 0;
-  //        if (tp == SST_FNM) {
-  //            clp = new Rcl::SearchDataClauseFilename(u8);
-  //        } else {
-  // ANY or ALL, several words.
-  //            if (tp == SST_ANY) {
-  clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_OR, u8);
-  //            } else {
-  //                clp = new Rcl::SearchDataClauseSimple(Rcl::SCLT_AND, u8);
-  //            }
-  //        }
-  sdata->addClause(clp);
-  //    }
-
-  //    if (prefs.ssearchAutoPhrase && rcldb) {
-  //        sdata->maybeAddAutoPhrase(*rcldb,
-  //                                  prefs.ssearchAutoPhraseThreshPC / 100.0);
-  //    }
-  //    if (maxexp != -1) {
-  //        sdata->setMaxExpand(maxexp);
-  //    }
-
-  //    for (const auto& dbdir : prefs.activeExtraDbs) {
-  //    }
-
+  std::string reason;
+  sdata = wasaStringToRcl(theconfig, stemlang, u8, reason);
 
   std::shared_ptr<Rcl::SearchData> rsdata(sdata);
   emit setDescription(QString::fromStdString(u8));

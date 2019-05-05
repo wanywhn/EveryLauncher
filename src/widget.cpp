@@ -55,7 +55,7 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   m_source->setSortSpec(dsss);
   m_source->setFiltSpec(dsfs);
 
-  emit useFilterProxy();
+//  emit useFilterProxy();
   emit docSourceChanged(m_source);
   //    emit sortDataChanged(m_sortspec);
   initiateQuery();
@@ -166,6 +166,9 @@ Widget::Widget(QWidget *parent) :DMainWindow(parent) {
   this->m_indexAvtive = false;
     this->m_queryActive=false;
   this->m_indexed = false;
+    this->escKey=new QShortcut(QKeySequence(Qt::Key_Escape),this);
+    this->upKey=new QShortcut(QKeySequence(Qt::Key_Up),this);
+    this->downkey=new QShortcut(QKeySequence(Qt::Key_Down),this);
   init_ui();
   init_conn();
   // TODO configure
@@ -200,6 +203,9 @@ void Widget::init_conn() {
 
   connect(restable,&ResTable::filterChanged,this,&Widget::filterChanged);
 
+  connect(this->escKey,&QShortcut::activated,this->searchLine,&SSearch::clearAll);
+  connect(this->upKey,&QShortcut::activated,this->restable,&ResTable::currentMoveUp);
+  connect(this->downkey,&QShortcut::activated,this->restable,&ResTable::currentMoveDown);
   connect(this->idxTimer, &QTimer::timeout, this, &Widget::toggleIndexing);
   connect(this->idxProcess,
           static_cast<void (QProcess::*)(int)>(&QProcess::finished), [this]() {

@@ -33,7 +33,7 @@ bool MSortFilterProxyModel::filterAcceptsRow(
   auto t = const_cast<MSortFilterProxyModel *>(this);
   auto sourceIndex = sourceModel()->index(source_row, 0, source_parent);
   if(sourceIndex.row()<0){
-      return false;
+      return true;
   }
   auto lineGroup = sourceIndex
                        .data(RecollModel::ModelRoles::Role_MIME_TYPE)

@@ -19,6 +19,7 @@ class QTimer;
 #include "searchdata.h"
 #include <memory>
 
+extern RclConfig *theconfig;
 struct SSearchDef;
 extern std::shared_ptr<Rcl::Db> rcldb;
 class RclCompleterModel : public QAbstractListModel {

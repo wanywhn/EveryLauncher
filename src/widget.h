@@ -13,6 +13,7 @@
 #include <execmd.h>
 #include <DtkWidgets>
 #include <DMainWindow>
+#include <QShortcut>
 
 DWIDGET_USE_NAMESPACE
 namespace Ui {
@@ -60,6 +61,9 @@ private:
     bool m_queryActive;
     bool m_indexAvtive;
     bool m_indexed;
+    QShortcut *escKey;
+    QShortcut *upKey;
+    QShortcut *downkey;
 };
 
 #endif // WIDGET_H

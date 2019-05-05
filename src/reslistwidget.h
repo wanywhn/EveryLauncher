@@ -50,7 +50,8 @@ public:
 
 private:
   void init_ui();
-  void init();
+  void init_conn();
+private slots:
   virtual void onTableView_currentChanged();
 public slots:
   virtual void setDocSource(std::shared_ptr<DocSequence> nsource);
@@ -58,6 +59,8 @@ public slots:
   virtual void readDocSource(bool resetPos = true);
   void clearSeach();
   void returnPressed();
+  void currentMoveUp();
+  void currentMoveDown();
   virtual void makeRowVisible(int row);
   virtual void takeFocus();
   void moveToNextResoule();
@@ -67,14 +70,16 @@ signals:
   void filterChanged(QString filed);
   //    friend class ResTablePager;
   //    friend class ResTableDetailArea;
+  void currentChanged();
 private:
 //  QVector<QPair<DListView *, MSortFilterProxyModel *> > vm;
   DListView *listview;
+  QSortFilterProxyModel *filterNone;
   MSortFilterProxyModel *proxyModel;
   //!! only store listview etc
   QVBoxLayout *llayout;
   RecollModel *m_model;
-  int m_detaildocnum;
+  int mdetailRow;
   Rcl::Doc m_detaildoc;
   int m_popcolumn;
   bool m_ismainres;
