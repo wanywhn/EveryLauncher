@@ -43,6 +43,9 @@ public:
     //    this->liw.setTitle(filename.toString());
     //    auto toRender=const_cast<ListItemWidget&>(this->liw).grab();
      QPixmap icon(iconpath);
+     if (icon.isNull()){
+         qDebug()<<"null icon:"<<iconpath;
+     }
      icon=icon.scaled(this->sizeHint(option,index));
     QRectF recf(opt.rect);
     //    qDebug()<<filename;
@@ -228,8 +231,8 @@ void ResTable::init_ui() {
 
   hlayout->addLayout(llayout);
   hlayout->addWidget(this->dtw);
-  hlayout->setStretchFactor(llayout, 1);
-  hlayout->setStretchFactor(this->dtw, 2);
+  hlayout->setStretchFactor(llayout, 2);
+  hlayout->setStretchFactor(this->dtw, 3);
 
   this->dtw->setVisible(false);
   //  this->detailedWidget->setWordWrap(true);

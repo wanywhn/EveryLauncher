@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QString>
+#include <DTitlebar>
 
 #include "config.h"
 #include "dbusproxy.h"
@@ -108,6 +109,12 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   Widget w;
+//  w.setWindowOpacity(0.1);
+//  w.setTranslucentBackground(true);
+//  w.setAttribute(Qt::WA_TranslucentBackground);
+  w.setEnableBlurWindow(true);
+
+//  w.setWindowFlags(Qt::FramelessWindowHint);
 
   DBusProxy proxy(SystemTray::getInstance(&w), w);
   EveryLauncherAdaptor adaptor(&proxy);

@@ -30,8 +30,22 @@ void DesktopPreview::init_ui() {
   this->setLayout(vlayout);
   this->comment->setWordWrap(true);
 
-  vlayout->addWidget(icon);
-  vlayout->addWidget(appName);
-  vlayout->addWidget(comment);
+  auto iconhLayout=new QHBoxLayout();
+  iconhLayout->addStretch(0);
+  iconhLayout->addWidget(icon);
+  iconhLayout->addStretch(0);
+  vlayout->addLayout(iconhLayout);
+
+  auto apnLayout=new QHBoxLayout();
+  apnLayout->addStretch(0);
+  apnLayout->addWidget(appName);
+  apnLayout->addStretch(0);
+  vlayout->addLayout(apnLayout);
+
+  auto cmtLayout=new QHBoxLayout();
+  cmtLayout->addStretch(0);
+  cmtLayout->addWidget(comment);
+  cmtLayout->addStretch(0);
+  vlayout->addLayout(cmtLayout);
 
 }

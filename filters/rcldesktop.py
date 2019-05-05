@@ -34,16 +34,23 @@ def main(args):
         ip=AppIcon
 
     if ip is None:
-        #TODO add default icon
+        #TODO add defauult icon
+        ip="test"
         pass
     AppIcon=ip
 
 
     NoDisplay=desktop.getNoDisplay()
-    if NoDisplay:
+    onlydi=desktop.getOnlyShowIn()
+
+    if NoDisplay is True or len(onlydi)>0:
         AppIcon=""
         AppName=""
         AppComment=""
+        NoDisplay="true"
+    else:
+        NoDisplay="false"
+
 
 
 

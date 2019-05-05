@@ -52,7 +52,6 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   //    }
 
   Rcl::Query *query = new Rcl::Query(rcldb.get());
-  //  query->setQuery(sdata);
   query->setCollapseDuplicates(true);
 
   //    curPreview = 0;
@@ -65,7 +64,9 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   //                           prefs.queryReplaceAbstract);
   m_source = std::shared_ptr<DocSequence>(src);
   DocSeqSortSpec dsss;
+  dsss.field="relevancyrating";
   DocSeqFiltSpec dsfs;
+//  dsfs.orCrit(DocSeqFiltSpec::DSFS_MIMETYPE,"application/x-all");
   m_source->setSortSpec(dsss);
   m_source->setFiltSpec(dsfs);
 
