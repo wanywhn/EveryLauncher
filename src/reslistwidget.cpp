@@ -31,6 +31,16 @@ public:
              const QModelIndex &index) const {
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
+    auto itemType=index.data(RecollModel::ModelRoles::Role_VIEW_TYPE).toString();
+    if(itemType=="SECTION"){
+        painter->drawText(opt.rect,"SECTION");
+
+    }else if(itemType=="DOT"){
+        painter->drawText(opt.rect,"DOT");
+
+    }else if (itemType=="ITEM"){
+
+
     auto filename =
         index.data(RecollModel::ModelRoles::Role_FILE_NAME).toString();
     if (index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString() ==
@@ -62,6 +72,7 @@ public:
 
     textPos.ry() += iconRectf.height() / 2;
     painter->drawText(textPos, filename);
+    }
   }
 
 private:
@@ -210,16 +221,17 @@ void ResTable::init_ui() {
         QAbstractItemView::SelectionMode::SingleSelection);
     vm.at(i).first->setItemDelegate(new ResTableDelegate(this));
 
-    vm.at(i).first->setModel(this->m_model);
+//    vm.at(i).first->setModel(this->m_model);
 
-    //    vm.at(i).second->setSourceModel(this->m_model);
+        vm.at(i).second->setSourceModel(this->m_model);
     //    vm.at(i).second->setFilterRole(RecollModel::ModelRoles::Role_MIME_TYPE);
     //    vm.at(i).second->setFilterRegExp(filterString->at(i));
     //        vm.at(i).second->setFilterWildcard(filterString->at(i));
     //    vm.at(i).second->setSortRole(RecollModel::ModelRoles::Role_RELEVANCY);
     //    vm.at(i).second->setDynamicSortFilter(false);
-    //        vm.at(i).first->setModel(vm.at(i).second);
+            vm.at(i).first->setModel(vm.at(i).second);
 
+            /*
     connect(vm.at(i).second, &MSortFilterProxyModel::itemCountChanged,
             [this, i](int count) {
               qDebug() << "se cout:" << count;
@@ -227,6 +239,7 @@ void ResTable::init_ui() {
               // TODO height?
               view->resize(view->width(), count * 70);
             });
+            */
   }
 
   hlayout->addLayout(llayout);

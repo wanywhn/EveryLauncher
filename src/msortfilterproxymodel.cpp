@@ -1,84 +1,118 @@
 #include "msortfilterproxymodel.h"
+#include "recollmodel.h"
 #include <QDebug>
 
-MSortFilterProxyModel::MSortFilterProxyModel(QObject *parent):QSortFilterProxyModel (parent)
-{
-   currentItemCount=0;
-   maxItemCount=15;
+MSortFilterProxyModel::MSortFilterProxyModel(QObject *parent)
+    : QSortFilterProxyModel(parent) {
+  connect(this, &MSortFilterProxyModel::modelReset, this,
+          &MSortFilterProxyModel::resetPar);
 }
 
+int MSortFilterProxyModel::getMaxItemCount() const { return maxItemCount; }
 
-int MSortFilterProxyModel::getMaxItemCount() const
-{
-    return maxItemCount;
+void MSortFilterProxyModel::setMaxItemCount(int value) {
+  maxItemCount = value;
+  invalidateFilter();
 }
 
-void MSortFilterProxyModel::setMaxItemCount(int value)
-{
-    maxItemCount = value;
+void MSortFilterProxyModel::resetPar() {
+  currentGroupCount = 0;
+  currentItemCount = 0;
+  mapidx.clear();
+  mapSections.clear();
+  setDot.clear();
+
+  firstLine = true;
 }
 
-bool MSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
-{
-    if(currentItemCount>=maxItemCount){
-        return false;
+bool MSortFilterProxyModel::filterAcceptsRow(
+    int source_row, const QModelIndex &source_parent) const {
+  auto t = const_cast<MSortFilterProxyModel *>(this);
+  auto sourceIndex = sourceModel()->index(source_row, 0, source_parent);
+  auto lineGroup = sourceModel()
+                       ->index(source_row, 0, source_parent)
+                       .data(RecollModel::ModelRoles::Role_MIME_TYPE)
+                       .toString();
+
+  // new group ,add section
+  if (prevGroup != lineGroup) {
+      int rawrow=currentItemCount;
+    if (t->ommitTill) {
+      // add  previous dot
+      t->ommitTill = false;
+      t->setDot.insert(currentItemCount);
+      t->mapSections.insert(currentItemCount, prevGroup);
+      t->currentItemCount++;
     }
-    auto accepted=QSortFilterProxyModel::filterAcceptsRow(source_row,source_parent);
-    if(accepted){
-        auto t=const_cast<MSortFilterProxyModel *>(this);
-        t->currentItemCount++;
-        emit itemCountChanged(t->currentItemCount);
+
+    t->currentGroupCount=0;
+    // this is the section
+    t->mapSections.insert(currentItemCount, lineGroup);
+    t->currentItemCount++;
+    t->prevGroup = lineGroup;
+
+    // real item
+    t->mapidx.insert(currentItemCount,rawrow);
+    t->currentItemCount++;
+    t->currentGroupCount++;
+    return true;
+  }
+  if (t->ommitTill) {
+    return false;
+  }
+  // same group sa previous
+  if (currentGroupCount > maxItemCount) {
+    t->ommitTill = true;
+    return false;
+  }
+  // add current
+  t->mapidx.insert(currentItemCount, source_row);
+  t->currentItemCount++;
+  t->currentGroupCount++;
+  return true;
+}
+
+int MSortFilterProxyModel::rowCount(const QModelIndex &parent) const {
+  return currentItemCount;
+}
+
+QVariant MSortFilterProxyModel::data(const QModelIndex &index, int role) const {
+  if (setDot.contains(index.row())) {
+    if (role == RecollModel::ModelRoles::Role_VIEW_TYPE) {
+      return "DOT";
     }
-    return accepted;
-
-}
-
-int MSortFilterProxyModel::rowCount(const QModelIndex &parent) const
-{
-    auto cnt=QSortFilterProxyModel::rowCount(parent);
-    return currentItemCount>0?cnt+1:cnt;
-
-}
-
-/*
-QModelIndex MSortFilterProxyModel::mapToSource(const QModelIndex &proxyIndex) const
-{
-    if(proxyIndex.row()==0) {
-        //dumpy item
-        return QModelIndex();
-    }else{
-       return QSortFilterProxyModel::mapToSource(proxyIndex) ;
+    if (role == RecollModel::ModelRoles::Role_MIME_TYPE) {
+      return mapSections.value(index.row());
     }
-}
-
-QModelIndex MSortFilterProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
-{
-    auto idx=sourceIndex.model()->index(sourceIndex.row()+1,sourceIndex.column());
-    return QSortFilterProxyModel::mapFromSource(idx);
-
-}
-*/
-
-QVariant MSortFilterProxyModel::data(const QModelIndex &index, int role) const
-{
-    if(index.row()==0){
-        //dumpy item
-        return "";
+  } else {
+    if (mapidx.contains(index.row())) {
+      if (role == RecollModel::ModelRoles::Role_VIEW_TYPE) {
+        return "ITEM";
+      }
+//      auto i = sourceModel()->index(mapidx.value(index.row()), index.column());
+      return QSortFilterProxyModel::data(index, role);
+    } else {
+      if (role == RecollModel::ModelRoles::Role_VIEW_TYPE) {
+        return "SECTION";
+      }
+      if (role == RecollModel::ModelRoles::Role_MIME_TYPE) {
+        return mapSections.value(index.row());
+      }
+      // the section
     }
-    auto i=index.model()->index(index.row()-1,index.column());
-    return QSortFilterProxyModel::data(i,role);
-
+  }
+  //	auto i=index.model()->index(index.row()-1,index.column());
+  return QVariant();
+//  return QSortFilterProxyModel::data(index, role);
 }
 
-bool MSortFilterProxyModel::removeRows(int row, int count, const QModelIndex &parent)
-{
-    auto tober=qMin(currentItemCount,count);
-    bool r=QSortFilterProxyModel::removeRows(row,tober,parent);
-        qDebug()<<"remove:curr "<<currentItemCount;
-    if(r){
-        currentItemCount-=tober;
-        qDebug()<<"remove:curr "<<currentItemCount;
-    }
-    return r;
+QModelIndex
+MSortFilterProxyModel::mapToSource(const QModelIndex &proxyIndex) const {
+//  auto t = const_cast<MSortFilterProxyModel *>(this);
+  if(mapidx.contains(proxyIndex.row())){
 
+      return sourceModel()->index(mapidx.value(proxyIndex.row()),
+                                    proxyIndex.column());
+  }
+  return QModelIndex();
 }

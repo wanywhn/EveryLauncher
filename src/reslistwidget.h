@@ -58,7 +58,6 @@ public slots:
   virtual void readDocSource(bool resetPos = true);
   void clearSeach();
   void returnPressed();
-//  virtual void onSortDataChanged(DocSeqSortSpec);
   virtual void makeRowVisible(int row);
   virtual void takeFocus();
   void moveToNextResoule();

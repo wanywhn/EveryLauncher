@@ -64,7 +64,7 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   //                           prefs.queryReplaceAbstract);
   m_source = std::shared_ptr<DocSequence>(src);
   DocSeqSortSpec dsss;
-  dsss.field="relevancyrating";
+  dsss.field="mtype";
   DocSeqFiltSpec dsfs;
 //  dsfs.orCrit(DocSeqFiltSpec::DSFS_MIMETYPE,"application/x-all");
   m_source->setSortSpec(dsss);

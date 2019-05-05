@@ -252,28 +252,3 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
   }
   return var;
 }
-// This gets called when the column headers are clicked
-void RecollModel::sort(int column, Qt::SortOrder order) {
-  if (m_ignoreSort) {
-    return;
-  }
-  //    LOGDEB("RecollModel::sort(" << column << ", " << order << ")\n");
-
-  DocSeqSortSpec spec;
-  if (column >= 0 && column < int(m_fields.size())) {
-    spec.field = m_fields[column];
-    if (!stringlowercmp("relevancyrating", spec.field) &&
-        order != Qt::AscendingOrder) {
-      QMessageBox::warning(0, "Recoll", tr("Can't sort by inverse relevance"),
-                           QMessageBox::Ok);
-      // TODO
-      //            QTimer::singleShot(0, m_table, SLOT(resetSort()));
-      return;
-    }
-    if (!stringlowercmp("date", spec.field) ||
-        !stringlowercmp("datetime", spec.field))
-      spec.field = "mtime";
-    spec.desc = order == Qt::AscendingOrder ? false : true;
-  }
-  emit sortDataChanged(spec);
-}
