@@ -15,6 +15,7 @@
 #include "everylauncher_adaptor.h"
 #include "everylauncher_interface.h"
 #include "everylaunchermonitor_interface.h"
+#include "keymonitor.h"
 #include "rclinit.h"
 #include "systemtray.h"
 #include "widget.h"
@@ -86,10 +87,14 @@ void _create_dirs() {
 int main(int argc, char *argv[]) {
     DApplication::loadDXcbPlugin();
     DApplication a(argc, argv);
+    DApplication::setApplicationName("EveryLauncher");
+    DApplication::setOrganizationName("EveryLauncher");
     Dtk::Widget::DApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     Dtk::Widget::DApplication::setQuitOnLastWindowClosed(false);
     Dtk::Widget::DApplication::setApplicationName(AppName);
     _create_dirs();
+
+
 
     std::string reason;
     // TODO -c

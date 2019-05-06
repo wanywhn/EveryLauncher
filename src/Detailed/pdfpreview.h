@@ -1,12 +1,25 @@
 #ifndef PDFPREVIEW_H
 #define PDFPREVIEW_H
 
-#include <QObject>
+#include "detailedtext.h"
 
-class PdfPreview
+#include <QObject>
+#include <QtPdfWidgets/QPdfView>
+#include <QtPdf/QPdfDocument>
+
+class PdfPreview :public DetailedW
 {
+    Q_OBJECT
 public:
-    PdfPreview();
+    PdfPreview(QWidget *parent);
+    void init_ui();
+private:
+    QPdfView *pdfView ;
+    QPdfDocument *pdfdoc;
+
+    // DetailedW interface
+public:
+    void showDoc(Rcl::Doc doc) override;
 };
 
 #endif // PDFPREVIEW_H

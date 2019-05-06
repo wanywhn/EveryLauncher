@@ -14,19 +14,16 @@ public:
     EventMonitor(QObject *parent = 0);
 
 signals:
-    void buttonPress(int x, int y);
-    void buttonDrag(int x, int y);
-    void buttonRelease(int x, int y);
-    void keyPress(int code);
-    void keyRelease(int code);
+    void hotKeyPressed();
 
 protected:
-    bool filterWheelEvent(int detail);
     static void callback(XPointer trash, XRecordInterceptData* data);
     void handleRecordEvent(XRecordInterceptData *);
     void run();
 
 private:
-    bool isPress;
+    bool metaisPress{false};
+    bool spaceisPress{false};
+
 };
 #endif // KEYMONITOR_H

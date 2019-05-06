@@ -1,4 +1,5 @@
 #include "detailedtext.h"
+#include <recollmodel.h>
 
 DetailedW::DetailedW(QWidget *parent) : QWidget(parent)
 {

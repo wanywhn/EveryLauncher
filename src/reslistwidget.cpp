@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QProcess>
 #include <QShortcut>
+#include <QSizePolicy>
 #include <QStyledItemDelegate>
 #include <QTextDocument>
 #include <QTimer>
@@ -140,8 +141,11 @@ void ResTable::init_ui() {
 
     hlayout->addWidget(listview);
     hlayout->addWidget(this->dtw);
-    hlayout->setStretchFactor(this->listview, 2);
-    hlayout->setStretchFactor(this->dtw, 3);
+//    hlayout->setStretchFactor(this->listview, 2);
+//    hlayout->setStretchFactor(this->dtw, 3);
+//    this->dtw->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+//    hlayout->setStretch(0,2);
+//    hlayout->setStretch(1,3);
 
     this->dtw->setVisible(false);
 }
@@ -159,6 +163,8 @@ void ResTable::onTableView_currentChanged() {
     this->m_model->getDocSource()->getTerms(hl);
     this->dtw->showDocDetail(index, doc, hl);
     this->dtw->setVisible(true);
+    this->dtw->setMaximumWidth(this->width()*0.618);
+    this->dtw->setMinimumWidth(this->width()*0.618);
 }
 
 void ResTable::moveToNextResoule() {
