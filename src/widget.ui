@@ -1,6 +1,6 @@
 <ui version="4.0">
- <class>Widget</class>
- <widget class="QWidget" name="Widget" >
+ <class>MainWindow</class>
+ <widget class="QWidget" name="MainWindow" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Widget</string>
+   <string>MainWindow</string>
   </property>
  </widget>
  <layoutDefault spacing="6" margin="11" />

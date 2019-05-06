@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui dbus webenginewidgets gui-private
+QT       += core gui dbus webenginewidgets x11extras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,7 +12,7 @@ TARGET = EveryLauncher
 TEMPLATE = app
 
 CONFIG += c++11 link_pkgconfig
-PKGCONFIG += dtkwidget
+PKGCONFIG += dtkwidget xcb xcb-util
 QMAKE_CXXFLAGS += -std=c++11
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -41,14 +41,13 @@ DBUS_INTERFACES +=dbus_itface
 dbus_xmls.path = /usr/share/dbus-1/interfaces
 dbus_xmls.files = $$dbus.files
 
-LIBS += -lrecoll -L/usr/lib/recoll
+LIBS += -lrecoll -L/usr/lib/recoll -lX11 -lXext
 INCLUDEPATH+=../../recoll1-code/src/query\
                 ../../recoll1-code/src/utils\
                 ../../recoll1-code/src/rcldb\
                 ../../recoll1-code/src/internfile\
                 ../../recoll1-code/src/unac\
-                ../../recoll1-code/src/common\
-                ../../recoll1-code/src/qtgui\
+                ../../recoll1-code/src/common
 
 SOURCES += \
         main.cpp \
@@ -73,6 +72,7 @@ SOURCES += \
         confgui/confguiindex.cpp\
         guiutils.cpp \
     Detailed/desktoppreview.cpp
+#    keymonitor.cpp
 
 HEADERS += \
         widget.h \
@@ -97,6 +97,7 @@ HEADERS += \
         confgui/confguiindex.h\
         guiutils.h \
     Detailed/desktoppreview.h
+#    keymonitor.h
 
 
 FORMS += \

@@ -8,8 +8,6 @@ SystemTray::SystemTray(QWidget *mpranet):QSystemTrayIcon(),mainWindow(mpranet)
 {
 
     init_ui();
-
-
     init_conn();
 }
 
@@ -20,7 +18,6 @@ void SystemTray::showWindow()
         return ;
     }
     if(this->mainWindow->isVisible()&&!this->mainWindow->isHidden()){
-        qDebug()<<"heler";
         this->mainWindow->show();
 //        this->mainWindow->setWindowFlags(this->mainWindow->windowFlags()|Qt::WindowStaysOnTopHint);
 //        this->mainWindow->setWindowFlag(Qt::WindowStaysOnTopHint,false);
@@ -31,7 +28,7 @@ void SystemTray::showWindow()
     }
     qDebug()<<"agen";
 
-    //FIXME 貌似需要量下才能现实？
+    //FIXME 貌似需要两下才能现实？
 //    this->mainWindow->hide();
 //    this->trayMenu->hideTearOffMenu();
 //    this->trayMenu->showTearOffMenu();
@@ -45,9 +42,9 @@ void SystemTray::init_ui()
 {
 
     this->trayMenu=new QMenu();
-    this->showUp=new QAction(tr("ShowMainWindow"),this->trayMenu);
-    this->preferenceAction=new QAction(tr("Preference"),this->trayMenu);
-    this->exitAction=new QAction(tr("Exit"),this->trayMenu);
+    this->showUp=new QAction(tr("显示主窗口"),this->trayMenu);
+    this->preferenceAction=new QAction(tr("选项"),this->trayMenu);
+    this->exitAction=new QAction(tr("退出"),this->trayMenu);
 
     this->trayMenu->addAction(this->showUp);
     this->trayMenu->addAction(this->preferenceAction);
@@ -62,7 +59,6 @@ void SystemTray::init_conn()
 
     connect(this->showUp,&QAction::triggered,this,&SystemTray::showWindow);//[this](){
     connect(this->preferenceAction,&QAction::triggered,[](){
-//        PreferenceWindow pw(this->mainWindow);
 
         confgui::ConfIndexW w(nullptr,theconfig);
         w.exec();

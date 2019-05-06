@@ -20,6 +20,7 @@ DetailedWidget::DetailedWidget(QWidget *parent) :QStackedWidget(parent)
 
 void DetailedWidget::showDocDetail(QModelIndex index, Rcl::Doc doc, HighlightData hl)
 {
+    qDebug()<<"item mime:"<<index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
    auto wid=str2idx[index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString()];
    this->setCurrentIndex(wid);
    auto curr=qobject_cast<DetailedW *>( this->currentWidget());

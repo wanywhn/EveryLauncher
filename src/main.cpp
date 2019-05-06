@@ -1,5 +1,5 @@
+#include <memory>
 #include <DApplication>
-//#include <QApplication>
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDebug>
@@ -33,121 +33,117 @@ QString ORGANIZATION_NAME = "WANYWHN";
 //#define DBUS_INTERFACE "com.gitee.wanywhn.everylauncherMonitor"
 RclConfig *theconfig;
 std::shared_ptr<Rcl::Db> rcldb;
+
+/**
+ * 打开数据库
+ * @param reason 传出错误用参数
+ * @param force 是否强制重新打开
+ * @param maindberror 是否返回是主数据库打开错误
+ * @return
+ */
 bool maybeOpenDb(string &reason, bool force, bool *maindberror) {
-  //    LOGDEB2("maybeOpenDb: force " << force << "\n");
 
-  if (force) {
-    rcldb = std::shared_ptr<Rcl::Db>(new Rcl::Db(theconfig));
-  }
-  rcldb->rmQueryDb("");
-  //    for (const auto& dbdir : prefs.activeExtraDbs) {
-  //        LOGDEB("main: adding [" << dbdir << "]\n");
-  //        rcldb->addQueryDb(dbdir);
-  //    }
-  Rcl::Db::OpenError error;
-  if (!rcldb->isopen() && !rcldb->open(Rcl::Db::DbRO, &error)) {
-    reason = "Could not open database";
-    if (maindberror) {
-      reason +=
-          " in " + theconfig->getDbDir() + " wait for indexing to complete?";
-      *maindberror = (error == Rcl::Db::DbOpenMainDb) ? true : false;
+    if (force) {
+        rcldb = std::make_shared<Rcl::Db>(theconfig);
     }
-    return false;
-  }
-  //    rcldb->setAbstractParams(-1, prefs.syntAbsLen, prefs.syntAbsCtx);
-  return true;
+    rcldb->rmQueryDb("");
+    Rcl::Db::OpenError error;
+    if (!rcldb->isopen() && !rcldb->open(Rcl::Db::DbRO, &error)) {
+        reason = "Could not open database";
+        if (maindberror) {
+            reason +=
+                    " in " + theconfig->getDbDir() + " wait for indexing to complete?";
+            *maindberror = error == Rcl::Db::DbOpenMainDb;
+        }
+        return false;
+    }
+    return true;
 }
-// This is never called because we _Exit() in rclmain_w.cpp
-static void recollCleanup() {
-  //    LOGDEB2("recollCleanup: closing database\n" );
-  rcldb.reset();
-  deleteZ(theconfig);
 
-  //    deleteAllTempFiles();
-  //    LOGDEB2("recollCleanup: done\n" );
+static void recollCleanup() {
+    rcldb.reset();
+    deleteZ(theconfig);
 }
+
 void _create_dirs() {
-  auto cfgDir =
-      QDir(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
-  if (!cfgDir.exists()) {
-    cfgDir.mkpath(cfgDir.absolutePath());
-  }
-  QDir::setCurrent(cfgDir.absolutePath());
-  cfgDir.setPath(RECOLL_CONFIG_DIR);
-  if (!cfgDir.exists()) {
-    cfgDir.mkdir(cfgDir.absolutePath());
-  }
-  QDir::setCurrent(cfgDir.absolutePath());
-  cfgDir.setPath(XAPIAN_DB_DIR);
-  if (!cfgDir.exists()) {
-    cfgDir.mkdir(cfgDir.absolutePath());
-  }
+    auto cfgDir =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
+    if (!cfgDir.exists()) {
+        cfgDir.mkpath(cfgDir.absolutePath());
+    }
+    QDir::setCurrent(cfgDir.absolutePath());
+    cfgDir.setPath(RECOLL_CONFIG_DIR);
+    if (!cfgDir.exists()) {
+        cfgDir.mkdir(cfgDir.absolutePath());
+    }
+    QDir::setCurrent(cfgDir.absolutePath());
+    cfgDir.setPath(XAPIAN_DB_DIR);
+    if (!cfgDir.exists()) {
+        cfgDir.mkdir(cfgDir.absolutePath());
+    }
 }
+
 int main(int argc, char *argv[]) {
     DApplication::loadDXcbPlugin();
-  DApplication a(argc, argv);
-  a.setAttribute(Qt::AA_EnableHighDpiScaling);
-  a.setQuitOnLastWindowClosed(false);
-  a.setApplicationName(AppName);
-  _create_dirs();
+    DApplication a(argc, argv);
+    Dtk::Widget::DApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    Dtk::Widget::DApplication::setQuitOnLastWindowClosed(false);
+    Dtk::Widget::DApplication::setApplicationName(AppName);
+    _create_dirs();
 
-  std::string reason;
-  // TODO -c
-  std::string confg = "/home/tender/.config/EveryLauncher/recoll";
-  theconfig = recollinit(0, recollCleanup, nullptr, reason, &confg);
-  if (!theconfig || !theconfig->ok()) {
-    QString msg = "Configuration problem: ";
-    msg += QString::fromUtf8(reason.c_str());
-    QMessageBox::critical(nullptr, "Recoll", msg);
-    exit(1);
-  }
-  bool b;
-  maybeOpenDb(reason, 1, &b);
-  //    fprintf(stderr, "recollinit done\n");
-  auto conn = QDBusConnection::sessionBus();
-  if (!conn.isConnected()) {
-    return -1;
-  }
-  Widget w;
+    std::string reason;
+    // TODO -c
+    std::string confg = "/home/tender/.config/EveryLauncher/recoll";
+    theconfig = recollinit(0, recollCleanup, nullptr, reason, &confg);
+    if (!theconfig || !theconfig->ok()) {
+        QString msg = "Configuration problem: ";
+        msg += QString::fromUtf8(reason.c_str());
+        QMessageBox::critical(nullptr, "Recoll", msg);
+        exit(1);
+    }
+    bool b;
+    maybeOpenDb(reason, 1, &b);
+    //    fprintf(stderr, "recollinit done\n");
+    auto conn = QDBusConnection::sessionBus();
+    if (!conn.isConnected()) {
+        return -1;
+    }
+    MainWindow w;
 //  w.setWindowOpacity(0.1);
 //  w.setTranslucentBackground(true);
 //  w.setAttribute(Qt::WA_TranslucentBackground);
-  w.setEnableBlurWindow(true);
+    w.setEnableBlurWindow(true);
 
 //  w.setWindowFlags(Qt::FramelessWindowHint);
 
-  DBusProxy proxy(SystemTray::getInstance(&w), w);
-  EveryLauncherAdaptor adaptor(&proxy);
-  if (!conn.registerService(DBUS_SERVICE)) {
-    EveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
-    //        auto itface=new
-    //        QDBusInterface(DBUS_SERVICE,DBUS_PATH,DBUS_INTERFACE);
-    //        itface->call("showWindow");
-    itface.showWindow();
-    return 0;
-  } else {
-    conn.registerObject(DBUS_PATH, &proxy);
-    // TODO register object
-  }
-  EveryLauncherMonitorInterface monitorItfc(
-      DBUS_MONITOR_SERVER, DBUS_MONITOR_PATH, QDBusConnection::sessionBus());
-  QObject::connect(&monitorItfc, &EveryLauncherMonitorInterface::fileWrited,
-                   [](QStringList sl) { qDebug() << "get?" << sl; });
-  SystemTray::getInstance(&w).show();
-  QObject::connect(&SystemTray::getInstance(&w), &SystemTray::exitAll,
-                   []() { qApp->exit(); });
-  auto desktop = QApplication::desktop();
-  w.move((desktop->width() - w.width()) / 2,
-         (desktop->height() - w.height()) / 3);
+    DBusProxy proxy(SystemTray::getInstance(&w), w);
+    EveryLauncherAdaptor adaptor(&proxy);
+    if (!conn.registerService(DBUS_SERVICE)) {
+        EveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
+        itface.showWindow();
+        return 0;
+    } else {
+        conn.registerObject(DBUS_PATH, &proxy);
+    }
+    EveryLauncherMonitorInterface monitorItfc(
+            DBUS_MONITOR_SERVER, DBUS_MONITOR_PATH, QDBusConnection::sessionBus());
+    QObject::connect(&monitorItfc, &EveryLauncherMonitorInterface::fileWrited,
+                     [](QStringList sl) { qDebug() << "get?" << sl; });
+    SystemTray::getInstance(&w).show();
+    QObject::connect(&SystemTray::getInstance(&w), &SystemTray::exitAll,
+                     []() { qApp->exit(); });
+    auto desktop = QApplication::desktop();
+    w.move((desktop->width() - w.width()) / 2,
+           (desktop->height() - w.height()) / 3);
 
-  auto fixdwid=desktop->width()/1.5;
-  fixdwid=fixdwid>1200?1200:fixdwid;
-  auto fixhei=desktop->height()/1.5;
-  fixhei=fixhei>1000?1000:fixhei;
+    auto fixdwid = desktop->width() / 1.5;
+    fixdwid = fixdwid > 1200 ? 1200 : fixdwid;
+    auto fixhei = desktop->height() / 1.5;
+    fixhei = fixhei > 1000 ? 1000 : fixhei;
 
-  w.setMinimumSize(fixdwid,fixhei);
-  w.setMaximumSize(fixdwid,fixhei);
-  w.show();
+    w.setMinimumSize(fixdwid, fixhei);
+    w.setMaximumSize(fixdwid, fixhei);
+    w.show();
 
-  return a.exec();
+    return Dtk::Widget::DApplication::exec();
 }

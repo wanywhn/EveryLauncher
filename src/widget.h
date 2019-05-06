@@ -21,15 +21,15 @@ class Widget;
 }
 class IndexWorker;
 
-class Widget : public DMainWindow
+class MainWindow : public DMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit Widget(QWidget *parent = nullptr);
-    ~Widget();
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() = default;
 
-    public slots:
+public slots:
 virtual void startSearch(std::shared_ptr<Rcl::SearchData> sdata, bool issimple);
     virtual void initiateQuery();
     void IndexSomeFiles(QStringList paths);
@@ -45,7 +45,7 @@ public slots:
 private:
     void init_ui();
     void init_conn();
-    virtual bool checkIdxPaths();
+
     virtual void toggleIndexing();
 private:
     QThread *idxWorkerThread;
@@ -54,7 +54,7 @@ private:
 
     std::shared_ptr<DocSequence> m_source;
     ResTable *restable;
-    SSearch *searchLine;
+    SearchWidget *searchLine;
     QSet<QString> tobeIndex;
     QMutex mtxTobeIndex;
     QProcess *idxProcess;

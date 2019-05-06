@@ -1,6 +1,8 @@
+#include <utility>
+
 #include "dbusproxy.h"
 
-DBusProxy::DBusProxy(SystemTray &t, Widget &w, QObject *parent):tray(t),widget(w)
+DBusProxy::DBusProxy(SystemTray &t, MainWindow &w, QObject *parent):tray(t),widget(w)
 {
 
 }
@@ -8,7 +10,7 @@ DBusProxy::DBusProxy(SystemTray &t, Widget &w, QObject *parent):tray(t),widget(w
 void DBusProxy::IndexChangeFiles(QStringList paths)
 {
     //TODO start Index
-    this->widget.IndexSomeFiles(paths);
+    this->widget.IndexSomeFiles(std::move(paths));
 
 }
 

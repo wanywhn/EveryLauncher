@@ -13,7 +13,7 @@ class ConfigListWidget : public QGroupBox
 {
     Q_OBJECT
 public:
-    ConfigListWidget(QString showGroupName,QString section="DEFAULT",QWidget *parent=nullptr);
+    explicit ConfigListWidget(QString showGroupName,QString section="DEFAULT",QWidget *parent=nullptr);
 
     static void initConfigFile();
 private:

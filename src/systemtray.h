@@ -12,7 +12,7 @@ class SystemTray : public QSystemTrayIcon
 {
     Q_OBJECT
 public:
-    SystemTray(QWidget *mpranet);
+    explicit SystemTray(QWidget *mpranet);
     static SystemTray& getInstance(QWidget *parent){
         static SystemTray instance(parent);
         return instance;

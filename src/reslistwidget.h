@@ -25,13 +25,8 @@ using std::map;
 using std::string;
 using std::vector;
 
-extern RclConfig *theconfig;
-// class ResTable;
 
-
-// class ResTablePager;
 class QUrl;
-// class RclMain;
 
 DWIDGET_USE_NAMESPACE
 class ResTable : public QWidget{
@@ -39,14 +34,11 @@ class ResTable : public QWidget{
   Q_OBJECT
 
 public:
-  ResTable(QWidget *parent = nullptr);
+    explicit ResTable(QWidget *parent = nullptr);
 
-  virtual ~ResTable() {}
-  virtual RecollModel *getModel() { return m_model; }
-  //    virtual ResTableDetailArea* getDetailArea() {return m_detail;}
-  virtual int getDetailDocNumOrTopRow();
+    ~ResTable() override = default;
 
-  //    void setRclMain(RclMain *m, bool ismain);
+    virtual RecollModel *getModel() { return m_model; }
 
 private:
   void init_ui();
@@ -61,30 +53,21 @@ public slots:
   void returnPressed();
   void currentMoveUp();
   void currentMoveDown();
-  virtual void makeRowVisible(int row);
-  virtual void takeFocus();
   void moveToNextResoule();
   void useFilterProxy();
 
 signals:
   void filterChanged(QString filed);
-  //    friend class ResTablePager;
-  //    friend class ResTableDetailArea;
   void currentChanged();
 private:
-//  QVector<QPair<DListView *, MSortFilterProxyModel *> > vm;
   DListView *listview;
   QSortFilterProxyModel *filterNone;
   MSortFilterProxyModel *proxyModel;
-  //!! only store listview etc
-  QVBoxLayout *llayout;
+  QSortFilterProxyModel *currentFilterModel;
   RecollModel *m_model;
-  int mdetailRow;
-  Rcl::Doc m_detaildoc;
-  int m_popcolumn;
   bool m_ismainres;
-    //TODO multi
     DetailedWidget *dtw;
+    int mdetailRow{-1};
 };
 
 #endif // RESLISTWIDGET_H

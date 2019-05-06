@@ -35,11 +35,11 @@ class PlainToRichQtPreview;
 class QUrl;
 
 class Preview : public DetailedW {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   Preview( )// Search terms etc. for highlighting
-      : DetailedW(0) {
+      : DetailedW(nullptr) {
     init();
   }
 

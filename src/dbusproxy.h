@@ -11,7 +11,7 @@ class DBusProxy : public QObject
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface","com.gitee.wanywhn.EveryLauncher")
 public:
-    explicit DBusProxy(SystemTray &t,Widget &w,QObject *parent = nullptr);
+    explicit DBusProxy(SystemTray &t,MainWindow &w,QObject *parent = nullptr);
 
 public slots:
     void IndexChangeFiles(QStringList paths);
@@ -21,7 +21,7 @@ signals:
 
 private:
     SystemTray &tray;
-    Widget 	&widget;
+    MainWindow 	&widget;
 
 };
 

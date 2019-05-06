@@ -1,6 +1,4 @@
-#include "widget.h"
-#include "ui_widget.h"
-
+#include <utility>
 #include <QDebug>
 #include <QMessageBox>
 #include <QProgressDialog>
@@ -8,25 +6,23 @@
 #include <QVBoxLayout>
 #include <docseqdb.h>
 
-extern std::shared_ptr<Rcl::Db> rcldb;
+#include "widget.h"
+#include "ui_widget.h"
+
+
 extern bool maybeOpenDb(string &reason, bool force, bool *maindberror);
-extern RclConfig *theconfig;
+
 // Start a db query and set the reslist docsource
-void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
+void MainWindow::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
                          bool issimple) {
-//      LOGDEB("RclMain::startSearch. Indexing " << (m_idxproc?"on":"off") <<
-//             " Active " << m_queryActive << "\n");
   if (m_queryActive) {
-    //    LOGDEB("startSearch: already active\n");
+      qDebug()<<"startSearch already active";
     return;
   }
   m_queryActive = true;
   restable->setEnabled(false);
   m_source = std::shared_ptr<DocSequence>();
 
-  //    m_searchIsSimple = issimple;
-
-  // The db may have been closed at the end of indexing
   string reason;
   // If indexing is being performed, we reopen the db at each query.
   bool b;
@@ -40,24 +36,24 @@ void Widget::startSearch(std::shared_ptr<Rcl::SearchData> sdata,
   }
 
 
-  Rcl::Query *query = new Rcl::Query(rcldb.get());
+  auto *query = new Rcl::Query(rcldb.get());
   query->setCollapseDuplicates(true);
 
-  //    curPreview = 0;
   DocSequenceDb *src =
       new DocSequenceDb(/*rcldb,*/ std::shared_ptr<Rcl::Query>(query),
-                        string(tr("Query results").toUtf8()), sdata);
+                        string(tr("Query results").toUtf8()), std::move(sdata));
   src->setAbstractParams(true, false);
   m_source = std::shared_ptr<DocSequence>(src);
+
   DocSeqSortSpec dsss;
   dsss.field="mtype";
   DocSeqFiltSpec dsfs;
+
   m_source->setSortSpec(dsss);
   m_source->setFiltSpec(dsfs);
 
 //  emit useFilterProxy();
   emit docSourceChanged(m_source);
-  //    emit sortDataChanged(m_sortspec);
   initiateQuery();
 }
 
@@ -65,13 +61,14 @@ class QueryThread : public QThread {
   std::shared_ptr<DocSequence> m_source;
 
 public:
-  QueryThread(std::shared_ptr<DocSequence> source) : m_source(source) {}
-  ~QueryThread() {}
-  virtual void run() { cnt = m_source->getResCnt(); }
-  int cnt;
+    explicit QueryThread(std::shared_ptr<DocSequence> source) : m_source(std::move(source)) {}
+  ~QueryThread() override = default;
+
+    void run() override { cnt = m_source->getResCnt(); }
+  int cnt{0};
 };
 
-void Widget::initiateQuery() {
+void MainWindow::initiateQuery() {
   if (!m_source)
     return;
 
@@ -79,18 +76,16 @@ void Widget::initiateQuery() {
   QueryThread qthr(m_source);
   qthr.start();
 
+//  DCircleProgress circleProgress(this);
+//  circleProgress.setText(tr("正在进行查询，<bt>"
+//                            "如果取消将退出程序。"));
+//  circleProgress.setWindowModality(Qt::WindowModal);
   QProgressDialog progress(this);
-  progress.setLabelText(tr("Query in progress.<br>"
-                           "Due to limitations of the indexing library,<br>"
-                           "cancelling will exit the program"));
+  progress.setLabelText(tr("正在进行查询<br>"
+                           "取消将退出程序<br>"));
   progress.setWindowModality(Qt::WindowModal);
   progress.setRange(0, 0);
 
-  // For some reason setMinimumDuration() does not seem to work with
-  // a busy dialog (range 0,0) Have to call progress.show() inside
-  // the loop.
-  // progress.setMinimumDuration(2000);
-  // Also the multiple processEvents() seem to improve the responsiveness??
   for (int i = 0;; i++) {
     qApp->processEvents();
     if (qthr.wait(100)) {
@@ -98,9 +93,9 @@ void Widget::initiateQuery() {
     }
     if (i == 20)
       progress.show();
+//        circleProgress.show();
     qApp->processEvents();
     if (progress.wasCanceled()) {
-      // Just get out of there asap.
       exit(1);
     }
 
@@ -108,13 +103,13 @@ void Widget::initiateQuery() {
   }
 
   int cnt = qthr.cnt;
-  QString msg;
-  if (cnt > 0) {
-    QString str;
-    msg = tr("Result count (est.)") + ": " + str.setNum(cnt);
-  } else {
-    msg = tr("No results found");
-  }
+//  QString msg;
+//  if (cnt > 0) {
+//    QString str;
+//    msg = tr("Result count (est.)") + ": " + str.setNum(cnt);
+//  } else {
+//    msg = tr("No results found");
+//  }
 
   QApplication::restoreOverrideCursor();
   m_queryActive = false;
@@ -122,13 +117,13 @@ void Widget::initiateQuery() {
   emit(resultsReady());
 }
 
-void Widget::IndexSomeFiles(QStringList paths) {
-  QMutexLocker locker(&mtxTobeIndex);
+void MainWindow::IndexSomeFiles(QStringList paths) {
   auto t = QSet<QString>::fromList(paths);
+  QMutexLocker locker(&mtxTobeIndex);
   tobeIndex.unite(t);
 }
 
-void Widget::filterChanged(QString field)
+void MainWindow::filterChanged(QString field)
 {
   DocSeqFiltSpec dsfs;
   dsfs.orCrit(DocSeqFiltSpec::DSFS_MIMETYPE,field.toStdString());
@@ -138,46 +133,26 @@ void Widget::filterChanged(QString field)
 
 }
 
-class IndexWorker : public QObject {
-  Q_OBJECT
-public:
-  IndexWorker(QSet<QString> &origin, QMutex &m, QObject *parent)
-      : QObject(parent), tobtIndex(origin), mutex(m) {}
-public slots:
-  void startIndex() {
-    QSet<QString> s;
-    {
-      QMutexLocker locker(&mutex);
-      s.unite(tobtIndex);
-      tobtIndex.clear();
-    }
-    // TODO index
-  }
-
-private:
-  QSet<QString> &tobtIndex;
-  QMutex &mutex;
-};
-Widget::Widget(QWidget *parent) :DMainWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) :DMainWindow(parent) {
   this->restable = new ResTable(this);
-  this->searchLine = new SSearch(this);
+  this->searchLine = new SearchWidget(this);
   this->idxProcess = new QProcess(this);
-  this->idxTimer = new QTimer;
+  this->idxTimer = new QTimer(this);
   this->m_indexAvtive = false;
-    this->m_queryActive=false;
+  this->m_queryActive=false;
   this->m_indexed = false;
-    this->escKey=new QShortcut(QKeySequence(Qt::Key_Escape),this);
-    this->upKey=new QShortcut(QKeySequence(Qt::Key_Up),this);
-    this->downkey=new QShortcut(QKeySequence(Qt::Key_Down),this);
+  this->escKey=new QShortcut(QKeySequence(Qt::Key_Escape),this);
+  this->upKey=new QShortcut(QKeySequence(Qt::Key_Up),this);
+  this->downkey=new QShortcut(QKeySequence(Qt::Key_Down),this);
   init_ui();
   init_conn();
   // TODO configure
-  this->idxTimer->setInterval(20000);
+  this->idxTimer->setInterval(40000);
+  this->idxTimer->start();
 }
 
-Widget::~Widget() {}
 
-void Widget::init_ui() {
+void MainWindow::init_ui() {
 
   auto cw=new QWidget(this);
   this->setCentralWidget(cw);
@@ -190,23 +165,28 @@ void Widget::init_ui() {
   mvLayout->addWidget(restable);
 }
 
-void Widget::init_conn() {
-  connect(this->searchLine, &SSearch::startSearch, this, &Widget::startSearch);
-  connect(this->searchLine,&SSearch::tabPressed,this->restable,&ResTable::moveToNextResoule);
-  connect(this->searchLine,&SSearch::clearSearch,this->restable,&ResTable::clearSeach);
-  connect(this->searchLine,&SSearch::returnPressed,this->restable,&ResTable::returnPressed);
+void MainWindow::init_conn() {
+  connect(this->searchLine, &SearchWidget::startSearch, this, &MainWindow::startSearch);
+  connect(this->searchLine,&SearchWidget::clearSearch,this->restable,&ResTable::clearSeach);
+
+  connect(this->searchLine,&SearchWidget::tabPressed,this->restable,&ResTable::moveToNextResoule);
+  connect(this->searchLine,&SearchWidget::returnPressed,this->restable,&ResTable::returnPressed);
+
+  connect(restable,&ResTable::filterChanged,this,&MainWindow::filterChanged);
+
   connect(this, SIGNAL(docSourceChanged(std::shared_ptr<DocSequence>)),
           restable, SLOT(setDocSource(std::shared_ptr<DocSequence>)));
   connect(this, SIGNAL(searchReset()), restable, SLOT(resetSource()));
   connect(this, SIGNAL(resultsReady()), restable, SLOT(readDocSource()));
-  connect(this,&Widget::useFilterProxy,restable,&ResTable::useFilterProxy);
+  connect(this,&MainWindow::useFilterProxy,restable,&ResTable::useFilterProxy);
 
-  connect(restable,&ResTable::filterChanged,this,&Widget::filterChanged);
 
-  connect(this->escKey,&QShortcut::activated,this->searchLine,&SSearch::clearAll);
+  connect(this->escKey,&QShortcut::activated,this->searchLine,&SearchWidget::clearAll);
   connect(this->upKey,&QShortcut::activated,this->restable,&ResTable::currentMoveUp);
   connect(this->downkey,&QShortcut::activated,this->restable,&ResTable::currentMoveDown);
-  connect(this->idxTimer, &QTimer::timeout, this, &Widget::toggleIndexing);
+
+  connect(this->idxTimer, &QTimer::timeout, this, &MainWindow::toggleIndexing);
+
   connect(this->idxProcess,
           static_cast<void (QProcess::*)(int)>(&QProcess::finished), [this]() {
             this->m_indexAvtive = false;
@@ -217,31 +197,11 @@ void Widget::init_conn() {
 
 }
 
-bool Widget::checkIdxPaths() {
-  string badpaths;
-  vector<string> args{"recollindex", "-c", theconfig->getConfDir(), "-E"};
-  ExecCmd::backtick(args, badpaths);
-  if (!badpaths.empty()) {
-    int rep = QMessageBox::warning(0, tr("Bad paths"),
-                                   tr("Bad paths in configuration file:\n") +
-                                       QString::fromLocal8Bit(badpaths.c_str()),
-                                   QMessageBox::Ok, QMessageBox::Cancel,
-                                   QMessageBox::NoButton);
-    if (rep == QMessageBox::Cancel)
-      return false;
-  }
-  return true;
-}
-
-// This gets called when the "update index" action is activated. It executes
-// the requested action, and disables the menu entry. This will be
-// re-enabled by the indexing status check
-void Widget::toggleIndexing() {
+void MainWindow::toggleIndexing() {
   if (m_indexAvtive) {
     qDebug() << "already indexing";
     return;
   }
-  qDebug() << "start Index";
   QStringList sl;
   {
     QMutexLocker locker(&mtxTobeIndex);
@@ -249,6 +209,10 @@ void Widget::toggleIndexing() {
     tobeIndex.clear();
   }
 
+  qDebug() << "start Index:"<<sl;
+  if(sl.size()==0){
+      return;
+  }
   QStringList args;
   args << " -c " + QString::fromStdString(theconfig->getConfDir());
   args << " -i " + sl.join(" ");

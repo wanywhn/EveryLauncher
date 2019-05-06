@@ -10,12 +10,10 @@ class MSortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    MSortFilterProxyModel(QObject *parent);
+    explicit MSortFilterProxyModel(QObject *parent);
 
-    // QAbstractItemModel interface
 public:
 
-    // QSortFilterProxyModel interface
     int getMaxItemCount() const;
     void setMaxItemCount(int value);
     public slots:
@@ -39,11 +37,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
 
-    // QAbstractProxyModel interface
 public:
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
 
-    // QAbstractItemModel interface
 public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
