@@ -207,6 +207,9 @@ void ResTable::clearSeach() {
 
 void ResTable::returnPressed() {
     auto currentIndex = listview->currentIndex();
+    if(!currentIndex.isValid()){
+        return;
+    }
     currentIndex=currentFilterModel->mapToSource(listview->currentIndex());
     auto vtype = currentIndex.data(RecollModel::Role_VIEW_TYPE).toString();
     if (vtype == "DOT" || vtype == "SECTION") {
@@ -222,16 +225,15 @@ void ResTable::returnPressed() {
             currentIndex.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
     auto path =
             currentIndex.data(RecollModel::ModelRoles::Role_LOCATION).toString();
-    static QProcess p;
+    QString aname;
+    QStringList args;
     if (mime == "application/x-all") {
-        //!!FIXME 打开微信终端下可以，这样貌似不行？
-        p.setProgram("dex");
+        aname="dex";
     } else {
-        p.setProgram("xdg-open");
+        aname="xdg-open";
     }
-    p.setArguments(QStringList(path.replace("file://", "")));
-    qDebug() << "P:" << p.program() << " Arg:" << p.arguments();
-    p.start();
+    args<<path.replace("file://", "");
+    QProcess::startDetached(aname,args,"/tmp");
 }
 
 void ResTable::currentMoveUp() {
