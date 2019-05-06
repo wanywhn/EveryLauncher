@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=com.gitee.wanywhn.everylauncher
-Exec=/home/tender/workplace/git/everyLauncher/launcher/main.py

@@ -6,6 +6,8 @@
 
 QT       += core gui dbus webenginewidgets x11extras
 
+LIBS += -lrecoll -L/usr/lib/recoll -lX11 -lXext -lXtst -lQt5Pdf -lQt5PdfWidgets -L/home/tender/workplace/git/qtpdf/lib
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = EveryLauncher
@@ -19,6 +21,7 @@ QMAKE_CXXFLAGS += -std=c++11
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+isEmpty(PREFIX): PREFIX = /usr
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -38,16 +41,25 @@ DBUS_ADAPTORS += dbus
 DBUS_INTERFACES +=dbus_itface
 #DBUS_INTERFACES +=$$PWD/com.gitee.wanywhn.EveryLauncher.xml
 
+
+dbus_service.path = /usr/share/dbus-1/services
+dbus_service.files = $$PWD/../dbus/com.gitee.wanywhn.EveryLauncher.service
+
+dbus_toggle.path=$$PREFIX/bin
+dbus_toggle.files=$$PWD/../bin/everylauncher-toggle
+
 dbus_xmls.path = /usr/share/dbus-1/interfaces
 dbus_xmls.files = $$dbus.files
 
-LIBS += -lrecoll -L/usr/lib/recoll -lX11 -lXext
 INCLUDEPATH+=../../recoll1-code/src/query\
                 ../../recoll1-code/src/utils\
                 ../../recoll1-code/src/rcldb\
                 ../../recoll1-code/src/internfile\
                 ../../recoll1-code/src/unac\
-                ../../recoll1-code/src/common
+                ../../recoll1-code/src/common\
+                ../../recoll1-code/src/qtgui\
+                ../../qtpdf/include\
+                ../../qtpdf/include/QtPdf
 
 SOURCES += \
         main.cpp \
@@ -71,8 +83,10 @@ SOURCES += \
         confgui/confgui.cpp\
         confgui/confguiindex.cpp\
         guiutils.cpp \
-    Detailed/desktoppreview.cpp
-#    keymonitor.cpp
+    Detailed/desktoppreview.cpp\
+    keymonitor.cpp \
+    Detailed/pdfpreview.cpp \
+    Detailed/imagepreview.cpp
 
 HEADERS += \
         widget.h \
@@ -96,9 +110,17 @@ HEADERS += \
         confgui/confgui.h\
         confgui/confguiindex.h\
         guiutils.h \
-    Detailed/desktoppreview.h
-#    keymonitor.h
+    Detailed/desktoppreview.h\
+    keymonitor.h \
+    Detailed/pdfpreview.h \
+    Detailed/imagepreview.h
 
 
 FORMS += \
         widget.ui
+
+target.path = $$PREFIX/bin
+
+deplib.path= $$PREFIX/lib
+deplib.files+=../lib/*
+INSTALLS += target dbus_xmls dbus_service deplib dbus_toggle
