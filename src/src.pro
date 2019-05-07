@@ -3,18 +3,18 @@
 # Project created by QtCreator 2019-04-27T08:19:14
 #
 #-------------------------------------------------
+TARGET = everylauncher
+TEMPLATE = app
 
 QT       += core gui dbus webenginewidgets x11extras
 
-LIBS += -lrecoll -L/usr/lib/recoll -lX11 -lXext -lXtst -lQt5Pdf -lQt5PdfWidgets -L/home/tender/workplace/git/qtpdf/lib
+LIBS += -lrecoll
+LIBS += -lX11 -lXext -lXtst -lQt5Pdf -lQt5PdfWidgets
+LIBS += -L$$PWD/../lib
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = EveryLauncher
-TEMPLATE = app
-
+QMAKE_RPATHDIR +=/usr/lib/recoll
 CONFIG += c++11 link_pkgconfig
-PKGCONFIG += dtkwidget xcb xcb-util
+PKGCONFIG += dtkwidget xcb xcb-util Qt5Xdg
 QMAKE_CXXFLAGS += -std=c++11
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -28,28 +28,6 @@ isEmpty(PREFIX): PREFIX = /usr
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
-dbus.files = $$PWD/com.gitee.wanywhn.EveryLauncher.xml
-dbus.header_flags += -l DBusProxy -i $$PWD/dbusproxy.h
-dbus.source_flags += -l DBusProxy
-
-dbus_itface.files= $$PWD/com.gitee.wanywhn.EveryLauncher.xml
-dbus_itface.header_flags += -c EveryLauncherInterface
-dbus_itface.source_flags += -c EveryLauncherInterface
-
-DBUS_ADAPTORS += dbus
-DBUS_INTERFACES +=dbus_itface
-#DBUS_INTERFACES +=$$PWD/com.gitee.wanywhn.EveryLauncher.xml
-
-
-dbus_service.path = /usr/share/dbus-1/services
-dbus_service.files = $$PWD/../dbus/com.gitee.wanywhn.EveryLauncher.service
-
-dbus_toggle.path=$$PREFIX/bin
-dbus_toggle.files=$$PWD/../bin/everylauncher-toggle
-
-dbus_xmls.path = /usr/share/dbus-1/interfaces
-dbus_xmls.files = $$dbus.files
 
 INCLUDEPATH+=../../recoll1-code/src/query\
                 ../../recoll1-code/src/utils\
@@ -119,8 +97,20 @@ HEADERS += \
 FORMS += \
         widget.ui
 
+dbus.files = $$PWD/com.gitee.wanywhn.EveryLauncher.xml
+dbus.header_flags += -l DBusProxy -i $$PWD/dbusproxy.h
+dbus.source_flags += -l DBusProxy
+
+dbus_itface.files= $$PWD/com.gitee.wanywhn.EveryLauncher.xml
+dbus_itface.header_flags += -c EveryLauncherInterface
+dbus_itface.source_flags += -c EveryLauncherInterface
+
+DBUS_ADAPTORS += dbus
+DBUS_INTERFACES +=dbus_itface
+
 target.path = $$PREFIX/bin
 
-deplib.path= $$PREFIX/lib
-deplib.files+=../lib/*
-INSTALLS += target dbus_xmls dbus_service deplib dbus_toggle
+dbus_xmls.files = $$dbus.files
+dbus_xmls.path = /usr/share/dbus-1/interfaces
+
+INSTALLS += target dbus_xmls

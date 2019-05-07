@@ -1,0 +1,16 @@
+Source: everylauncher
+Section: utils
+Priority: optional
+Maintainer: Jia Qingtong <wanywhn@qq.com>
+Build-Depends: debhelper (>= 11), libqt5xdg-dev, pkg-config,
+               libqt5x11extras5-dev, libdtkwidget-dev,recollcmd,
+               x11proto-record-dev, libxtst-dev,
+Standards-Version: 4.1.3
+Homepage: https://gitee.com/wanywhn/everyLauncher
+
+Package: everylauncher
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: 一个全文搜索加桌面启动器。
+	
+ 

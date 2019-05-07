@@ -1,1 +1,1 @@
-../../ftrace-hook/build-src-unknown-Debug/everylaunchermonitor_interface.h
+../../everylauncher-server/server/everylaunchermonitor_interface.h

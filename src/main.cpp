@@ -9,6 +9,8 @@
 #include <QStandardPaths>
 #include <QString>
 #include <DTitlebar>
+#include <XdgDirs>
+#include <QProcess>
 
 #include "config.h"
 #include "dbusproxy.h"
@@ -21,7 +23,7 @@
 #include "widget.h"
 
 QString AppName = "EveryLauncher";
-QString RECOLL_CONFIG_DIR = "recoll";
+QString RECOLL_CONFIG_DIR = "recoll_conf";
 QString RECOLL_CONFIG_FILE = "recoll.conf";
 QString XAPIAN_DB_DIR = "xapiandb";
 QString DBUS_SERVICE = "com.gitee.wanywhn.EveryLauncher";
@@ -72,15 +74,19 @@ void _create_dirs() {
     if (!cfgDir.exists()) {
         cfgDir.mkpath(cfgDir.absolutePath());
     }
-    QDir::setCurrent(cfgDir.absolutePath());
+    //TODO clear filter
+        if(!cfgDir.exists(RECOLL_CONFIG_DIR)){
+        QStringList args;
+        args<<"/usr/share/everylauncher/recoll_conf";
+        args<<cfgDir.absolutePath();
+        args<<"-r";
+        QProcess::execute("cp",args);
+        }
+
+        //TODO clear db
     cfgDir.setPath(RECOLL_CONFIG_DIR);
-    if (!cfgDir.exists()) {
-        cfgDir.mkdir(cfgDir.absolutePath());
-    }
-    QDir::setCurrent(cfgDir.absolutePath());
-    cfgDir.setPath(XAPIAN_DB_DIR);
-    if (!cfgDir.exists()) {
-        cfgDir.mkdir(cfgDir.absolutePath());
+    if (!cfgDir.exists(XAPIAN_DB_DIR)) {
+        cfgDir.mkdir(XAPIAN_DB_DIR);
     }
 }
 
@@ -94,11 +100,13 @@ int main(int argc, char *argv[]) {
     Dtk::Widget::DApplication::setApplicationName(AppName);
     _create_dirs();
 
+    MainWindow w;
 
 
     std::string reason;
     // TODO -c
-    std::string confg = "/home/tender/.config/EveryLauncher/recoll";
+    auto cfh=QDir(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).absoluteFilePath(RECOLL_CONFIG_DIR);
+    std::string confg =cfh.toStdString();
     theconfig = recollinit(0, recollCleanup, nullptr, reason, &confg);
     if (!theconfig || !theconfig->ok()) {
         QString msg = "Configuration problem: ";
@@ -113,7 +121,6 @@ int main(int argc, char *argv[]) {
     if (!conn.isConnected()) {
         return -1;
     }
-    MainWindow w;
 //  w.setWindowOpacity(0.1);
 //  w.setTranslucentBackground(true);
 //  w.setAttribute(Qt::WA_TranslucentBackground);

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EveryLauncher
+Name[zh_CN]=易启
+Comment=测试
+Icon=everylauncher
+Exec=everylauncher
+
