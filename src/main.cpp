@@ -31,8 +31,8 @@ QString DBUS_PATH = "/com/gitee/wanywhn/EveryLauncher";
 // QString DBUS_INTERFACE="com.gitee.wanywhn.EveryLauncher";
 QString ORGANIZATION_NAME = "WANYWHN";
 
-#define DBUS_MONITOR_SERVER "com.gitee.wanywhn.everylauncherMonitor"
-#define DBUS_MONITOR_PATH "/com/gitee/wanywhn/everylauncherMonitor"
+#define DBUS_MONITOR_SERVER "com.gitee.wanywhn.EveryLauncherMonitor"
+#define DBUS_MONITOR_PATH "/com/gitee/wanywhn/EveryLauncherMonitor"
 //#define DBUS_INTERFACE "com.gitee.wanywhn.everylauncherMonitor"
 RclConfig *theconfig;
 std::shared_ptr<Rcl::Db> rcldb;
@@ -137,10 +137,11 @@ int main(int argc, char *argv[]) {
     } else {
         conn.registerObject(DBUS_PATH, &proxy);
     }
-    EveryLauncherMonitorInterface monitorItfc(
-            DBUS_MONITOR_SERVER, DBUS_MONITOR_PATH, QDBusConnection::sessionBus());
-    QObject::connect(&monitorItfc, &EveryLauncherMonitorInterface::fileWrited,
-                     [](QStringList sl) { qDebug() << "get?" << sl; });
+//    EveryLauncherMonitorInterface monitorItfc(
+//            DBUS_MONITOR_SERVER, DBUS_MONITOR_PATH, QDBusConnection::sessionBus());
+//    QObject::connect(&monitorItfc, &EveryLauncherMonitorInterface::fileWrited,
+//                     [](QStringList sl) { qDebug() << "get?" << sl;
+//                                        });
     SystemTray::getInstance(&w).show();
     QObject::connect(&SystemTray::getInstance(&w), &SystemTray::exitAll,
                      []() { qApp->exit(); });

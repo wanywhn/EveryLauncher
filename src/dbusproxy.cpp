@@ -10,6 +10,7 @@ DBusProxy::DBusProxy(SystemTray &t, MainWindow &w, QObject *parent):tray(t),widg
 void DBusProxy::IndexChangeFiles(QStringList paths)
 {
     //TODO start Index
+    qDebug()<<"here";
     this->widget.IndexSomeFiles(std::move(paths));
 
 }

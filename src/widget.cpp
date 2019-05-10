@@ -103,13 +103,6 @@ void MainWindow::initiateQuery() {
   }
 
   int cnt = qthr.cnt;
-//  QString msg;
-//  if (cnt > 0) {
-//    QString str;
-//    msg = tr("Result count (est.)") + ": " + str.setNum(cnt);
-//  } else {
-//    msg = tr("No results found");
-//  }
 
   QApplication::restoreOverrideCursor();
   m_queryActive = false;
@@ -147,7 +140,7 @@ MainWindow::MainWindow(QWidget *parent) :DMainWindow(parent) {
   init_ui();
   init_conn();
   // TODO configure
-  this->idxTimer->setInterval(40000);
+  this->idxTimer->setInterval(4000);
   this->idxTimer->start();
 }
 
@@ -187,11 +180,18 @@ void MainWindow::init_conn() {
 
   connect(this->idxTimer, &QTimer::timeout, this, &MainWindow::toggleIndexing);
 
-  connect(this->idxProcess,
-          static_cast<void (QProcess::*)(int)>(&QProcess::finished), [this]() {
+  connect(this->idxProcess,QOverload<int,QProcess::ExitStatus>::of(&QProcess::finished)
+          , [this]() {
+      qDebug()<<"fi1";
             this->m_indexAvtive = false;
             this->m_indexed = true;
           });
+  connect(this->idxProcess,&QProcess::errorOccurred,[this](){
+      qDebug()<<"fi2";
+            this->m_indexAvtive = false;
+            this->m_indexed = true;
+
+  });
   connect(this->idxProcess, &QProcess::started,
           [this]() { this->m_indexAvtive = true; });
 
@@ -209,13 +209,16 @@ void MainWindow::toggleIndexing() {
     tobeIndex.clear();
   }
 
-  qDebug() << "start Index:"<<sl;
   if(sl.size()==0){
       return;
   }
   QStringList args;
-  args << " -c " + QString::fromStdString(theconfig->getConfDir());
-  args << " -i " + sl.join(" ");
+  args << "-c";
+  args<<QString::fromStdString(theconfig->getConfDir());
+  args << "-i";
+  for(auto item:sl){
+      args<<item;
+  }
 
   idxProcess->start("recollindex", args);
 }

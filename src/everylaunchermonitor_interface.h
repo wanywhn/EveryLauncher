@@ -1,1 +1,1 @@
-../../everylauncher-server/server/everylaunchermonitor_interface.h
+../../everylauncher-server/build-everylauncher-monitor-unknown-Debug/everylaunchermonitor_interface.h
