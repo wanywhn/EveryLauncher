@@ -2,8 +2,10 @@
 #define CONFIG_H
 
 #include <QString>
+#include <rclconfig.h>
 
 
+extern RclConfig *theconfig;
 extern const QString AppName;
 extern const QString RECOLL_CONFIG_DIR;
 extern const QString XAPIAN_DB_DIR;

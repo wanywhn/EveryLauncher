@@ -17,6 +17,7 @@
 #include "everylauncher_adaptor.h"
 #include "everylauncher_interface.h"
 #include "everylaunchermonitor_interface.h"
+#include "firsttimeinit.h"
 #include "keymonitor.h"
 #include "rclinit.h"
 #include "systemtray.h"
@@ -93,11 +94,11 @@ void _create_dirs() {
 int main(int argc, char *argv[]) {
     DApplication::loadDXcbPlugin();
     DApplication a(argc, argv);
-    DApplication::setApplicationName("EveryLauncher");
-    DApplication::setOrganizationName("EveryLauncher");
+    DApplication::setApplicationName(AppName);
+    DApplication::setOrganizationName(AppName);
     Dtk::Widget::DApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     Dtk::Widget::DApplication::setQuitOnLastWindowClosed(false);
-    Dtk::Widget::DApplication::setApplicationName(AppName);
+//    Dtk::Widget::DApplication::setApplicationName(AppName);
     _create_dirs();
 
     MainWindow w;
@@ -155,6 +156,16 @@ int main(int argc, char *argv[]) {
     w.setMinimumSize(fixdwid, fixhei);
     w.setMaximumSize(fixdwid, fixhei);
     w.show();
+    QSettings s;
+    if(s.value("firstTime",true).toBool()){
+        firstTimeInit ftDialog(&w);
+        if(ftDialog.exec()!=QDialog::Accepted){
+            QMessageBox::warning(&w,QObject::tr("尚未索引"),QObject::tr("警告，尚未创建索引。可能无法搜索到东西。"));
+        }else{
+            s.setValue("firstTime",false);
+
+        }
+    }
 
     return Dtk::Widget::DApplication::exec();
 }

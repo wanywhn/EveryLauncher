@@ -64,7 +64,8 @@ SOURCES += \
     Detailed/desktoppreview.cpp\
     keymonitor.cpp \
     Detailed/pdfpreview.cpp \
-    Detailed/imagepreview.cpp
+    Detailed/imagepreview.cpp \
+    firsttimeinit.cpp
 
 HEADERS += \
         widget.h \
@@ -91,7 +92,8 @@ HEADERS += \
     Detailed/desktoppreview.h\
     keymonitor.h \
     Detailed/pdfpreview.h \
-    Detailed/imagepreview.h
+    Detailed/imagepreview.h \
+    firsttimeinit.h
 
 
 FORMS += \
