@@ -22,17 +22,17 @@
 #include "systemtray.h"
 #include "widget.h"
 
-QString AppName = "EveryLauncher";
-QString RECOLL_CONFIG_DIR = "recoll_conf";
-QString RECOLL_CONFIG_FILE = "recoll.conf";
-QString XAPIAN_DB_DIR = "xapiandb";
-QString DBUS_SERVICE = "com.gitee.wanywhn.EveryLauncher";
-QString DBUS_PATH = "/com/gitee/wanywhn/EveryLauncher";
+const QString AppName = "EveryLauncher";
+const QString RECOLL_CONFIG_DIR = "recoll_conf";
+const QString RECOLL_CONFIG_FILE = "recoll.conf";
+const QString XAPIAN_DB_DIR = "xapiandb";
+const QString DBUS_SERVICE = "com.gitee.wanywhn.EveryLauncher";
+const QString DBUS_PATH = "/com/gitee/wanywhn/EveryLauncher";
 // QString DBUS_INTERFACE="com.gitee.wanywhn.EveryLauncher";
-QString ORGANIZATION_NAME = "WANYWHN";
+const QString ORGANIZATION_NAME = "WANYWHN";
 
-#define DBUS_MONITOR_SERVER "com.gitee.wanywhn.EveryLauncherMonitor"
-#define DBUS_MONITOR_PATH "/com/gitee/wanywhn/EveryLauncherMonitor"
+const QString DBUS_MONITOR_SERVER ="com.gitee.wanywhn.EveryLauncherMonitor";
+const QString DBUS_MONITOR_PATH ="/com/gitee/wanywhn/EveryLauncherMonitor";
 //#define DBUS_INTERFACE "com.gitee.wanywhn.everylauncherMonitor"
 RclConfig *theconfig;
 std::shared_ptr<Rcl::Db> rcldb;
@@ -137,8 +137,6 @@ int main(int argc, char *argv[]) {
     } else {
         conn.registerObject(DBUS_PATH, &proxy);
     }
-//    EveryLauncherMonitorInterface monitorItfc(
-//            DBUS_MONITOR_SERVER, DBUS_MONITOR_PATH, QDBusConnection::sessionBus());
 //    QObject::connect(&monitorItfc, &EveryLauncherMonitorInterface::fileWrited,
 //                     [](QStringList sl) { qDebug() << "get?" << sl;
 //                                        });

@@ -28,6 +28,7 @@
 #include <qtimer.h>
 #include <qwidget.h>
 
+#include <dbusproxy.h>
 #include <functional>
 #include <list>
 #include <set>
@@ -229,6 +230,14 @@ ConfTopPanelW::ConfTopPanelW(QWidget *parent, ConfNull *config)
   eskp->setFsEncoding(true);
   setSzPol(eskp, QSizePolicy::Preferred, QSizePolicy::Preferred, 1, 3);
   gl1->addWidget(eskp, gridrow++, 0, 1, 2);
+
+  w=new ConfParamIntW(this,
+                      ConfLink(new ConfLinkRclRep(config,"monitorIndexInterval")),
+                      tr("文件监控报告间隔"),
+                      tr("设置多长时间文件变更监控汇报一次，以进行索引，默认600秒"),
+                      1,99999);
+
+  gl1->addWidget(w, gridrow++, 1);
 
   w = new ConfParamIntW(this,
                         ConfLink(new ConfLinkRclRep(config, "idxflushmb")),
