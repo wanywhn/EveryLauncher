@@ -3,12 +3,6 @@
 
 DetailedW::DetailedW(QWidget *parent) : QWidget(parent)
 {
-
-}
-
-void DetailedW::showDoc(Rcl::Doc doc)
-{
-
 }
 
 void DetailedW::setHighlightData(HighlightData hl)
@@ -19,4 +13,9 @@ void DetailedW::setHighlightData(HighlightData hl)
 void DetailedW::setIndex(const QModelIndex &value)
 {
     index = value;
+}
+
+bool DetailedW::supportMimeType(std::string &m)
+{
+    return setSupportedMimeType.contains(m);
 }

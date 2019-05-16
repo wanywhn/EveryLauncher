@@ -73,6 +73,10 @@ private:
   // DetailedW interface
 public:
   void showDoc(Rcl::Doc doc) override;
+
+  // DetailedW interface
+public:
+  bool supportMimeType(std::string &) Q_DECL_OVERRIDE;
 };
 
 #endif /* _PREVIEW_W_H_INCLUDED_ */

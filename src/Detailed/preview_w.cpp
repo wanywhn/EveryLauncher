@@ -33,9 +33,19 @@ extern
 
     RclConfig *theconfig;
 
-void Preview::init() {
-  setObjectName("Preview");
-  QVBoxLayout *previewLayout = new QVBoxLayout(this);
+    Preview::Preview()// Search terms etc. for highlighting
+        : DetailedW(nullptr) {
+        setSupportedMimeType.fromList({
+
+                                     "text/plain",
+
+                                      });
+        init();
+    }
+
+    void Preview::init() {
+        setObjectName("Preview");
+        QVBoxLayout *previewLayout = new QVBoxLayout(this);
 
   pvEdit = new PreviewTextEdit(this, "pvEdit", this);
   pvEdit->setReadOnly(true);

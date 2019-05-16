@@ -4,6 +4,10 @@
 
 PdfPreview::PdfPreview(QWidget *parent):DetailedW (parent)
 {
+    setSupportedMimeType.fromList({
+
+             "application/pdf",
+                                  });
 
     this->pdfView=new QPdfView(this);
     this->pdfdoc=new QPdfDocument(this);

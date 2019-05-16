@@ -5,6 +5,21 @@
 
 imagePreview::imagePreview(QWidget *parent):DetailedW (parent)
 {
+    setSupportedMimeType.fromList({
+
+                                "image/jpeg",
+                                 "image/bmp",
+                                 "image/gif",
+                                 "image/jpeg",
+                                 "image/png",
+                                 "image/x-portable-bitmap",
+                                 "image/x-portable-graymap",
+                                 "image/x-portable-pixmap",
+                                 "image/x-xbitmap",
+                                 "image/x-xpixmap",
+                                 "image/svg+xml",
+
+                                  });
     this->img=new QPixmap();
     this->imgView=new QLabel(this);
 //   imgView->setFixedSize(this->sizeHint());

@@ -9,6 +9,11 @@
 #include <recollmodel.h>
 
 DesktopPreview::DesktopPreview() {
+    setSupportedMimeType.fromList({
+
+             "application/x-all",
+
+                                  });
   icon = new QLabel(this);
   appName = new QLabel(this);
   comment=new QLabel(this);

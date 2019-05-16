@@ -2,6 +2,7 @@
 #define DETAILEDTEXT_H
 
 #include <QModelIndex>
+#include <QSet>
 #include <QTextEdit>
 #include <QWidget>
 #include <hldata.h>
@@ -16,6 +17,7 @@ public:
     virtual void showDoc(Rcl::Doc doc);
     void setHighlightData(HighlightData hl);
     void setIndex(const QModelIndex &value);
+    bool supportMimeType(std::string &m);
 
 signals:
 
@@ -23,6 +25,7 @@ public slots:
 protected:
     HighlightData m_hData;
     QModelIndex index;
+    QSet<std::string> setSupportedMimeType;
 };
 
 #endif // DETAILEDTEXT_H
