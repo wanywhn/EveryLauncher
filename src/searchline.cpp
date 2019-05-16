@@ -1,11 +1,9 @@
 #include "searchline.h"
-
 #include <memory>
 #include <set>
 #include <sstream>
 #include <string>
 #include <vector>
-
 #include <QAbstractItemView>
 #include <QAbstractListModel>
 #include <QCompleter>
@@ -24,6 +22,8 @@
 #include <qtooltip.h>
 #include <qvariant.h>
 #include <qwhatsthis.h>
+#include <QSettings>
+#include <QDesktopServices>
 
 #include "log.h"
 #include "rcldb.h"
@@ -100,8 +100,10 @@ void KeyWordsCompleterModel::onPartialWord(int tp, const QString &_qtext,
 
 SearchWidget::SearchWidget(QWidget *parent, const char *) : QWidget(parent) {
   queryText = new MLineEdit(this);
-  queryText->installEventFilter(this);
+  m_completermodel = new KeyWordsCompleterModel(this);
+//  queryText->installEventFilter(this);
   QTimer::singleShot(0, queryText, SLOT(setFocus()));
+  this->btnSearch=new QPushButton(tr("搜索"),this);
   init_ui();
   init_conn();
 }
@@ -111,23 +113,47 @@ void SearchWidget::init_conn() {
   connect(queryText, &QLineEdit::textChanged, this,
           &SearchWidget::searchTextChanged);
   connect(queryText, &QLineEdit::textEdited, this, &SearchWidget::searchTextEdited);
-  connect(queryText,&MLineEdit::returnPressed,this,&SearchWidget::returnPressed);
+  connect(queryText,&MLineEdit::returnPressed,[this](){
+      if(normalInputState){
+          emit this->returnPressed();
+          return ;
+      }
+      if(searchUrl.isEmpty()){
+          return ;
+      }
+      auto qt=this->queryText->text();
+      //left three char is "xx "
+      auto content=qt.right(qt.length()-3).trimmed();
 
-  m_completermodel = new KeyWordsCompleterModel(this);
+      if(content.isEmpty()){
+          return ;
+      }
+      QDesktopServices::openUrl(QUrl(searchUrl+content.replace(" ","+")));
+  });
+
   auto completer = new QCompleter(m_completermodel, this);
   completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
   completer->setFilterMode(Qt::MatchContains);
   completer->setCaseSensitivity(Qt::CaseInsensitive);
   completer->setMaxVisibleItems(completervisibleitems);
   queryText->setCompleter(completer);
-  connect(this, &SearchWidget::partialWord, m_completermodel,
-          &KeyWordsCompleterModel::onPartialWord);
+//  connect(this, &SearchWidget::partialWord, m_completermodel,
+//          &KeyWordsCompleterModel::onPartialWord);
   connect(completer, SIGNAL(activated(const QString &)), this,
           SLOT(onCompletionActivated(const QString &)));
   //    auto s=new QShortcut(tr("ESC"),queryText);
   //    connect(s,&QShortcut::activated,this,&SearchWidget::clearAll);
-  connect(this->queryText,&MLineEdit::tabPressed,this,&SearchWidget::tabPressed);
-  connect(this->queryText,&MLineEdit::stabPressed,this,&SearchWidget::stabPressed);
+  connect(this->queryText,&MLineEdit::tabPressed,[this](){
+      if(normalInputState)
+      emit this->tabPressed();
+  });
+//  connect(this->queryText,&MLineEdit::stabPressed,this,&SearchWidget::stabPressed);
+  connect(this->btnSearch,&QPushButton::clicked,this,&SearchWidget::returnPressed);
+}
+
+void SearchWidget::init_input_state()
+{
+   normalInputState=true;
 }
 
 void SearchWidget::takeFocus() {
@@ -138,7 +164,7 @@ void SearchWidget::takeFocus() {
 
 QString SearchWidget::currentText() { return queryText->text(); }
 
-void SearchWidget::clearAll() { queryText->clear();emit clearSearch(); }
+void SearchWidget::clearAll() { queryText->clear();init_input_state();emit clearSearch(); }
 
 // onCompletionActivated() is called when an entry is selected in the
 // popup, but the edit text is going to be replaced in any case if
@@ -179,25 +205,41 @@ void SearchWidget::init_ui() {
   this->setLayout(hLayout);
 
   hLayout->addWidget(this->queryText);
+  hLayout->addWidget(btnSearch);
 }
 
 void SearchWidget::searchTextEdited(const QString &text) {
-  LOGDEB1("SearchWidget::searchTextEdited: text [" << qs2u8s(text) << "]\n");
-  QString pword;
+    //TODO prepare compe
+  QString pword=text;
   int cs = getPartialWord(pword);
 
-  m_savedEditText = text.left(cs);
-  if (cs >= 0) {
-    //        emit partialWord(tp, currentText(), pword);
-  } else {
-    //        emit partialWord(tp, currentText(), " ");
-  }
+//  m_savedEditText = text.left(cs);
+//  if (cs >= 0) {
+//            emit partialWord(tp, currentText(), pword);
+//  } else {
+//            emit partialWord(0,pword, " ");
+//  }
 }
 
 void SearchWidget::searchTextChanged(const QString &text) {
   LOGDEB1("SearchWidget::searchTextChanged: text [" << qs2u8s(text) << "]\n");
 
-  if(text.trimmed().size()>=2){
+      //TODO wneh occur keyword ,shouldn't start search
+  if(text.size()==3){
+      if(text.trimmed().size()!=2){
+          return ;
+      }
+      //key word=2char
+      QSettings sett;
+      sett.beginGroup("SearchPrefix");
+      searchUrl=sett.value(text.trimmed(),"https://www.baidu.com/s?wd=").toString();
+      if(!searchUrl.isEmpty()){
+          normalInputState=false;
+      }
+      sett.endGroup();
+      return ;
+  }
+  if(text.trimmed().size()>3){
     emit startSimpleSearch();
   }else{
     emit clearSearch();
@@ -266,9 +308,6 @@ void SearchWidget::onWordReplace(const QString &o, const QString &n) {
     startSimpleSearch();
 }
 
-/*
- *
- */
 int SearchWidget::getPartialWord(QString &word) {
 
 }

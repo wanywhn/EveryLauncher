@@ -162,8 +162,8 @@ void MainWindow::init_conn() {
   connect(this->searchLine, &SearchWidget::startSearch, this, &MainWindow::startSearch);
   connect(this->searchLine,&SearchWidget::clearSearch,this->restable,&ResTable::clearSeach);
 
-  connect(this->searchLine,&SearchWidget::tabPressed,this->restable,&ResTable::moveToNextResoule);
-  connect(this->searchLine,&SearchWidget::returnPressed,this->restable,&ResTable::returnPressed);
+//  connect(this->searchLine,&SearchWidget::tabPressed,this->restable,&ResTable::moveToNextResoule);
+//  connect(this->searchLine,&SearchWidget::returnPressed,this->restable,&ResTable::returnPressed);
 
   connect(restable,&ResTable::filterChanged,this,&MainWindow::filterChanged);
 

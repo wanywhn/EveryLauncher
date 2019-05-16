@@ -12,6 +12,7 @@
 #include <QVariant>
 #include <QWidget>
 #include <memory>
+#include <QPushButton>
 
 class QTimer;
 
@@ -99,11 +100,15 @@ signals:
 private:
   void init_ui();
   void init_conn();
+  void init_input_state();
 
 private:
+  bool normalInputState{true};
+  QString searchUrl{""};
   int getPartialWord(QString &word);
   bool startSimpleSearch(const string &q);
   MLineEdit *queryText;
+  QPushButton *btnSearch;
 
   QString m_savedEditText;
   KeyWordsCompleterModel *m_completermodel{nullptr};

@@ -38,6 +38,13 @@ const QString DBUS_MONITOR_PATH ="/com/gitee/wanywhn/EveryLauncherMonitor";
 RclConfig *theconfig;
 std::shared_ptr<Rcl::Db> rcldb;
 
+static QMap<QString,QString> searchEngineMap={
+    {"so","http://stackoverflow.com/search?q="},
+    {"bi","https://cn.bing.com/search?q="},
+    {"zh","http://www.zhihu.com/search?q="},
+    {"bd","https://www.baidu.com/s?wd="},
+
+};
 /**
  * 打开数据库
  * @param reason 传出错误用参数
@@ -167,5 +174,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    QSettings sett;
+    sett.beginGroup("SearchPrefix");
+    for(auto item:searchEngineMap.keys()){
+        if(!sett.contains(item)){
+            sett.setValue(item,searchEngineMap.value(item));
+        }
+    }
+
+    sett.endGroup();
     return Dtk::Widget::DApplication::exec();
 }
