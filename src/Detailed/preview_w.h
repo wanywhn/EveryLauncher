@@ -38,10 +38,7 @@ class Preview : public DetailedW {
   Q_OBJECT
 
 public:
-  Preview( )// Search terms etc. for highlighting
-      : DetailedW(nullptr) {
-    init();
-  }
+  Preview( );
 
   friend class PreviewTextEdit;
 
@@ -74,9 +71,6 @@ private:
 public:
   void showDoc(Rcl::Doc doc) override;
 
-  // DetailedW interface
-public:
-  bool supportMimeType(std::string &) Q_DECL_OVERRIDE;
 };
 
 #endif /* _PREVIEW_W_H_INCLUDED_ */

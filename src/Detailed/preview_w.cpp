@@ -35,7 +35,8 @@ extern
 
     Preview::Preview()// Search terms etc. for highlighting
         : DetailedW(nullptr) {
-        setSupportedMimeType.fromList({
+        setSupportedMimeType=std::set<std::string>({
+//        setSupportedMimeType.fromList({
 
                                      "text/plain",
 

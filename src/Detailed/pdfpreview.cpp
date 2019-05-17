@@ -4,7 +4,8 @@
 
 PdfPreview::PdfPreview(QWidget *parent):DetailedW (parent)
 {
-    setSupportedMimeType.fromList({
+        setSupportedMimeType=std::set<std::string>({
+//    setSupportedMimeType.fromList({
 
              "application/pdf",
                                   });

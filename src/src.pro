@@ -6,7 +6,16 @@
 TARGET = everylauncher
 TEMPLATE = app
 
-QT       += core gui dbus webenginewidgets x11extras
+QT       += core\
+         gui\
+         dbus\
+         webenginewidgets\
+         x11extras\
+        network \
+        xml \
+        multimedia \
+        multimediawidgets \
+        widgets
 
 LIBS += -lrecoll
 LIBS += -lX11 -lXext -lXtst -lQt5Pdf -lQt5PdfWidgets
@@ -65,7 +74,9 @@ SOURCES += \
     keymonitor.cpp \
     Detailed/pdfpreview.cpp \
     Detailed/imagepreview.cpp \
-    firsttimeinit.cpp
+    firsttimeinit.cpp \
+    Detailed/player/playercontrols.cpp \
+    Detailed/player/player.cpp
 
 HEADERS += \
         widget.h \
@@ -93,7 +104,9 @@ HEADERS += \
     keymonitor.h \
     Detailed/pdfpreview.h \
     Detailed/imagepreview.h \
-    firsttimeinit.h
+    firsttimeinit.h \
+    Detailed/player/player.h \
+    Detailed/player/playercontrols.h
 
 
 FORMS += \

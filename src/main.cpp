@@ -103,12 +103,11 @@ int main(int argc, char *argv[]) {
     DApplication a(argc, argv);
     DApplication::setApplicationName(AppName);
     DApplication::setOrganizationName(AppName);
-    Dtk::Widget::DApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    Dtk::Widget::DApplication::setQuitOnLastWindowClosed(false);
+    DApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    DApplication::setQuitOnLastWindowClosed(false);
 //    Dtk::Widget::DApplication::setApplicationName(AppName);
     _create_dirs();
 
-    MainWindow w;
 
 
     std::string reason;
@@ -129,6 +128,7 @@ int main(int argc, char *argv[]) {
     if (!conn.isConnected()) {
         return -1;
     }
+    MainWindow w;
 //  w.setWindowOpacity(0.1);
 //  w.setTranslucentBackground(true);
 //  w.setAttribute(Qt::WA_TranslucentBackground);

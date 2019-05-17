@@ -9,7 +9,8 @@
 #include <recollmodel.h>
 
 DesktopPreview::DesktopPreview() {
-    setSupportedMimeType.fromList({
+        setSupportedMimeType=std::set<std::string>({
+//    setSupportedMimeType.fromList({
 
              "application/x-all",
 

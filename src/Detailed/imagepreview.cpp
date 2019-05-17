@@ -5,7 +5,8 @@
 
 imagePreview::imagePreview(QWidget *parent):DetailedW (parent)
 {
-    setSupportedMimeType.fromList({
+//    setSupportedMimeType.fromList({
+        setSupportedMimeType=std::set<std::string>({
 
                                 "image/jpeg",
                                  "image/bmp",
