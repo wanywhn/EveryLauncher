@@ -33,7 +33,7 @@ DetailedWidget::DetailedWidget(QWidget *parent) : QStackedWidget(parent) {
 
 void DetailedWidget::showDocDetail(QModelIndex index, Rcl::Doc doc,
                                    HighlightData hl) {
-      qDebug()<<"doc mime"<<QString::fromStdString(doc.mimetype)<<"path:"<<QString::fromStdString(doc.url);
+    qDebug()<<"doc mime"<<QString::fromStdString(doc.mimetype)<<"path:"<<QString::fromStdString(doc.url);
 //      qDebug()<<"item
   //    mime:"<<index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
   //   auto

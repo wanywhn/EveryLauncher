@@ -31,6 +31,17 @@ void DesktopPreview::showDoc(Rcl::Doc doc) {
 
 }
 
+QString DesktopPreview::getSummarySize(QString desktopFilepath)
+{
+
+}
+
+QString DesktopPreview::getInstalledVersion(QString dsktfp)
+{
+
+
+}
+
 void DesktopPreview::init_ui() {
   auto vlayout = new QVBoxLayout();
   this->setLayout(vlayout);

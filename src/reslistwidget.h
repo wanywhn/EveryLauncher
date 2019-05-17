@@ -15,6 +15,7 @@
 #include "recollmodel.h"
 
 #include <DtkWidgets>
+#include <dde-launcher/dbusfileinfo.h>
 #include <map>
 #include <memory>
 #include <string>

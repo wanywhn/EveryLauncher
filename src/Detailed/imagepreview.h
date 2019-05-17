@@ -17,6 +17,12 @@ private:
 
     QPixmap *img;
     QLabel *imgView;
+    QLabel *imgType;
+    QLabel *imgSize;
+    QLabel *imgFileSize;
+    QLabel *timeAcccess;
+    QLabel *timeModify;
+    QLabel *timeChange;
 
 
     // DetailedW interface
