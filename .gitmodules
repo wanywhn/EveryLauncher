@@ -1,9 +1,6 @@
-[submodule "recoll1-code"]
+[submodule "3rdparty/recoll1-code"]
 	path = 3rdparty/recoll1-code
 	url = https://@opensourceprojects.eu/git/p/recoll1/code
-	branch = tags/RECOLL-1.24.1
-
-[submodule "qtpdf"]
-	path = 3rdparty/qpdf
+[submodule "3rdparty/qtpdf"]
+	path = 3rdparty/qtpdf
 	url = https://github.com/qt-labs/qtpdf.git
-

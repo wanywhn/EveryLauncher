@@ -17,13 +17,11 @@ public:
 
 
 private:
-    QString getSummarySize(QString desktopFilepath);
-    QString getInstalledVersion(QString dsktfp);
-    QString getInstalledDate(QString dsktfp);
-private:
     void init_ui();
     QLabel  *icon;
     QLabel	*appName;
+    QLabel *appInstalledTime;
+    QLabel *appSize;
     QLabel	*comment;
 
 };

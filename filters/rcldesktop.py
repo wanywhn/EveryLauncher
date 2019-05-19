@@ -39,6 +39,7 @@ def main(args):
         pass
     AppIcon=ip
 
+    AppVersion=desktop.getVersionString();
 
     NoDisplay=desktop.getNoDisplay()
     onlydi=desktop.getOnlyShowIn()
@@ -63,6 +64,7 @@ def main(args):
 <meta name="AppComment" content="'''+AppComment+'''" />
 <meta name="AppIcon" content="'''+AppIcon+'''" />
 <meta name="AppNoDisplay" content="'''+NoDisplay+'''" />
+<meta name="AppVersion" content="'''+AppVersion+'''" />
 
 </head>
 <body>

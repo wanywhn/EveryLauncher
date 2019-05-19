@@ -7,7 +7,6 @@
 #include <QStringList>
 #include <QVBoxLayout>
 #include <recollmodel.h>
-
 DesktopPreview::DesktopPreview() {
         setSupportedMimeType=std::set<std::string>({
 //    setSupportedMimeType.fromList({
@@ -18,6 +17,8 @@ DesktopPreview::DesktopPreview() {
   icon = new QLabel(this);
   appName = new QLabel(this);
   comment=new QLabel(this);
+  appInstalledTime=new QLabel(this);
+  appSize=new QLabel(this);
   init_ui();
 }
 
@@ -29,18 +30,10 @@ void DesktopPreview::showDoc(Rcl::Doc doc) {
   appName->setText(index.data(RecollModel::Role_APP_NAME).toString());
   comment->setText(index.data(RecollModel::Role_APP_COMMENT).toString());
 
+  auto locale=this->locale();
+  //TODO wneh index desktop file ,wo can collect app info,and display here
 }
 
-QString DesktopPreview::getSummarySize(QString desktopFilepath)
-{
-
-}
-
-QString DesktopPreview::getInstalledVersion(QString dsktfp)
-{
-
-
-}
 
 void DesktopPreview::init_ui() {
   auto vlayout = new QVBoxLayout();
@@ -58,6 +51,19 @@ void DesktopPreview::init_ui() {
   apnLayout->addWidget(appName);
   apnLayout->addStretch(0);
   vlayout->addLayout(apnLayout);
+
+
+  auto apitLayout=new QHBoxLayout();
+  apitLayout->addStretch(0);
+  apitLayout->addWidget(appInstalledTime);
+  apitLayout->addStretch(0);
+  vlayout->addLayout(apitLayout);
+
+  auto apszLayout=new QHBoxLayout();
+  apszLayout->addStretch(0);
+  apszLayout->addWidget(appSize);
+  apszLayout->addStretch(0);
+  vlayout->addLayout(apszLayout);
 
   auto cmtLayout=new QHBoxLayout();
   cmtLayout->addStretch(0);

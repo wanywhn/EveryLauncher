@@ -16,7 +16,6 @@
  */
 #ifndef _PREVIEW_PLAINTORICH_H_INCLUDED_
 #define _PREVIEW_PLAINTORICH_H_INCLUDED_
-#include "autoconfig.h"
 
 #include <map>
 #include <string>

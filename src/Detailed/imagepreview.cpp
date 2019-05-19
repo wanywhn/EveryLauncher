@@ -81,7 +81,6 @@ void imagePreview::showDoc(Rcl::Doc doc)
    imgFileSize->setText(valueText);
 
    timeAcccess->setText(info.lastRead().toString());
-   //TODO empty ?
    timeModify->setText(info.lastModified().toString());
    timeChange->setText(info.metadataChangeTime().toString());
 
