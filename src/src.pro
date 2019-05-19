@@ -5,7 +5,6 @@
 #-------------------------------------------------
 TARGET = everylauncher
 TEMPLATE = app
-
 QT       += core\
          gui\
          dbus\
@@ -19,7 +18,7 @@ QT       += core\
 
 LIBS += -lrecoll
 LIBS += -lX11 -lXext -lXtst -lQt5Pdf -lQt5PdfWidgets
-LIBS += -L$$PWD/../lib
+LIBS += -L$$PWD/../3rdparty/qtpdf/lib
 
 QMAKE_RPATHDIR +=/usr/lib/recoll
 CONFIG += c++11 link_pkgconfig
@@ -38,15 +37,17 @@ isEmpty(PREFIX): PREFIX = /usr
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-INCLUDEPATH+=../../recoll1-code/src/query\
-                ../../recoll1-code/src/utils\
-                ../../recoll1-code/src/rcldb\
-                ../../recoll1-code/src/internfile\
-                ../../recoll1-code/src/unac\
-                ../../recoll1-code/src/common\
-                ../../recoll1-code/src/qtgui\
-                ../../qtpdf/include\
-                ../../qtpdf/include/QtPdf
+INCLUDEPATH+=../3rdparty/recoll1-code/src/query\
+             ../3rdparty/recoll1-code/src/utils\
+             ../3rdparty/recoll1-code/src/rcldb\
+             ../3rdparty/recoll1-code/src/internfile\
+             ../3rdparty/recoll1-code/src/unac\
+             ../3rdparty/recoll1-code/src/common\
+             ../3rdparty/recoll1-code/src/qtgui\
+             ../3rdparty/qtpdf/include\
+             ../3rdparty/qtpdf/include/QtPdf
+
+#             ../3rdparty/deepin-appstore/src/dbus
 
 SOURCES += \
         main.cpp \

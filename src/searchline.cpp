@@ -224,7 +224,10 @@ void SearchWidget::searchTextEdited(const QString &text) {
 void SearchWidget::searchTextChanged(const QString &text) {
   LOGDEB1("SearchWidget::searchTextChanged: text [" << qs2u8s(text) << "]\n");
 
-      //TODO wneh occur keyword ,shouldn't start search
+      //TODO it's better to insert some file into xapian to impl search
+  if(text.size()<3){
+      normalInputState=true;
+  }
   if(text.size()==3){
       if(text.trimmed().size()!=2){
           return ;
@@ -232,15 +235,15 @@ void SearchWidget::searchTextChanged(const QString &text) {
       //key word=2char
       QSettings sett;
       sett.beginGroup("SearchPrefix");
-      searchUrl=sett.value(text.trimmed(),"https://www.baidu.com/s?wd=").toString();
+      searchUrl=sett.value(text.trimmed()).toString();
       if(!searchUrl.isEmpty()){
           normalInputState=false;
       }
       sett.endGroup();
       return ;
   }
-  if(text.trimmed().size()>3){
-    emit startSimpleSearch();
+  if(text.trimmed().size()>=3&&normalInputState){
+    startSimpleSearch();
   }else{
     emit clearSearch();
   }
