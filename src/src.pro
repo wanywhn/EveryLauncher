@@ -132,3 +132,6 @@ dbus_xmls.files = $$dbus.files
 dbus_xmls.path = /usr/share/dbus-1/interfaces
 
 INSTALLS += target dbus_xmls
+
+RESOURCES += \
+    res.qrc
