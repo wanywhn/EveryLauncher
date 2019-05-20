@@ -22,6 +22,7 @@ private:
     QLabel	*appName;
     QLabel *appInstalledTime;
     QLabel *appSize;
+    QLabel *appVersion;
     QLabel	*comment;
 
 };

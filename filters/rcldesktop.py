@@ -40,6 +40,8 @@ def main(args):
     AppIcon=ip
 
     AppVersion=desktop.getVersionString();
+    if AppVersion is None:
+        AppVersion="0.0"
 
     NoDisplay=desktop.getNoDisplay()
     onlydi=desktop.getOnlyShowIn()

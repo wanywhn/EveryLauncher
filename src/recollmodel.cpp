@@ -109,11 +109,6 @@ RecollModel::RecollModel(const QStringList fields, QObject *parent)
         }
     }
 
-    // Construct the actual list of column names
-    for (const auto &field : fields) {
-        m_fields.emplace_back((const char *) (field.toUtf8()));
-        m_getters.push_back(chooseGetter(m_fields.back()));
-    }
 
     g_hiliter.set_inputhtml(false);
 }
@@ -142,22 +137,6 @@ void RecollModel::setDocSource(std::shared_ptr<DocSequence> nsource) {
     }
 }
 
-QVariant RecollModel::headerData(int idx, Qt::Orientation orientation,
-                                 int role) const {
-    if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
-        return idx;
-    }
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole &&
-        idx < int(m_fields.size())) {
-        map<string, QString>::const_iterator it =
-                o_displayableFields.find(m_fields[idx]);
-        if (it == o_displayableFields.end())
-            return QString::fromUtf8(m_fields[idx].c_str());
-        else
-            return it->second;
-    }
-    return QVariant();
-}
 
 QVariant RecollModel::data(const QModelIndex &index, int role) const {
     if (!m_source || !index.isValid() || role < Qt::UserRole) {
@@ -217,6 +196,13 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             var = gengetter("appnodisplay", doc);
             break;
         }
+        case Role_APP_VERSION:{
+        var=gengetter("appversion",doc);
+
+            break;
+
+        }
+
         default:
             break;
     }

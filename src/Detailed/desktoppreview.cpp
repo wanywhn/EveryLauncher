@@ -19,6 +19,7 @@ DesktopPreview::DesktopPreview() {
   comment=new QLabel(this);
   appInstalledTime=new QLabel(this);
   appSize=new QLabel(this);
+  appVersion=new QLabel(this);
   init_ui();
 }
 
@@ -26,9 +27,11 @@ void DesktopPreview::showDoc(Rcl::Doc doc) {
 
   auto path = index.data(RecollModel::Role_LOCATION).toString();
   auto pixmap=QPixmap(index.data(RecollModel::Role_ICON_PATH).toString());
-  icon->setPixmap(pixmap);
+  icon->setPixmap(pixmap.scaled(128,128));
+  //TODO change size
   appName->setText(index.data(RecollModel::Role_APP_NAME).toString());
   comment->setText(index.data(RecollModel::Role_APP_COMMENT).toString());
+  appVersion->setText(index.data(RecollModel::Role_APP_VERSION).toString());
 
   auto locale=this->locale();
   //TODO wneh index desktop file ,wo can collect app info,and display here
@@ -42,15 +45,37 @@ void DesktopPreview::init_ui() {
 
   auto iconhLayout=new QHBoxLayout();
   iconhLayout->addStretch(0);
-  iconhLayout->addWidget(icon);
+
+  auto vtopLayout=new QVBoxLayout();
+  auto h=new QHBoxLayout();
+  h->addStretch(0);
+  h->addWidget(icon);
+  h->addStretch(0);
+  vtopLayout->addLayout(h);
+
+
+  h=new QHBoxLayout();
+  h->addStretch(0);
+  h->addWidget(appName);
+  h->addStretch(0);
+  vtopLayout->addLayout(h);
+
+  h=new QHBoxLayout();
+  h->addStretch(0);
+  h->addWidget(appVersion);
+  h->addStretch(0);
+  vtopLayout->addLayout(h);
+
+  h=new QHBoxLayout();
+  h->addStretch(0);
+  h->addWidget(comment);
+  h->addStretch(0);
+  vtopLayout->addLayout(h);
+
+  iconhLayout->addLayout(vtopLayout);
+
   iconhLayout->addStretch(0);
   vlayout->addLayout(iconhLayout);
-
-  auto apnLayout=new QHBoxLayout();
-  apnLayout->addStretch(0);
-  apnLayout->addWidget(appName);
-  apnLayout->addStretch(0);
-  vlayout->addLayout(apnLayout);
 
 
   auto apitLayout=new QHBoxLayout();
@@ -64,11 +89,5 @@ void DesktopPreview::init_ui() {
   apszLayout->addWidget(appSize);
   apszLayout->addStretch(0);
   vlayout->addLayout(apszLayout);
-
-  auto cmtLayout=new QHBoxLayout();
-  cmtLayout->addStretch(0);
-  cmtLayout->addWidget(comment);
-  cmtLayout->addStretch(0);
-  vlayout->addLayout(cmtLayout);
 
 }

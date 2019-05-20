@@ -26,6 +26,7 @@ public:
         Role_APP_NAME=Qt::UserRole+8,
         Role_VIEW_TYPE=Qt::UserRole+9,
         Role_NODISPLAY=Qt::UserRole+10,
+        Role_APP_VERSION=Qt::UserRole+11,
     };
 
 public:
@@ -36,15 +37,12 @@ public:
     // Reimplemented methods
     int rowCount(const QModelIndex &) const override;
 
-    QVariant headerData(int col, Qt::Orientation orientation,
-                              int role ) const override;
 
     QVariant data(const QModelIndex &index,
                         int role ) const override;
   virtual void readDocSource();
   virtual void setDocSource(std::shared_ptr<DocSequence> nsource);
   virtual std::shared_ptr<DocSequence> getDocSource() { return m_source; }
-  virtual const std::vector<std::string> &getFields() { return m_fields; }
   virtual const std::map<std::string, QString> &getAllFields() {
     return o_displayableFields;
   }
@@ -56,8 +54,6 @@ signals:
   friend class ResTable;
 private:
   mutable std::shared_ptr<DocSequence> m_source;
-  std::vector<std::string> m_fields;
-  std::vector<FieldGetter *> m_getters;
   static std::map<std::string, QString> o_displayableFields;
   FieldGetter *chooseGetter(const std::string &);
       HighlightData m_hdata;
