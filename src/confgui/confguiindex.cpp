@@ -28,6 +28,7 @@
 #include <qtimer.h>
 #include <qwidget.h>
 
+#include <configsearchengine.h>
 #include <dbusproxy.h>
 #include <functional>
 #include <list>
@@ -207,6 +208,11 @@ void ConfIndexW::reloadPanels() {
   w = new ConfSubPanelW(this, m_conf, m_rclconf);
   m_widgets.push_back(w);
   tabWidget->addTab(w, QObject::tr("局部参数"));
+
+  w=new ConfigSearchEngine(this);
+  m_widgets.push_back(w);
+  tabWidget->addTab(w,QObject::tr("Search Engine"));
+
 }
 
 ConfTopPanelW::ConfTopPanelW(QWidget *parent, ConfNull *config)

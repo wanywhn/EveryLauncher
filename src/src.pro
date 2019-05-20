@@ -77,7 +77,8 @@ SOURCES += \
     Detailed/imagepreview.cpp \
     firsttimeinit.cpp \
     Detailed/player/playercontrols.cpp \
-    Detailed/player/player.cpp
+    Detailed/player/player.cpp \
+    configsearchengine.cpp
 
 HEADERS += \
         widget.h \
@@ -107,7 +108,8 @@ HEADERS += \
     Detailed/imagepreview.h \
     firsttimeinit.h \
     Detailed/player/player.h \
-    Detailed/player/playercontrols.h
+    Detailed/player/playercontrols.h \
+    configsearchengine.h
 
 
 FORMS += \

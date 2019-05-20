@@ -38,11 +38,11 @@ const QString DBUS_MONITOR_PATH ="/com/gitee/wanywhn/EveryLauncherMonitor";
 RclConfig *theconfig;
 std::shared_ptr<Rcl::Db> rcldb;
 
-static QMap<QString,QString> searchEngineMap={
-    {"so","http://stackoverflow.com/search?q="},
-    {"bi","https://cn.bing.com/search?q="},
-    {"zh","http://www.zhihu.com/search?q="},
-    {"bd","https://www.baidu.com/s?wd="},
+static QMap<QString,QStringList> searchEngineMap={
+    {"so",{"http://stackoverflow.com/search?q=","StackOverflow"}},
+    {"bi",{"https://cn.bing.com/search?q=","Bing"}},
+    {"zh",{"http://www.zhihu.com/search?q=","知乎"}},
+    {"bd",{"https://www.baidu.com/s?wd=","百度"}},
 
 };
 /**
