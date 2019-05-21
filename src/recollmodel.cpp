@@ -79,7 +79,7 @@ FieldGetter *RecollModel::chooseGetter(const string &field) {
         return gengetter;
 }
 
-RecollModel::RecollModel(const QStringList fields, QObject *parent)
+RecollModel::RecollModel(QObject *parent)
         : QAbstractListModel(parent) {
     // Initialize the translated map for column headers
     o_displayableFields["abstract"] = tr("Abstract");

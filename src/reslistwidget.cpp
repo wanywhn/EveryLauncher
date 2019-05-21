@@ -108,11 +108,11 @@ ResTable::ResTable(QWidget *parent)
 
     this->dtw = new DetailedWidget();
     QStringList fields;
-    fields << "url"
-           << "title"
-           << "mtype"
-           << "abstract";
-    if (!(m_model = new RecollModel(fields, this)))
+//    fields << "url"
+//           << "title"
+//           << "mtype"
+//           << "abstract";
+    if (!(m_model = new RecollModel( this)))
         return;
     init_ui();
     init_conn();

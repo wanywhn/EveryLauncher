@@ -2,7 +2,8 @@
 #include "preferencewindow.h"
 #include <QDebug>
 #include <QIcon>
-#include <confgui/confguiindex.h>
+#include "confgui/confguiindex.h"
+#include <QtWidgets/QApplication>
 
 SystemTray::SystemTray(QWidget *mpranet)
     : QSystemTrayIcon(), mainWindow(mpranet) {

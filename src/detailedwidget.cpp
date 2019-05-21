@@ -1,10 +1,10 @@
 #include "detailedwidget.h"
 #include "reslistwidget.h"
-#include <Detailed/desktoppreview.h>
-#include <Detailed/imagepreview.h>
-#include <Detailed/pdfpreview.h>
-#include <Detailed/player/player.h>
-#include <Detailed/preview_w.h>
+#include "Detailed/desktoppreview.h"
+#include "Detailed/imagepreview.h"
+#include "Detailed/pdfpreview.h"
+#include "Detailed/player/player.h"
+#include "Detailed/preview_w.h"
 #include <QDebug>
 #include <QMediaPlayer>
 

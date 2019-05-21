@@ -2,9 +2,9 @@
 #define PLAYER_H
 
 #include <QWidget>
-#include <QMediaPlayer>
 #include <QGraphicsView>
-#include <Detailed/detailedtext.h>
+#include <QtMultimedia/QMediaPlayer>
+#include "../detailedtext.h"
 
 class QAbstractItemView;
 class QLabel;

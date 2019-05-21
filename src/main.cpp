@@ -14,11 +14,11 @@
 
 #include "config.h"
 #include "dbusproxy.h"
+#include "../cmake-build-debug/src/everylauncher_adaptor.h"
 #include "everylauncher_adaptor.h"
 #include "everylauncher_interface.h"
 #include "everylaunchermonitor_interface.h"
 #include "firsttimeinit.h"
-#include "keymonitor.h"
 #include "rclinit.h"
 #include "systemtray.h"
 #include "widget.h"
@@ -141,7 +141,8 @@ int main(int argc, char *argv[]) {
     DBusProxy proxy(SystemTray::getInstance(&w), w);
     EveryLauncherAdaptor adaptor(&proxy);
     if (!conn.registerService(DBUS_SERVICE)) {
-        EveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
+//        EveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
+        ComGiteeWanywhnEveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
         itface.showWindow();
         return 0;
     } else {

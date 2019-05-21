@@ -274,9 +274,9 @@ void ConfParamFNW::loadValue()
 
 void ConfParamFNW::showBrowserDialog()
 {
-    QString s = myGetFileName(m_isdir);
-    if (!s.isEmpty())
-        m_le->setText(s);
+//    QString s = myGetFileName(m_isdir);
+//    if (!s.isEmpty())
+//        m_le->setText(s);
 }
 
 class SmallerListWidget: public QListWidget 
@@ -435,7 +435,8 @@ void ConfParamSLW::deleteSelected()
 // "Add entry" dialog for a file name list
 void ConfParamDNLW::showInputDialog()
 {
-    QString s = myGetFileName(true);
+//    QString s = myGetFileName(true);
+        QString s=QFileDialog::getExistingDirectory(nullptr,"dir");
     if (!s.isEmpty()) {
 	QList<QListWidgetItem *>items = 
 	    m_lb->findItems(s, Qt::MatchFixedString|Qt::MatchCaseSensitive);

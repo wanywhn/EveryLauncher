@@ -78,7 +78,8 @@ SOURCES += \
     firsttimeinit.cpp \
     Detailed/player/playercontrols.cpp \
     Detailed/player/player.cpp \
-    configsearchengine.cpp
+    configsearchengine.cpp \
+    unitedmodel.cpp
 
 HEADERS += \
         widget.h \
@@ -109,7 +110,8 @@ HEADERS += \
     firsttimeinit.h \
     Detailed/player/player.h \
     Detailed/player/playercontrols.h \
-    configsearchengine.h
+    configsearchengine.h \
+    unitedmodel.h
 
 
 FORMS += \

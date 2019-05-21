@@ -7,7 +7,7 @@
 #include <QSortFilterProxyModel>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <detailedwidget.h>
+#include "detailedwidget.h"
 
 #include "docseq.h"
 #include "msortfilterproxymodel.h"

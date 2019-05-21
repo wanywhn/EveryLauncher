@@ -30,7 +30,7 @@ public:
     };
 
 public:
-    explicit RecollModel(QStringList fields, QObject *parent = nullptr);
+    explicit RecollModel(QObject *parent = nullptr);
 
     ~RecollModel() override = default;
 
