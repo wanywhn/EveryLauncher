@@ -59,7 +59,6 @@ signals:
   void tabPressed();
   void stabPressed();
 
-//  void textChanged();
 };
 
 class SearchWidget : public QWidget {
@@ -75,8 +74,7 @@ public:
 
 public slots:
 
-    virtual void setSearchString(const QString &text);
-  virtual void prepareSimpleSearch();
+    virtual void prepareSimpleSearch();
 
     virtual void onWordReplace(const QString &, const QString &);
   virtual void takeFocus();

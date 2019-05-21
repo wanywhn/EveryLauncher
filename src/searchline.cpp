@@ -276,10 +276,6 @@ void SearchWidget::prepareSimpleSearch() {
   emit startSearch(s.toStdString());
 }
 
-void SearchWidget::setSearchString(const QString &txt) {
-  queryText->setText(txt);
-}
-
 bool SearchWidget::hasSearchString() { return !currentText().isEmpty(); }
 
 void SearchWidget::onWordReplace(const QString &o, const QString &n) {

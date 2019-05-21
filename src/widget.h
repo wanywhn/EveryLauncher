@@ -48,8 +48,6 @@ private:
 
     virtual void toggleIndexing();
 private:
-    QThread *idxWorkerThread;
-    IndexWorker *worker;
     QTimer	*idxTimer;
 
     std::shared_ptr<DocSequence> m_source;

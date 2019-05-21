@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QVBoxLayout>
 #include <docseqdb.h>
+#include <wasatorcl.h>
 
 #include "widget.h"
 #include "ui_widget.h"
@@ -19,10 +20,9 @@ void MainWindow::startSearch(string userInput) {
     string stemlang = "english";
 
     std::string reason;
-    auto sdata = wasaStringToRcl(theconfig, stemlang, u8, reason);
+    auto sdata = wasaStringToRcl(theconfig, stemlang,userInput, reason);
 
-    std::shared_ptr<Rcl::SearchData> rsdata(userInput);
-    emit setDescription(QString::fromStdString(u8));
+    std::shared_ptr<Rcl::SearchData> rsdata(sdata);
 
     if (m_queryActive) {
         qDebug()<<"startSearch already active";
@@ -32,7 +32,6 @@ void MainWindow::startSearch(string userInput) {
     restable->setEnabled(false);
     m_source = std::shared_ptr<DocSequence>();
 
-    string reason;
     // If indexing is being performed, we reopen the db at each query.
     bool b;
     if (!maybeOpenDb(reason, m_indexed, &b)) {
@@ -50,7 +49,7 @@ void MainWindow::startSearch(string userInput) {
 
     DocSequenceDb *src =
             new DocSequenceDb(/*rcldb,*/ std::shared_ptr<Rcl::Query>(query),
-                                         string(tr("Query results").toUtf8()), std::move(userInput));
+                                         string(tr("Query results").toUtf8()), std::move(rsdata));
     src->setAbstractParams(true, false);
     m_source = std::shared_ptr<DocSequence>(src);
 

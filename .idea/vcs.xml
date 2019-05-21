@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/3rdparty/qtpdf" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/3rdparty/qtpdf/src/3rdparty/pdfium" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/3rdparty/recoll1-code" vcs="Git" />
+  </component>
+</project>
