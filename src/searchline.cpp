@@ -269,27 +269,11 @@ void SearchWidget::prepareSimpleSearch() {
       s += tmp;
     }
   }
-  string u8 = s.toStdString();
-  trimstring(u8);
-  if (u8.length() == 0)
-    return;
+  if(s.isEmpty()){
+    return ;
+  }
 
-  if (!startSimpleSearch(u8))
-    return;
-}
-
-bool SearchWidget::startSimpleSearch(const string &u8) {
-  LOGDEB("SearchWidget::startSimpleSearch(" << u8 << ")\n");
-  // TODO
-  string stemlang = "english";
-
-  std::string reason;
-  auto sdata = wasaStringToRcl(theconfig, stemlang, u8, reason);
-
-  std::shared_ptr<Rcl::SearchData> rsdata(sdata);
-  emit setDescription(QString::fromStdString(u8));
-  emit startSearch(rsdata, true);
-  return true;
+  emit startSearch(s.toStdString());
 }
 
 void SearchWidget::setSearchString(const QString &txt) {

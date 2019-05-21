@@ -27,10 +27,10 @@ class MainWindow : public DMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() = default;
+    ~MainWindow() override = default;
 
 public slots:
-virtual void startSearch(std::shared_ptr<Rcl::SearchData> sdata, bool issimple);
+virtual void startSearch(string userInput);
     virtual void initiateQuery();
     void IndexSomeFiles(QStringList paths);
 signals:

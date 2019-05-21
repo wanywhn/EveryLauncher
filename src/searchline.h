@@ -89,9 +89,9 @@ private slots:
   virtual void restoreText();
 
 signals:
-  void startSearch(std::shared_ptr<Rcl::SearchData>, bool);
-  void setDescription(QString);
-  void clearSearch();
+  void startSearch(std::string);
+
+    void clearSearch();
   void partialWord(int, const QString &text, const QString &partial);
   void tabPressed();
   void stabPressed();
@@ -106,8 +106,8 @@ private:
   bool normalInputState{true};
   QString searchUrl{""};
   int getPartialWord(QString &word);
-  bool startSimpleSearch(const string &q);
-  MLineEdit *queryText;
+
+    MLineEdit *queryText;
   QPushButton *btnSearch;
 
   QString m_savedEditText;
