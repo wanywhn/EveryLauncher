@@ -76,7 +76,7 @@ public:
 public slots:
 
     virtual void setSearchString(const QString &text);
-  virtual void startSimpleSearch();
+  virtual void prepareSimpleSearch();
 
     virtual void onWordReplace(const QString &, const QString &);
   virtual void takeFocus();

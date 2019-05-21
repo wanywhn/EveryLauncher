@@ -39,6 +39,7 @@ extern
 //        setSupportedMimeType.fromList({
 
                                      "text/plain",
+                                                       "application/msword",
 
                                       });
         init();

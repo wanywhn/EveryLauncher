@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <recollmodel.h>
 #include <QDateTime>
+#include <QScrollArea>
 
 imagePreview::imagePreview(QWidget *parent):DetailedW (parent)
 {
@@ -60,7 +61,9 @@ void imagePreview::init_ui()
     hinfolayout->addLayout(infoLayout);
     hinfolayout->addStretch(1);
 
-    vlayout->addWidget(imgView);
+    auto sa=new QScrollArea();
+    sa->setWidget(imgView);
+    vlayout->addWidget(sa);
     vlayout->addLayout(hinfolayout);
     this->setLayout(vlayout);
 }
@@ -71,6 +74,8 @@ void imagePreview::showDoc(Rcl::Doc doc)
    img->load(filepath);
    imgView->setPixmap(*img);
    imgView->setScaledContents(true);
+//   imgView->adjustSize();
+   imgView->resize(this->sizeHint().width(),(this->sizeHint().width()/imgView->width())*imgView->height());
 
    QFileInfo info(QUrl(QString::fromStdString(doc.url)).toLocalFile());
    imgType->setText(QString::fromStdString(doc.mimetype));

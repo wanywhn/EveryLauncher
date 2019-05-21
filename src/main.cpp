@@ -129,6 +129,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     MainWindow w;
+    QIcon icon(":/icon/everylauncher.svg");
+    w.setWindowIcon(icon);
 //  w.setWindowOpacity(0.1);
 //  w.setTranslucentBackground(true);
 //  w.setAttribute(Qt::WA_TranslucentBackground);
@@ -149,6 +151,7 @@ int main(int argc, char *argv[]) {
 //                     [](QStringList sl) { qDebug() << "get?" << sl;
 //                                        });
     SystemTray::getInstance(&w).show();
+    SystemTray::getInstance(&w).setIcon(icon);
     QObject::connect(&SystemTray::getInstance(&w), &SystemTray::exitAll,
                      []() { qApp->exit(); });
     auto desktop = QApplication::desktop();
