@@ -45,7 +45,7 @@ aux_source_directory(./Detailed/player SRC)
 aux_source_directory(./confgui SRC)
 
 qt5_wrap_ui(FORMS widget.ui)
-add_executable(${CMD_NAME} ${SRC} ${QTRES} ${FORMS})
+add_executable(${CMD_NAME} ${SRC} ${QTRES} ${FORMS} ELModelInterface.h)
 
 
 

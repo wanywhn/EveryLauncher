@@ -69,7 +69,7 @@ void MainWindow::init_conn() {
 
 //    connect(restable,&ResWidget::filterChanged,this,&MainWindow::filterChanged);
 
-    connect(this,&MainWindow::useFilterProxy,restable,&ResWidget::useFilterProxy);
+//    connect(this,&MainWindow::useFilterProxy,restable,&ResWidget::useFilterProxy);
 
 
     connect(this->escKey,&QShortcut::activated,this->searchLine,&SearchWidget::clearAll);

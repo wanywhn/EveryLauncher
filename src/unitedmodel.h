@@ -15,7 +15,7 @@ public:
 
     // Basic functionality:
     QModelIndex index(int row, int column,
-                      const QModelIndex &parent = QModelIndex()) const override;
+                      const QModelIndex &parent) const override;
     QModelIndex parent(const QModelIndex &index) const override;
 
     int rowCount(const QModelIndex &parent ) const override;
@@ -29,9 +29,11 @@ public slots:
     signals:
 
 private:
-    QVector<RecollModel *> rmodel;
-    QSortFilterProxyModel *filterNone;
-    QVector<QAbstractListModel *> lmodel;
+    int rowNumber{0};
+//    QVector<RecollModel *> rmodel;
+//    RecollModel *m_model;
+//    QSortFilterProxyModel *filterNone;
+    QVector<QAbstractItemModel *> lmodel;
 };
 
 #endif // UNITEDMODEL_H

@@ -5,13 +5,15 @@
 #include <docseq.h>
 
 #include <bits/shared_ptr.h>
+#include "ELModelInterface.h"
+
 extern RclConfig *theconfig;
 typedef QString (FieldGetter)(const std::string &fldname,
                                  const Rcl::Doc &doc);
 
   class ResWidget;
 
-class RecollModel : public QAbstractListModel{
+class RecollModel : public QAbstractListModel,public ELModelInterface{
 
   Q_OBJECT
 public:
@@ -40,7 +42,7 @@ public:
 
     QVariant data(const QModelIndex &index,
                         int role ) const override;
-    void search(std::string &str);
+    void search(std::string &str) override;
     void setFilterSpec(DocSeqFiltSpec &spec);
 private:
   virtual void readDocSource();
@@ -61,6 +63,7 @@ signals:
   void restultReady();
 
 private:
+
 
     bool m_queryActive{false};
     bool m_indexed{false};

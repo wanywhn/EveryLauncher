@@ -28,7 +28,7 @@ void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 //        return;
 //    }
 // FIXME why always (0,0)
-qDebug()<<opt.rect;
+//qDebug()<<opt.rect;
 
 //    } else if (itemType == "ITEM") {
 
@@ -45,13 +45,13 @@ qDebug()<<opt.rect;
 
     QPixmap icon(iconpath);
     if (icon.isNull()) {
-        qDebug() << "null icon:" << iconpath;
+//        qDebug() << "null icon:" << iconpath;
     }
     icon = icon.scaled(this->sizeHint(option, index));
     if (opt.state & QStyle::State_Selected) {
         painter->fillRect(opt.rect, opt.palette.highlight());
     }
-    QRectF iconRectf(opt.rect.adjusted(0,index.row()*sizeHint(opt,index).width(),0,0));
+    QRectF iconRectf(opt.rect);
     iconRectf.setSize(icon.size());
 
     painter->drawPixmap(iconRectf, icon, icon.rect());

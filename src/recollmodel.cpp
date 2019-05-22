@@ -266,6 +266,7 @@ void RecollModel::search(std::string &str) {
 //  emit useFilterProxy();
 //    emit docSourceChanged(m_source);
     this->setDocSource(m_source);
+
     initiateQuery();
 
 }

@@ -5,65 +5,81 @@
 #include <QThread>
 #include <QtWidgets/QMessageBox>
 #include <DtkWidgets>
+#include <QtCore/QStringListModel>
 #include "unitedmodel.h"
 #include "config.h"
 #include "searchline.h"
 
+class MFilterModel : public QSortFilterProxyModel, public ELModelInterface {
+public:
+    MFilterModel(RecollModel *parent) : QSortFilterProxyModel(parent), model(parent) {}
+
+private:
+    void search(std::string &string1) override {
+        model->search(string1);
+
+    }
+
+private:
+    RecollModel *model;
+
+};
+
 UnitedModel::UnitedModel(QObject *parent)
         : QAbstractListModel(parent) {
 
-    QMap<QString,std::string> k2k{
-            {"app","app"},
-            {"text","text"},
-            {"spreadsheet","spreadsheet"},
-            {"presentation","presentation"},
-            {"media","media"},
-            {"message","message"},
-            {"other","other"},
+    QMap<QString, std::string> k2k{
+            {"app",          "app"},
+            {"text",         "text"},
+            {"spreadsheet",  "spreadsheet"},
+            {"presentation", "presentation"},
+            {"media",        "media"},
+            {"message",      "message"},
+            {"other",        "other"},
     };
 //    for(const auto &item:k2k.keys()){
 //        string frag;
 //        theconfig->getGuiFilter(k2k.value(item), frag);
 //        DocSeqFiltSpec m_filtspec;
 //        m_filtspec.orCrit(DocSeqFiltSpec::DSFS_QLANG, frag);
-        auto m=new RecollModel;
-        connect(m,&RecollModel::restultReady,[this](){
-            qDebug()<<"ready";
-            this->beginResetModel();
-            this->endResetModel();
+    auto m = new RecollModel;
+    connect(m, &RecollModel::restultReady, [this]() {
+        qDebug() << "ready";
+        this->beginResetModel();
+        this->endResetModel();
 
-        });
+    });
 //        m->setFilterSpec(m_filtspec);
-filterNone=new QSortFilterProxyModel;
+    auto filterNone = new MFilterModel(m);
     filterNone->setFilterRole(RecollModel::ModelRoles::Role_NODISPLAY);
     filterNone->setFilterRegExp("^((?!true).)*$");
     filterNone->setSourceModel(m);
-        rmodel.push_back(m);
+    lmodel.push_back(filterNone);
+
+
+//        m_model=m;
 //    }
 }
 
 
 QModelIndex UnitedModel::index(int row, int column, const QModelIndex &parent) const {
-    return filterNone->index(row,column,parent);
-    // FIXME: Implement me!
+    return createIndex(row, column, row);
 }
 
 
 int UnitedModel::rowCount(const QModelIndex &parent) const {
 //    if (!parent.isValid())
 //        return 0;
-    auto totoalcnt=0;
-//    for(auto item:rmodel){
-//        if(item->rowCount(QModelIndex())>0){
-//            totoalcnt+=item->rowCount(QModelIndex());//+1;
-//        }
-//    }
-//    for(auto item:lmodel){
-//        if(item->rowCount(QModelIndex())>0){
-//            totoalcnt+=item->rowCount(QModelIndex())+1;
-//        }
-//    }
-return filterNone->rowCount(parent);
+    auto totoalcnt = 0;
+    for (auto item:lmodel) {
+        if (item->rowCount(QModelIndex()) > 0) {
+            totoalcnt += item->rowCount(QModelIndex());//+1;
+        }
+    }
+//return filterNone->rowCount(parent);
+    auto ncthis = const_cast<UnitedModel *>(this);
+    ncthis->rowNumber = totoalcnt;
+    qDebug()<<"rowcnt:"<<totoalcnt;
     return totoalcnt;
 }
 
@@ -72,19 +88,37 @@ QVariant UnitedModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    return filterNone->data(index,role);
-    // FIXME: Implement me!
-    return QVariant();
+    if (index.row() >= rowNumber) {
+        return QVariant();
+    }
+    int r = index.row();
+    auto fitem = lmodel.first();
+    for (auto item:lmodel) {
+        if (r > item->rowCount()) {
+            r -= item->rowCount();
+            continue;
+        }
+        fitem = item;
+        break;
+
+    }
+    return fitem->data(fitem->index(r, index.column(), index.parent()), role);
 }
 
 QModelIndex UnitedModel::parent(const QModelIndex &index) const {
+
+    return QModelIndex();
+//    return createIndex(index.row(),index.column(),index.row());
 
 }
 
 void UnitedModel::startSearch(std::string str) {
     //TODO search in every model
-    for(auto item:rmodel){
-        item->search(str);
+
+    for (auto item:lmodel) {
+        if (auto t = dynamic_cast<ELModelInterface *>(item)) {
+            t->search(str);
+        }
     }
 }
 
