@@ -7,7 +7,6 @@
 
 #include <string>
 #include <QAbstractListModel>
-#include <QStringListModel>
 
 class ELModelInterface {
 public :

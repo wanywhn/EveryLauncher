@@ -1,5 +1,5 @@
 #include "pdfpreview.h"
-#include <recollmodel.h>
+#include <Model/recollmodel.h>
 #include <QVBoxLayout>
 
 PdfPreview::PdfPreview(QWidget *parent):DetailedW (parent)

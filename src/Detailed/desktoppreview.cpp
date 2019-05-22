@@ -6,7 +6,7 @@
 #include <QSettings>
 #include <QStringList>
 #include <QVBoxLayout>
-#include <recollmodel.h>
+#include <Model/recollmodel.h>
 DesktopPreview::DesktopPreview() {
         setSupportedMimeType=std::set<std::string>({
 //    setSupportedMimeType.fromList({

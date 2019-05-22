@@ -10,9 +10,8 @@
 #include "detailedwidget.h"
 
 #include "docseq.h"
-#include "msortfilterproxymodel.h"
 #include "plaintorich.h"
-#include "recollmodel.h"
+#include "Model/recollmodel.h"
 #include "unitedmodel.h"
 
 #include <DtkWidgets>
@@ -60,7 +59,6 @@ signals:
   void currentChanged();
 private:
   DListView *listview;
-  MSortFilterProxyModel *proxyModel;
   UnitedModel *m_model;
 public:
     void setM_model(UnitedModel *m_model);

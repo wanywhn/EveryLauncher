@@ -4,7 +4,7 @@
 #include <QFormLayout>
 #include <QLocale>
 #include <QVBoxLayout>
-#include <recollmodel.h>
+#include <Model/recollmodel.h>
 #include <QDateTime>
 #include <QScrollArea>
 

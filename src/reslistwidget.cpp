@@ -25,7 +25,6 @@ ResWidget::ResWidget(QWidget *parent)
         : QWidget(parent), m_model(nullptr), m_ismainres(true) {
 
     listview = new DListView(this);
-    proxyModel = new MSortFilterProxyModel(this);
 
     this->dtw = new DetailedWidget();
     QStringList fields;
@@ -49,7 +48,6 @@ void ResWidget::init_ui() {
     listview->setSelectionBehavior(QAbstractItemView::SelectRows);
     listview->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     listview->setItemDelegate(new SearchItemDelegate(this));
-    proxyModel->setSourceModel(this->m_model);
 //  proxyModel->setDynamicSortFilter(false);
 
 
@@ -103,7 +101,6 @@ void ResWidget::moveToNextResoule() {
 
 void ResWidget::useFilterProxy() {
 
-    listview->setModel(proxyModel);
 }
 
 

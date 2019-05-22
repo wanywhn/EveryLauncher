@@ -3,34 +3,15 @@
 //
 
 #include "SearchItemDelegate.h"
-#include "recollmodel.h"
+#include "Model/recollmodel.h"
 #include <QDebug>
 #include <QPainter>
 
 void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
-    auto itemType =
-            index.data(RecollModel::Role_VIEW_TYPE).toString();
-    auto mimeType =
-            index.data(RecollModel::Role_MIME_TYPE).toString();
-//    if (itemType == "SECTION") {
-//        painter->drawText(opt.rect.adjusted(-1, -1, -1, -1), mimeType);
-//        if (opt.state & QStyle::State_Selected) {
-//            painter->fillRect(opt.rect, opt.palette.highlight());
-//        }
-//        return;
-//    } else if (itemType == "DOT") {
-//        painter->drawText(opt.rect.center(), "...");
-//        if (opt.state & QStyle::State_Selected) {
-//            painter->fillRect(opt.rect, opt.palette.highlight());
-//        }
-//        return;
-//    }
-// FIXME why always (0,0)
-//qDebug()<<opt.rect;
-
-//    } else if (itemType == "ITEM") {
+//    auto mimeType =
+//            index.data(RecollModel::Role_MIME_TYPE).toString();
 
     auto filename =
             index.data(RecollModel::Role_FILE_NAME).toString();
@@ -65,15 +46,5 @@ void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 QSize SearchItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
 
     //TODO hidpi?
-    auto itemType =
-            index.data(RecollModel::Role_VIEW_TYPE).toString();
-    if (itemType == "SECTION") {
-
-
-        return {200, 25};
-    } else if (itemType == "DOT") {
-
-        return {200, 25};
-    }
     return {50, 50};
 }

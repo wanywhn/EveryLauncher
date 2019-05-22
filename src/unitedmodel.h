@@ -4,7 +4,7 @@
 #include <QAbstractItemModel>
 #include <docseq.h>
 #include <QtCore/QSortFilterProxyModel>
-#include "recollmodel.h"
+#include "Model/recollmodel.h"
 
 class UnitedModel : public QAbstractListModel
 {
