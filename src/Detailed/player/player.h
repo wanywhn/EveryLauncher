@@ -66,7 +66,7 @@ private:
 
     // DetailedW interface
 public:
-    void showDoc(Rcl::Doc doc) Q_DECL_OVERRIDE;
+    void showDoc() Q_DECL_OVERRIDE;
 
     // DetailedW interface
 public:

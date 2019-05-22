@@ -56,7 +56,7 @@ public slots:
 
 signals:
   void filterChanged(QString filed);
-  void currentChanged();
+//  void currentChanged();
 private:
   DListView *listview;
   UnitedModel *m_model;

@@ -19,7 +19,7 @@ private:
 
     // DetailedW interface
 public:
-    void showDoc(Rcl::Doc doc) override;
+    void showDoc() override;
 };
 
 #endif // PDFPREVIEW_H

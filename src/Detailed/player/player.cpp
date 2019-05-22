@@ -9,6 +9,7 @@
 #include <QtWidgets>
 #include <QVideoWidget>
 #include <QGraphicsVideoItem>
+#include <Model/ELModelInterface.h>
 
 Player::Player(QWidget *parent)
     :DetailedW(parent)
@@ -260,10 +261,10 @@ void Player::updateDurationInfo(qint64 currentInfo)
     m_labelDuration->setText(tStr);
 }
 
-void Player::showDoc(Rcl::Doc doc)
+void Player::showDoc()
 {
     auto path=
-    QUrl(QString::fromStdString(doc.url));//.replace("file://",""));
+    QUrl(index.data(ELModelInterface::ModelRoles::Role_LOCATION).toString());//.replace("file://",""));
 //    qDebug()<<"url:"<<path;
     QFileInfo f(path.toLocalFile());
     if(f.exists()&&f.isSymLink()){

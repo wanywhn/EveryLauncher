@@ -26,9 +26,9 @@ void PdfPreview::init_ui()
 
 }
 
-void PdfPreview::showDoc(Rcl::Doc doc)
+void PdfPreview::showDoc()
 {
-    auto path=index.data(RecollModel::ModelRoles::Role_LOCATION).toString();
+    auto path=index.data(ELModelInterface::Role_LOCATION).toString();
     path.replace("file://","");
     pdfdoc->load(path);
 

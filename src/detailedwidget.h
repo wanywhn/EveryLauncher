@@ -13,7 +13,7 @@ class DetailedWidget : public QStackedWidget
 public:
     explicit DetailedWidget(QWidget *parent = nullptr);
 
-    void showDocDetail(QModelIndex index,Rcl::Doc doc,HighlightData hl);
+    void showDocDetail(QModelIndex index);
 signals:
 
 public slots:

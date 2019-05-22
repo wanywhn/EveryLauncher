@@ -18,7 +18,7 @@
 
 
 void ResWidget::init_conn() {
-    connect(this, &ResWidget::currentChanged, this, &ResWidget::onTableView_currentChanged);
+//    connect(this, &ResWidget::currentChanged, this, &ResWidget::onTableView_currentChanged);
 }
 
 ResWidget::ResWidget(QWidget *parent)
@@ -96,7 +96,7 @@ void ResWidget::moveToNextResoule() {
 
     listview->setCurrentIndex(listview->model()->index(r, 0));
     mdetailRow = r;
-    emit currentChanged();
+    this->onTableView_currentChanged();
 }
 
 void ResWidget::useFilterProxy() {
@@ -142,7 +142,7 @@ void ResWidget::currentMoveUp() {
     if (cidx.isValid()) {
         listview->setCurrentIndex(cidx);
         mdetailRow = cidx.row();
-        emit currentChanged();
+        this->onTableView_currentChanged();
     }
 }
 
@@ -150,7 +150,7 @@ void ResWidget::currentMoveDown() {
     auto cidx = listview->model()->index(listview->currentIndex().row() + 1, 0);
     if (cidx.isValid()) {
         mdetailRow = cidx.row();
-        emit currentChanged();
+        this->onTableView_currentChanged();
         listview->setCurrentIndex(cidx);
     }
 

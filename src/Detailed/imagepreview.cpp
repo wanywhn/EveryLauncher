@@ -68,17 +68,17 @@ void imagePreview::init_ui()
     this->setLayout(vlayout);
 }
 
-void imagePreview::showDoc(Rcl::Doc doc)
+void imagePreview::showDoc()
 {
-   auto filepath=index.data(RecollModel::RecollModel::Role_LOCATION).toString().replace("file://","");
+   auto filepath=index.data(ELModelInterface::Role_LOCATION).toString().replace("file://","");
    img->load(filepath);
    imgView->setPixmap(*img);
    imgView->setScaledContents(true);
 //   imgView->adjustSize();
    imgView->resize(this->sizeHint().width(),(this->sizeHint().width()/imgView->width())*imgView->height());
 
-   QFileInfo info(QUrl(QString::fromStdString(doc.url)).toLocalFile());
-   imgType->setText(QString::fromStdString(doc.mimetype));
+   QFileInfo info(QUrl(index.data(ELModelInterface::Role_LOCATION).toString()).toLocalFile());
+   imgType->setText(index.data(ELModelInterface::Role_MIME_TYPE).toString());
    auto ims=QImage(info.absoluteFilePath()).size();
    imgSize->setText(QString("%1X%2").arg(ims.width()).arg(ims.height()));
    QLocale locale = this->locale();

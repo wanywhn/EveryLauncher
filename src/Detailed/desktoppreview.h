@@ -13,7 +13,7 @@ public:
 
     // DetailedW interface
 public:
-    void showDoc(Rcl::Doc doc) override;
+    void showDoc() override;
 
 
 private:

@@ -4,7 +4,7 @@
 #include "Detailed/imagepreview.h"
 #include "Detailed/pdfpreview.h"
 #include "Detailed/player/player.h"
-#include "Detailed/preview_w.h"
+#include "Detailed/text_preview.h"
 #include <QDebug>
 #include <QMediaPlayer>
 
@@ -31,20 +31,13 @@ DetailedWidget::DetailedWidget(QWidget *parent) : QStackedWidget(parent) {
   }
 }
 
-void DetailedWidget::showDocDetail(QModelIndex index, Rcl::Doc doc,
-                                   HighlightData hl) {
-    qDebug()<<"doc mime"<<QString::fromStdString(doc.mimetype)<<"path:"<<QString::fromStdString(doc.url);
-//      qDebug()<<"item
-  //    mime:"<<index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString();
-  //   auto
-  //   wid=str2idx[index.data(RecollModel::ModelRoles::Role_MIME_TYPE).toString()];
-  auto wid = wididx.value(doc.mimetype);
+void DetailedWidget::showDocDetail(QModelIndex index) {
+  auto mimetype=index.data(ELModelInterface::ModelRoles::Role_MIME_TYPE).toString().toStdString();
+  auto wid = wididx.value(mimetype);
   if (wid == nullptr) {
       wid=qobject_cast<DetailedW *>(this->widget(0));
   }
   this->setCurrentWidget(wid);
-  //   auto curr=qobject_cast<DetailedW *>( this->currentWidget());
-  wid->setHighlightData(hl);
   wid->setIndex(index);
-  wid->showDoc(doc);
+  wid->showDoc();
 }

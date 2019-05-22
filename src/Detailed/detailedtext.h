@@ -13,7 +13,7 @@ class DetailedW : public QWidget
 public:
     explicit DetailedW(QWidget *parent = nullptr);
 
-    virtual void showDoc(Rcl::Doc doc);
+    virtual void showDoc();
     void setHighlightData(HighlightData hl);
     void setIndex(const QModelIndex &value);
     //两种方法，一是子类在setSupportedMimeType中添加自己支持的mime，二是直接重写支个方法

@@ -23,15 +23,15 @@ DesktopPreview::DesktopPreview() {
   init_ui();
 }
 
-void DesktopPreview::showDoc(Rcl::Doc doc) {
+void DesktopPreview::showDoc() {
 
-  auto path = index.data(RecollModel::Role_LOCATION).toString();
-  auto pixmap=QPixmap(index.data(RecollModel::Role_ICON_PATH).toString());
+  auto path = index.data(ELModelInterface::Role_LOCATION).toString();
+  auto pixmap=QPixmap(index.data(ELModelInterface::Role_ICON_PATH).toString());
   icon->setPixmap(pixmap.scaled(128,128));
   //TODO change size
-  appName->setText(index.data(RecollModel::Role_APP_NAME).toString());
-  comment->setText(index.data(RecollModel::Role_APP_COMMENT).toString());
-  appVersion->setText(index.data(RecollModel::Role_APP_VERSION).toString());
+  appName->setText(index.data(ELModelInterface::Role_APP_NAME).toString());
+  comment->setText(index.data(ELModelInterface::Role_APP_COMMENT).toString());
+  appVersion->setText(index.data(ELModelInterface::Role_APP_VERSION).toString());
 
   auto locale=this->locale();
   //TODO wneh index desktop file ,wo can collect app info,and display here
