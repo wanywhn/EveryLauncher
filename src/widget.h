@@ -30,16 +30,13 @@ public:
     ~MainWindow() override = default;
 
 public slots:
-virtual void startSearch(string userInput);
-    virtual void initiateQuery();
+
     void IndexSomeFiles(QStringList paths);
 signals:
-    void resultsReady();
-    void docSourceChanged(std::shared_ptr<DocSequence>);
-    void searchReset();
+
     void useFilterProxy();
 public slots:
-    void filterChanged(QString field);
+//    void filterChanged(QString field);
 //private slots:
 //    void pfinished(int );
 private:
@@ -50,15 +47,13 @@ private:
 private:
     QTimer	*idxTimer;
 
-    std::shared_ptr<DocSequence> m_source;
-    ResTable *restable;
+    ResWidget *restable;
+    UnitedModel *m_model;
     SearchWidget *searchLine;
     QSet<QString> tobeIndex;
     QMutex mtxTobeIndex;
     QProcess *idxProcess;
-    bool m_queryActive;
     bool m_indexAvtive;
-    bool m_indexed;
     QShortcut *escKey;
     QShortcut *upKey;
     QShortcut *downkey;

@@ -1,4 +1,5 @@
 #include "recollmodel.h"
+#include "searchline.h"
 
 #include <bits/stl_list.h>
 #include <bits/stl_map.h>
@@ -8,7 +9,10 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <plaintorich.h>
+#include <docseqdb.h>
+#include <wasatorcl.h>
 
+extern bool maybeOpenDb(string &reason, bool force, bool *maindberror);
 class PlainToRichQtReslist : public PlainToRich {
 public:
     ~PlainToRichQtReslist() override = default;
@@ -208,3 +212,80 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
     }
     return var;
 }
+
+
+void RecollModel::resetSource() {
+    setDocSource(std::shared_ptr<DocSequence>(nullptr));
+}
+
+
+
+void RecollModel::search(std::string &str) {
+
+    string stemlang = "english";
+
+    std::string reason;
+    auto sdata = wasaStringToRcl(theconfig, stemlang, str, reason);
+
+    std::shared_ptr<Rcl::SearchData> rsdata(sdata);
+
+    if (m_queryActive) {
+        qDebug() << "startSearch already active";
+        return;
+    }
+    m_queryActive = true;
+
+    m_source = std::shared_ptr<DocSequence>();
+
+    bool b;
+    if (!maybeOpenDb(reason, m_indexed, &b)) {
+        m_indexed = false;
+        QMessageBox::critical(0, "Recoll", QString(reason.c_str()),
+                              QMessageBox::Ok);
+        m_queryActive = false;
+        return;
+    }
+
+
+    auto *query = new Rcl::Query(rcldb.get());
+    query->setCollapseDuplicates(true);
+
+    DocSequenceDb *src =
+            new DocSequenceDb(/*rcldb,*/ std::shared_ptr<Rcl::Query>(query),
+                                         string(tr("Query results").toUtf8()), std::move(rsdata));
+    src->setAbstractParams(true, false);
+    m_source = std::shared_ptr<DocSequence>(src);
+
+    DocSeqSortSpec dsss;
+    dsss.field = "mtype";
+    DocSeqFiltSpec dsfs;
+
+    m_source->setSortSpec(dsss);
+    m_source->setFiltSpec(dsfs);
+
+//  emit useFilterProxy();
+//    emit docSourceChanged(m_source);
+    this->setDocSource(m_source);
+    initiateQuery();
+
+}
+
+
+void RecollModel::initiateQuery() {
+    if (!m_source)
+        return;
+
+    int cnt = m_source->getResCnt();
+    qDebug() << "count :" << cnt;
+
+    m_queryActive = false;
+    this->readDocSource();
+    emit(restultReady());
+}
+
+void RecollModel::setFilterSpec(DocSeqFiltSpec &spec) {
+    m_source->setFiltSpec(spec);
+
+}
+
+

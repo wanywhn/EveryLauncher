@@ -6,9 +6,9 @@
 #define EVERYLAUNCHER_SEARCHITEMDELEGATE_H
 
 
-#include "reslistwidget.h"
+#include <QtWidgets/QStyledItemDelegate>
 
-class SearchItemDelegate :public QStyledItemDelegate {
+class SearchItemDelegate : public QStyledItemDelegate {
 
 public:
     explicit SearchItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {}

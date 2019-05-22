@@ -13,6 +13,7 @@
 #include "msortfilterproxymodel.h"
 #include "plaintorich.h"
 #include "recollmodel.h"
+#include "unitedmodel.h"
 
 #include <DtkWidgets>
 #include <dde-launcher/dbusfileinfo.h>
@@ -30,16 +31,16 @@ using std::vector;
 class QUrl;
 
 DWIDGET_USE_NAMESPACE
-class ResTable : public QWidget{
+class ResWidget : public QWidget{
 
   Q_OBJECT
 
 public:
-    explicit ResTable(QWidget *parent = nullptr);
+    explicit ResWidget(QWidget *parent = nullptr);
 
-    ~ResTable() override = default;
+    ~ResWidget() override = default;
 
-    virtual RecollModel *getModel() { return m_model; }
+    virtual UnitedModel * getModel() { return m_model; }
 
 private:
   void init_ui();
@@ -47,10 +48,7 @@ private:
 private slots:
   virtual void onTableView_currentChanged();
 public slots:
-  virtual void setDocSource(std::shared_ptr<DocSequence> nsource);
-  virtual void resetSource();
-  virtual void readDocSource(bool resetPos = true);
-  void clearSeach();
+
   void returnPressed();
   void currentMoveUp();
   void currentMoveDown();
@@ -62,11 +60,13 @@ signals:
   void currentChanged();
 private:
   DListView *listview;
-  QSortFilterProxyModel *filterNone;
   MSortFilterProxyModel *proxyModel;
-  QSortFilterProxyModel *currentFilterModel;
-  RecollModel *m_model;
-  bool m_ismainres;
+  UnitedModel *m_model;
+public:
+    void setM_model(UnitedModel *m_model);
+
+private:
+    bool m_ismainres;
     DetailedWidget *dtw;
     int mdetailRow{-1};
 };

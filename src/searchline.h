@@ -87,7 +87,7 @@ private slots:
   virtual void restoreText();
 
 signals:
-  void startSearch(std::string);
+  void startSearch(std::string );
 
     void clearSearch();
   void partialWord(int, const QString &text, const QString &partial);

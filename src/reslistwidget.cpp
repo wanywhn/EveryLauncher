@@ -17,16 +17,15 @@
 
 
 
-void ResTable::init_conn() {
-    connect(this, &ResTable::currentChanged, this, &ResTable::onTableView_currentChanged);
+void ResWidget::init_conn() {
+    connect(this, &ResWidget::currentChanged, this, &ResWidget::onTableView_currentChanged);
 }
 
-ResTable::ResTable(QWidget *parent)
+ResWidget::ResWidget(QWidget *parent)
         : QWidget(parent), m_model(nullptr), m_ismainres(true) {
 
     listview = new DListView(this);
     proxyModel = new MSortFilterProxyModel(this);
-    filterNone = new QSortFilterProxyModel(this);
 
     this->dtw = new DetailedWidget();
     QStringList fields;
@@ -34,14 +33,14 @@ ResTable::ResTable(QWidget *parent)
 //           << "title"
 //           << "mtype"
 //           << "abstract";
-    if (!(m_model = new RecollModel( this)))
+    if (!(m_model = new UnitedModel( this)))
         return;
     init_ui();
     init_conn();
 }
 
 
-void ResTable::init_ui() {
+void ResWidget::init_ui() {
 
     auto hlayout = new QHBoxLayout();
     this->setLayout(hlayout);
@@ -53,13 +52,10 @@ void ResTable::init_ui() {
     proxyModel->setSourceModel(this->m_model);
 //  proxyModel->setDynamicSortFilter(false);
 
-    filterNone->setFilterRole(RecollModel::ModelRoles::Role_NODISPLAY);
-    filterNone->setFilterRegExp("^((?!true).)*$");
-    filterNone->setSourceModel(m_model);
+
 
 //  listview->setModel(proxyModel);
-    listview->setModel(filterNone);
-    currentFilterModel=filterNone;
+    listview->setModel(m_model);
 
     hlayout->addWidget(listview);
     hlayout->addWidget(this->dtw);
@@ -69,27 +65,27 @@ void ResTable::init_ui() {
 //    hlayout->setStretch(0,2);
 //    hlayout->setStretch(1,3);
 
-    this->dtw->setVisible(false);
+//    this->dtw->setVisible(false);
 }
 
-void ResTable::onTableView_currentChanged() {
+void ResWidget::onTableView_currentChanged() {
 
-    if (!m_model || !m_model->getDocSource())
-        return;
-    auto index = listview->model()->index(mdetailRow, 0);
-    index=currentFilterModel->mapToSource(index);
-    Rcl::Doc doc;
-    this->m_model->getDocSource()->getDoc(index.row(), doc);
-
-    HighlightData hl;
-    this->m_model->getDocSource()->getTerms(hl);
-    this->dtw->showDocDetail(index, doc, hl);
-    this->dtw->setVisible(true);
-    this->dtw->setMaximumWidth(this->width()*0.618);
-    this->dtw->setMinimumWidth(this->width()*0.618);
+//    if (!m_model || !m_model->getDocSource())
+//        return;
+//    auto index = listview->model()->index(mdetailRow, 0);
+//    index=currentFilterModel->mapToSource(index);
+//    Rcl::Doc doc;
+//    this->m_model->getDocSource()->getDoc(index.row(), doc);
+//
+//    HighlightData hl;
+//    this->m_model->getDocSource()->getTerms(hl);
+//    this->dtw->showDocDetail(index, doc, hl);
+//    this->dtw->setVisible(true);
+//    this->dtw->setMaximumWidth(this->width()*0.618);
+//    this->dtw->setMinimumWidth(this->width()*0.618);
 }
 
-void ResTable::moveToNextResoule() {
+void ResWidget::moveToNextResoule() {
 
     if (listview->model()->rowCount() <= 0) {
         return;
@@ -105,35 +101,14 @@ void ResTable::moveToNextResoule() {
     emit currentChanged();
 }
 
-void ResTable::useFilterProxy() {
+void ResWidget::useFilterProxy() {
 
     listview->setModel(proxyModel);
-    currentFilterModel=proxyModel;
 }
 
-void ResTable::setDocSource(std::shared_ptr<DocSequence> nsource) {
-    if (m_model) {
-        m_model->setDocSource(std::move(nsource));
-        proxyModel->setMaxItemCount(4);
-    }
 
-}
-
-void ResTable::resetSource() {
-    setDocSource(std::shared_ptr<DocSequence>(nullptr));
-}
-
-void ResTable::readDocSource(bool resetPos) {
-    m_model->readDocSource();
-    this->dtw->hide();
-}
-
-void ResTable::clearSeach() {
-    this->resetSource();
-    this->readDocSource();
-}
-
-void ResTable::returnPressed() {
+void ResWidget::returnPressed() {
+    /*
     auto currentIndex = listview->currentIndex();
     if(!currentIndex.isValid()){
         return;
@@ -162,9 +137,10 @@ void ResTable::returnPressed() {
     }
     args<<path.replace("file://", "");
     QProcess::startDetached(aname,args,"/tmp");
+     */
 }
 
-void ResTable::currentMoveUp() {
+void ResWidget::currentMoveUp() {
     auto cidx = listview->model()->index(listview->currentIndex().row() - 1, 0);
     if (cidx.isValid()) {
         listview->setCurrentIndex(cidx);
@@ -173,7 +149,7 @@ void ResTable::currentMoveUp() {
     }
 }
 
-void ResTable::currentMoveDown() {
+void ResWidget::currentMoveDown() {
     auto cidx = listview->model()->index(listview->currentIndex().row() + 1, 0);
     if (cidx.isValid()) {
         mdetailRow = cidx.row();
@@ -181,4 +157,9 @@ void ResTable::currentMoveDown() {
         listview->setCurrentIndex(cidx);
     }
 
+}
+
+void ResWidget::setM_model(UnitedModel *m_model) {
+    ResWidget::m_model = m_model;
+    listview->setModel(m_model);
 }

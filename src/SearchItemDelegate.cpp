@@ -3,6 +3,9 @@
 //
 
 #include "SearchItemDelegate.h"
+#include "recollmodel.h"
+#include <QDebug>
+#include <QPainter>
 
 void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QStyleOptionViewItem opt = option;
@@ -11,19 +14,21 @@ void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
             index.data(RecollModel::Role_VIEW_TYPE).toString();
     auto mimeType =
             index.data(RecollModel::Role_MIME_TYPE).toString();
-    if (itemType == "SECTION") {
-        painter->drawText(opt.rect.adjusted(-1, -1, -1, -1), mimeType);
-        if (opt.state & QStyle::State_Selected) {
-            painter->fillRect(opt.rect, opt.palette.highlight());
-        }
-        return;
-    } else if (itemType == "DOT") {
-        painter->drawText(opt.rect.center(), "...");
-        if (opt.state & QStyle::State_Selected) {
-            painter->fillRect(opt.rect, opt.palette.highlight());
-        }
-        return;
-    }
+//    if (itemType == "SECTION") {
+//        painter->drawText(opt.rect.adjusted(-1, -1, -1, -1), mimeType);
+//        if (opt.state & QStyle::State_Selected) {
+//            painter->fillRect(opt.rect, opt.palette.highlight());
+//        }
+//        return;
+//    } else if (itemType == "DOT") {
+//        painter->drawText(opt.rect.center(), "...");
+//        if (opt.state & QStyle::State_Selected) {
+//            painter->fillRect(opt.rect, opt.palette.highlight());
+//        }
+//        return;
+//    }
+// FIXME why always (0,0)
+qDebug()<<opt.rect;
 
 //    } else if (itemType == "ITEM") {
 
@@ -43,11 +48,10 @@ void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         qDebug() << "null icon:" << iconpath;
     }
     icon = icon.scaled(this->sizeHint(option, index));
-    QRectF recf(opt.rect);
     if (opt.state & QStyle::State_Selected) {
         painter->fillRect(opt.rect, opt.palette.highlight());
     }
-    QRectF iconRectf(opt.rect);
+    QRectF iconRectf(opt.rect.adjusted(0,index.row()*sizeHint(opt,index).width(),0,0));
     iconRectf.setSize(icon.size());
 
     painter->drawPixmap(iconRectf, icon, icon.rect());
