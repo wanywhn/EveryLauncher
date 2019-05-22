@@ -12,7 +12,7 @@
 #include "docseq.h"
 #include "plaintorich.h"
 #include "Model/recollmodel.h"
-#include "unitedmodel.h"
+#include "Model/unitedmodel.h"
 
 #include <DtkWidgets>
 #include <dde-launcher/dbusfileinfo.h>

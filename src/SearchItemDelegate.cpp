@@ -14,13 +14,15 @@ void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 //            index.data(RecollModel::Role_MIME_TYPE).toString();
 
     auto filename =
-            index.data(RecollModel::Role_FILE_NAME).toString();
-    if (index.data(RecollModel::Role_MIME_TYPE).toString() ==
-        "application/x-all") {
+    index.data(RecollModel::Role_TITLE).toString();
+            if(filename.isEmpty())
+                filename=index.data(RecollModel::Role_FILE_NAME).toString();
+//    if (index.data(RecollModel::Role_MIME_TYPE).toString() ==
+//        "application/x-all") {
         // TODO find app icon
-        filename =
-                index.data(RecollModel::Role_APP_NAME).toString();
-    }
+//        filename =
+//                index.data(RecollModel::Role_APP_NAME).toString();
+//    }
     auto iconpath =
             index.data(RecollModel::Role_ICON_PATH).toString();
 

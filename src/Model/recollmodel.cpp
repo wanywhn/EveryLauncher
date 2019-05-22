@@ -206,6 +206,10 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             break;
 
         }
+        case Role_TITLE:{
+            var=gengetter("title",doc);
+            break;
+        }
 
         default:
             break;

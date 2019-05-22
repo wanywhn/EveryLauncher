@@ -6,6 +6,7 @@
 #include <QtWidgets/QMessageBox>
 #include <DtkWidgets>
 #include <QtCore/QStringListModel>
+#include <Model/ModelWeather.h>
 #include "unitedmodel.h"
 #include "config.h"
 #include "searchline.h"
@@ -56,6 +57,7 @@ UnitedModel::UnitedModel(QObject *parent)
     filterNone->setSourceModel(m);
     lmodel.push_back(filterNone);
 
+    lmodel.push_back(new ModelWeather());
 
 //        m_model=m;
 //    }

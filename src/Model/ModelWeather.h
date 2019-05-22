@@ -15,6 +15,8 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const override;
 
+private:
+    QStringList sl{"1","2"};
 };
 
 #endif //EVERYLAUNCHER_MODELWEATHER_H
