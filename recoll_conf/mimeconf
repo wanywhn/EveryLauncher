@@ -429,6 +429,7 @@ other = application/vnd.sun.xml.draw \
 # you can define them with a colon. The part before the colon is not
 # displayed but used for ordering, ie: a:zzbutshouldbefirst b:aacomeslast
 #
+app = rclcat:app
 text = rclcat:text
 spreadsheet = rclcat:spreadsheet
 presentation = rclcat:presentation

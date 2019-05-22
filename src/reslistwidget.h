@@ -45,7 +45,7 @@ private:
   void init_ui();
   void init_conn();
 private slots:
-  virtual void onTableView_currentChanged();
+  virtual void onTableView_currentChanged(QModelIndex &index);
 public slots:
 
   void returnPressed();

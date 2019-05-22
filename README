@@ -8,10 +8,14 @@
 - [ ] 地图集成
 - [ ] 前缀限制检索范围
 - [ ] 程序大小统计
+create,modified,open
 - [ ] 图片预览机制优化
 - [ ] 百度、维基直接展示概要
 - [ ] MP3现实内置图片
+	meta data:created,modified,duration,sample Rate. icon with play btn
 - [ ] MP4现实内部片段总览
 - [ ] 检索未安装的程序
 - [ ] 实现SectionView
+- [ ] PPT Preview?
+- [ ] Music Search?
 

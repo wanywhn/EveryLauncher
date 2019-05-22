@@ -265,7 +265,7 @@ void Player::showDoc()
 {
     auto path=
     QUrl(index.data(ELModelInterface::ModelRoles::Role_LOCATION).toString());//.replace("file://",""));
-//    qDebug()<<"url:"<<path;
+    qDebug()<<"url:"<<path;
     QFileInfo f(path.toLocalFile());
     if(f.exists()&&f.isSymLink()){
         qDebug()<<"file is Sym";

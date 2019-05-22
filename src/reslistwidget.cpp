@@ -66,7 +66,7 @@ void ResWidget::init_ui() {
 //    this->dtw->setVisible(false);
 }
 
-void ResWidget::onTableView_currentChanged() {
+void ResWidget::onTableView_currentChanged(QModelIndex &index) {
 
 //    if (!m_model || !m_model->getDocSource())
 //        return;
@@ -77,10 +77,10 @@ void ResWidget::onTableView_currentChanged() {
 //
 //    HighlightData hl;
 //    this->m_model->getDocSource()->getTerms(hl);
-//    this->dtw->showDocDetail(index, doc, hl);
-//    this->dtw->setVisible(true);
-//    this->dtw->setMaximumWidth(this->width()*0.618);
-//    this->dtw->setMinimumWidth(this->width()*0.618);
+    this->dtw->showDocDetail(index);
+    this->dtw->setVisible(true);
+    this->dtw->setMaximumWidth(this->width()*0.618);
+    this->dtw->setMinimumWidth(this->width()*0.618);
 }
 
 void ResWidget::moveToNextResoule() {
@@ -96,7 +96,7 @@ void ResWidget::moveToNextResoule() {
 
     listview->setCurrentIndex(listview->model()->index(r, 0));
     mdetailRow = r;
-    this->onTableView_currentChanged();
+//    this->onTableView_currentChanged(QModelIndex());
 }
 
 void ResWidget::useFilterProxy() {
@@ -142,7 +142,7 @@ void ResWidget::currentMoveUp() {
     if (cidx.isValid()) {
         listview->setCurrentIndex(cidx);
         mdetailRow = cidx.row();
-        this->onTableView_currentChanged();
+        this->onTableView_currentChanged(cidx);
     }
 }
 
@@ -150,7 +150,7 @@ void ResWidget::currentMoveDown() {
     auto cidx = listview->model()->index(listview->currentIndex().row() + 1, 0);
     if (cidx.isValid()) {
         mdetailRow = cidx.row();
-        this->onTableView_currentChanged();
+        this->onTableView_currentChanged(cidx);
         listview->setCurrentIndex(cidx);
     }
 

@@ -33,26 +33,34 @@ Preview::Preview()// Search terms etc. for highlighting
 //        setSupportedMimeType.fromList({
 
                                                          "text/plain",
-                                                         "application/msword",
+//                                                         "application/msword",
 
                                                  });
     init();
 }
 
 void Preview::init() {
-    label=new QLabel();
+//    label = new QLabel();
+//    label->setWordWrap(true);
+//    label->setTextFormat(Qt::TextFormat::RichText);
 
+    browser=new QTextBrowser;
+    browser->setAcceptRichText(true);
     auto previewLayout = new QVBoxLayout(this);
-    previewLayout->addWidget(label);
+    previewLayout->addWidget(browser);
 
 
     this->setLayout(previewLayout);
 }
 
 void Preview::showDoc() {
-    label->setText(index.data(ELModelInterface::ModelRoles::Role_FILE_SIMPLE_CONTENT).toString());
+    browser->clear();
+    auto sl=index.data(ELModelInterface::ModelRoles::Role_FILE_FULLTEXT_COLORED).toStringList();
+    for(auto item:sl){
+        browser->append(item);
+    }
+//    this->browser.ap
 
-    return;
 }
 
 

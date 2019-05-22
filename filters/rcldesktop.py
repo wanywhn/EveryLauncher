@@ -59,7 +59,7 @@ def main(args):
 
     print('''
 <html><head>
-<title>''' +name+
+<title>''' +AppName+
           '''</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
 <meta name="AppName" content="'''+AppName+'''" />
@@ -70,7 +70,7 @@ def main(args):
 
 </head>
 <body>
-'''+AppName+'''
+'''+name+'''
 </body>
 </html>
 

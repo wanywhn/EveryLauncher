@@ -25,7 +25,7 @@ DesktopPreview::DesktopPreview() {
 
 void DesktopPreview::showDoc() {
 
-  auto path = index.data(ELModelInterface::Role_LOCATION).toString();
+//  auto path = index.data(ELModelInterface::Role_LOCATION).toString();
   auto pixmap=QPixmap(index.data(ELModelInterface::Role_ICON_PATH).toString());
   icon->setPixmap(pixmap.scaled(128,128));
   //TODO change size

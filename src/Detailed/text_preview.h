@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <memory>
 #include <QComboBox>
+#include <QTextBrowser>
 
 #include "detailedtext.h"
 
@@ -14,6 +15,7 @@ class QCheckBox;
 class Preview;
 class PlainToRichQtPreview;
 class QUrl;
+
 
 class Preview : public DetailedW {
   Q_OBJECT
@@ -29,8 +31,8 @@ public:
   void showDoc() override;
 
 private:
-//    QTextBrowser *editor;
-QLabel *label;
+    QTextBrowser *browser;
+//QLabel *label;
 
 };
 

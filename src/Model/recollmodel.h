@@ -56,6 +56,8 @@ private:
   static std::map<std::string, QString> o_displayableFields;
   FieldGetter *chooseGetter(const std::string &);
       HighlightData m_hdata;
+
+    void getHighlight(const vector<string> &vs, QStringList &sl) const;
 };
 
 
