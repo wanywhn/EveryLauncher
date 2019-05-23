@@ -33,7 +33,7 @@ Preview::Preview()// Search terms etc. for highlighting
 //        setSupportedMimeType.fromList({
 
                                                          "text/plain",
-//                                                         "application/msword",
+                                                         "application/msword",
 
                                                  });
     init();
@@ -52,12 +52,28 @@ void Preview::init() {
 
     this->setLayout(previewLayout);
 }
+static QSet<QString> rawset({
+    "application/msword",
 
+});
 void Preview::showDoc() {
     browser->clear();
-    auto sl=index.data(ELModelInterface::ModelRoles::Role_FILE_FULLTEXT_COLORED).toStringList();
+    QStringList sl;
+    auto mtype=index.data(ELModelInterface::ModelRoles::Role_MIME_TYPE).toString();
+
+    if(rawset.contains(mtype)){
+        sl=index.data(ELModelInterface::ModelRoles::Role_FILE_FULLTEXT_COLORED_FROM_CACHED).toStringList();
+    }else{
+        sl=index.data(ELModelInterface::ModelRoles::Role_FILE_FULLTEXT_COLORED_FROM_RAW).toStringList();
+    }
+//    QString s;
+//    for(auto i:sl){
+//        s.append(i);
+//        s.append("\n");
+//    }
+//    browser->setHtml(s);
     for(auto item:sl){
-        browser->append(item);
+        browser->append(item.replace("\n","<br>"));
     }
 //    this->browser.ap
 

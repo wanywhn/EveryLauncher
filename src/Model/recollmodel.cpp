@@ -13,12 +13,14 @@
 #include <wasatorcl.h>
 #include <QTextStream>
 #include <QFile>
+#include <internfile.h>
 
 class PlainToRichQtReslist : public PlainToRich {
 public:
     virtual ~PlainToRichQtReslist() = default;
 
     string startMatch(unsigned int) override {
+        //TODO user define
         return string("<span style='")
                + string("color:blue") + string("'>");
     }
@@ -87,6 +89,16 @@ FieldGetter *RecollModel::chooseGetter(const string &field) {
     else
         return gengetter;
 }
+bool dump_contents(RclConfig *rclconfig, Rcl::Doc& idoc,std::string &strsout)
+ {
+     FileInterner interner(idoc, rclconfig, FileInterner::FIF_forPreview);
+     Rcl::Doc fdoc;
+ string ipath = idoc.ipath;
+     if (interner.internfile(fdoc, ipath)) {
+         strsout.append(fdoc.text);
+     }
+     return true;
+ }
 
 RecollModel::RecollModel(QObject *parent)
         : QAbstractListModel(parent) {
@@ -222,7 +234,18 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             var = gengetter("title", doc);
             break;
         }
-        case Role_FILE_FULLTEXT_COLORED:{
+        case Role_FILE_FULLTEXT_COLORED_FROM_CACHED:{
+            std::vector<std::string> fileContent;
+            std::string str;
+            dump_contents(theconfig,doc,str);
+            fileContent.emplace_back(str);
+            QStringList sl;
+            getHighlight(fileContent,sl);
+            var=sl;
+            break;
+
+        }
+        case Role_FILE_FULLTEXT_COLORED_FROM_RAW:{
             auto url=QUrl(gengetter("url",doc)).toLocalFile();
             QFile f(url);
             qDebug()<<url;
@@ -248,8 +271,7 @@ void RecollModel::getHighlight(const vector<string> &vs, QStringList &sl) const 
     HighlightData hd;
     m_source->getTerms(hd);
     for (const auto &item:vs) {
-
-                std::__cxx11::list<string> lr;
+                std::list<string> lr;
                 g_hiliter.plaintorich(item, lr,hd);
                 for (const auto &lrstr:lr) {
                     sl << QString::fromStdString(lrstr);
