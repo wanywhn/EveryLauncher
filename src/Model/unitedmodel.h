@@ -50,7 +50,6 @@ class UnitedModel : public QAbstractListModel
 public:
     explicit UnitedModel(QObject *parent = nullptr);
 
-    // Basic functionality:
     QModelIndex index(int row, int column,
                       const QModelIndex &parent) const override;
     QModelIndex parent(const QModelIndex &index) const override;
@@ -62,13 +61,11 @@ public:
 
 public slots:
     void startSearch(std::string str);
+    void cleanSearch();
 
 
 private:
     int rowNumber{0};
-//    QVector<RecollModel *> rmodel;
-//    RecollModel *m_model;
-//    QSortFilterProxyModel *filterNone;
     QVector<ELModelInterface *> lmodel;
 };
 

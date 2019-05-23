@@ -158,17 +158,20 @@ int main(int argc, char *argv[]) {
     SystemTray::getInstance(&w).setIcon(icon);
     QObject::connect(&SystemTray::getInstance(&w), &SystemTray::exitAll,
                      []() { qApp->exit(); });
-    auto desktop = QApplication::desktop();
-    w.move((desktop->width() - w.width()) / 2,
-           (desktop->height() - w.height()) / 3);
 
-    auto fixdwid = desktop->width() / 1.5;
-    fixdwid = fixdwid > 1200 ? 1200 : fixdwid;
-    auto fixhei = desktop->height() / 1.5;
-    fixhei = fixhei > 1000 ? 1000 : fixhei;
+    auto desktop = QApplication::desktop();
+
+    auto fixdwid = desktop->width() / 1.3;
+    fixdwid = fixdwid > 1400 ? 1400 : fixdwid;
+    auto fixhei = desktop->height() / 1.2;
+    fixhei = fixhei > 1400 ? 1400 : fixhei;
 
     w.setMinimumSize(fixdwid, fixhei);
     w.setMaximumSize(fixdwid, fixhei);
+
+    w.move((desktop->width() - w.width()) / 2,
+           (desktop->height() - w.height()) / 3);
+
     w.show();
     QSettings s;
     if(s.value("firstTime",true).toBool()){

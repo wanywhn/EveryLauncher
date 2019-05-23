@@ -17,16 +17,6 @@ void MainWindow::IndexSomeFiles(QStringList paths) {
     tobeIndex.unite(t);
 }
 
-//void MainWindow::filterChanged(QString field)
-//{
-//    DocSeqFiltSpec dsfs;
-//    dsfs.orCrit(DocSeqFiltSpec::DSFS_MIMETYPE,field.toStdString());
-//    m_source->setFiltSpec(dsfs);
-//    emit docSourceChanged(m_source);
-//    initiateQuery();
-//
-//}
-
 MainWindow::MainWindow(QWidget *parent) :DMainWindow(parent) {
     this->restable = new ResWidget(this);
     this->searchLine = new SearchWidget(this);
@@ -62,18 +52,16 @@ void MainWindow::init_ui() {
 
 void MainWindow::init_conn() {
     connect(this->searchLine, &SearchWidget::startSearch,m_model, &UnitedModel::startSearch);
-//    connect(this->searchLine,&SearchWidget::clearSearch,this->restable,&ResWidget::clearSeach);
+    connect(this->searchLine,&SearchWidget::clearSearch,restable,&ResWidget::cleanSearch);
 
 //  connect(this->searchLine,&SearchWidget::tabPressed,this->restable,&ResWidget::moveToNextResoule);
     connect(this->searchLine,&SearchWidget::returnPressed,this->restable,&ResWidget::returnPressed);
 
-//    connect(restable,&ResWidget::filterChanged,this,&MainWindow::filterChanged);
-
-//    connect(this,&MainWindow::useFilterProxy,restable,&ResWidget::useFilterProxy);
-
 
     connect(this->escKey,&QShortcut::activated,this->searchLine,&SearchWidget::clearAll);
+
     connect(this->upKey,&QShortcut::activated,this->restable,&ResWidget::currentMoveUp);
+
     connect(this->downkey,&QShortcut::activated,this->restable,&ResWidget::currentMoveDown);
 
     connect(this->idxTimer, &QTimer::timeout, this, &MainWindow::toggleIndexing);
@@ -82,12 +70,10 @@ void MainWindow::init_conn() {
             , [this]() {
                 qDebug()<<"fi1";
                 this->m_indexAvtive = false;
-//                this->m_indexed = true;
             });
     connect(this->idxProcess,&QProcess::errorOccurred,[this](){
         qDebug()<<"fi2";
         this->m_indexAvtive = false;
-//        this->m_indexed = true;
 
     });
     connect(this->idxProcess, &QProcess::started,
@@ -107,14 +93,14 @@ void MainWindow::toggleIndexing() {
         tobeIndex.clear();
     }
 
-    if(sl.size()==0){
+    if(sl.empty()){
         return;
     }
     QStringList args;
     args << "-c";
     args<<QString::fromStdString(theconfig->getConfDir());
     args << "-i";
-    for(auto item:sl){
+    for(const auto &item:sl){
         args<<item;
     }
 

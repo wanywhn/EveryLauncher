@@ -5,7 +5,7 @@
 # TODO
 - [ ] 添加天气支持
 - [ ] 自然语义理解
-- [ ] 地图集成
+- [x] 地图集成
 - [ ] 前缀限制检索范围
 - [ ] 程序大小统计
 create,modified,open
@@ -19,3 +19,5 @@ create,modified,open
 - [ ] PPT Preview?
 - [ ] Music Search?
 
+
+- [ ] 地图当前位置

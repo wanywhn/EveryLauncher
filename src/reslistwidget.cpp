@@ -16,7 +16,6 @@
 #include <QVBoxLayout>
 
 
-
 void ResWidget::init_conn() {
 //    connect(this, &ResWidget::currentChanged, this, &ResWidget::onTableView_currentChanged);
 }
@@ -32,7 +31,7 @@ ResWidget::ResWidget(QWidget *parent)
 //           << "title"
 //           << "mtype"
 //           << "abstract";
-    if (!(m_model = new UnitedModel( this)))
+    if (!(m_model = new UnitedModel(this)))
         return;
     init_ui();
     init_conn();
@@ -79,8 +78,8 @@ void ResWidget::onTableView_currentChanged(QModelIndex &index) {
 //    this->m_model->getDocSource()->getTerms(hl);
     this->dtw->showDocDetail(index);
     this->dtw->setVisible(true);
-    this->dtw->setMaximumWidth(this->width()*0.618);
-    this->dtw->setMinimumWidth(this->width()*0.618);
+    this->dtw->setMaximumWidth(this->width() * 0.618);
+    this->dtw->setMinimumWidth(this->width() * 0.618);
 }
 
 void ResWidget::moveToNextResoule() {
@@ -97,10 +96,6 @@ void ResWidget::moveToNextResoule() {
     listview->setCurrentIndex(listview->model()->index(r, 0));
     mdetailRow = r;
 //    this->onTableView_currentChanged(QModelIndex());
-}
-
-void ResWidget::useFilterProxy() {
-
 }
 
 
@@ -148,15 +143,25 @@ void ResWidget::currentMoveUp() {
 
 void ResWidget::currentMoveDown() {
     auto cidx = listview->model()->index(listview->currentIndex().row() + 1, 0);
-    if (cidx.isValid()) {
-        mdetailRow = cidx.row();
-        this->onTableView_currentChanged(cidx);
-        listview->setCurrentIndex(cidx);
+    if (cidx.row() >= m_model->rowCount(QModelIndex())) {
+        return;
     }
+    mdetailRow = cidx.row();
+    qDebug() << "currentMoveDown:Row:" << cidx.row();
+    this->onTableView_currentChanged(cidx);
+    listview->setCurrentIndex(cidx);
 
 }
 
 void ResWidget::setM_model(UnitedModel *m_model) {
     ResWidget::m_model = m_model;
     listview->setModel(m_model);
+}
+
+void ResWidget::cleanSearch() {
+    listview->clearFocus();
+    dtw->hide();
+
+    m_model->cleanSearch();
+
 }

@@ -39,8 +39,6 @@ public:
 
     ~ResWidget() override = default;
 
-    virtual UnitedModel * getModel() { return m_model; }
-
 private:
   void init_ui();
   void init_conn();
@@ -52,7 +50,7 @@ public slots:
   void currentMoveUp();
   void currentMoveDown();
   void moveToNextResoule();
-  void useFilterProxy();
+  void cleanSearch();
 
 signals:
   void filterChanged(QString filed);

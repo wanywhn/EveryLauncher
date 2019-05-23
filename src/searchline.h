@@ -66,11 +66,9 @@ class SearchWidget : public QWidget {
 
 public:
 
-  SearchWidget(QWidget *parent = 0, const char * = 0);
+    explicit SearchWidget(QWidget *parent = 0);
 
-  virtual bool hasSearchString();
-
-  virtual QString currentText();
+    virtual QString currentText();
 
 public slots:
 

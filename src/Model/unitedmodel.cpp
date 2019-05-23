@@ -108,6 +108,13 @@ void UnitedModel::startSearch(std::string str) {
     }
 }
 
+void UnitedModel::cleanSearch() {
+    //TODO clean res
+    for(auto item:lmodel){
+    }
+
+}
+
 extern bool maybeOpenDb(string &reason, bool force, bool *maindberror);
 
 
