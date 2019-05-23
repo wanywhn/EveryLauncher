@@ -130,7 +130,9 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     MainWindow w;
-    QIcon icon(":/icon/everylauncher.svg");
+    QIcon icon("qrc:/icon/everylauncher.svg");
+    DApplication::setWindowIcon(icon);
+    a.setProductIcon(icon);
     w.setWindowIcon(icon);
 //  w.setWindowOpacity(0.1);
 //  w.setTranslucentBackground(true);

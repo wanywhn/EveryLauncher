@@ -2,4 +2,8 @@
     <qresource prefix="/icon">
         <file>everylauncher.svg</file>
     </qresource>
+    <qresource prefix="/html">
+        <file>BaiduMap.html</file>
+        <file>GaoDeMap.html</file>
+    </qresource>
 </RCC>

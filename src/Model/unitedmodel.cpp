@@ -10,6 +10,7 @@
 #include "unitedmodel.h"
 #include "config.h"
 #include "searchline.h"
+#include "map_model.h"
 
 
 
@@ -34,10 +35,9 @@ UnitedModel::UnitedModel(QObject *parent)
 //        m->setFilterSpec(m_filtspec);
     auto filterNone = new MFilterModel(m);
     lmodel.push_back(filterNone);
-//    lmodel.push_back(m);
 
     // FIXME there
-//    lmodel.push_back(new ModelWeather());
+    lmodel.push_back(new map_model());
     for(auto item:lmodel){
     connect(item, &ELModelInterface::resultsReady, [this]() {
         qDebug() << "ready";
