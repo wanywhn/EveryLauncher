@@ -11,6 +11,7 @@
 #include <DTitlebar>
 #include <XdgDirs>
 #include <QProcess>
+#include <QtWebView/QtWebView>
 
 #include "config.h"
 #include "dbusproxy.h"

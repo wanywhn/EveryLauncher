@@ -1,18 +1,12 @@
 #include "recollmodel.h"
 #include "searchline.h"
 
-#include <bits/stl_list.h>
-#include <bits/stl_map.h>
-
 #include <QDebug>
-#include <QIcon>
 #include <QMessageBox>
-#include <QPixmap>
 #include <plaintorich.h>
 #include <docseqdb.h>
 #include <wasatorcl.h>
 #include <QTextStream>
-#include <QFile>
 #include <internfile.h>
 
 class PlainToRichQtReslist : public PlainToRich {
@@ -101,7 +95,7 @@ bool dump_contents(RclConfig *rclconfig, Rcl::Doc& idoc,std::string &strsout)
  }
 
 RecollModel::RecollModel(QObject *parent)
-        : QAbstractListModel(parent) {
+         {
     // Initialize the translated map for column headers
     o_displayableFields["abstract"] = tr("Abstract");
     o_displayableFields["author"] = tr("Author");
@@ -346,12 +340,13 @@ void RecollModel::initiateQuery() {
 
     m_queryActive = false;
     this->readDocSource();
-    emit(restultReady());
+    emit(resultsReady());
 }
 
 void RecollModel::setFilterSpec(DocSeqFiltSpec &spec) {
     m_source->setFiltSpec(spec);
 
 }
+
 
 

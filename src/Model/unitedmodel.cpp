@@ -11,20 +11,7 @@
 #include "config.h"
 #include "searchline.h"
 
-class MFilterModel : public QSortFilterProxyModel, public ELModelInterface {
-public:
-    MFilterModel(RecollModel *parent) : QSortFilterProxyModel(parent), model(parent) {}
 
-private:
-    void search(std::string &string1) override {
-        model->search(string1);
-
-    }
-
-private:
-    RecollModel *model;
-
-};
 
 UnitedModel::UnitedModel(QObject *parent)
         : QAbstractListModel(parent) {
@@ -44,20 +31,20 @@ UnitedModel::UnitedModel(QObject *parent)
 //        DocSeqFiltSpec m_filtspec;
 //        m_filtspec.orCrit(DocSeqFiltSpec::DSFS_QLANG, frag);
     auto m = new RecollModel;
-    connect(m, &RecollModel::restultReady, [this]() {
+//        m->setFilterSpec(m_filtspec);
+    auto filterNone = new MFilterModel(m);
+    lmodel.push_back(filterNone);
+//    lmodel.push_back(m);
+
+    // FIXME there
+//    lmodel.push_back(new ModelWeather());
+    for(auto item:lmodel){
+    connect(item, &ELModelInterface::resultsReady, [this]() {
         qDebug() << "ready";
         this->beginResetModel();
         this->endResetModel();
-
     });
-//        m->setFilterSpec(m_filtspec);
-    auto filterNone = new MFilterModel(m);
-    filterNone->setFilterRole(RecollModel::ModelRoles::Role_NODISPLAY);
-    filterNone->setFilterRegExp("^((?!true).)*$");
-    filterNone->setSourceModel(m);
-    lmodel.push_back(filterNone);
-
-    lmodel.push_back(new ModelWeather());
+    }
 
 //        m_model=m;
 //    }
@@ -74,8 +61,8 @@ int UnitedModel::rowCount(const QModelIndex &parent) const {
 //        return 0;
     auto totoalcnt = 0;
     for (auto item:lmodel) {
-        if (item->rowCount(QModelIndex()) > 0) {
-            totoalcnt += item->rowCount(QModelIndex());//+1;
+        if (item->rowCount() > 0) {
+            totoalcnt += item->rowCount();//+1;
         }
     }
 //return filterNone->rowCount(parent);
@@ -90,13 +77,14 @@ QVariant UnitedModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
 
+    //TODO map
     if (index.row() >= rowNumber) {
         return QVariant();
     }
     int r = index.row();
     auto fitem = lmodel.first();
     for (auto item:lmodel) {
-        if (r > item->rowCount()) {
+        if (r >= item->rowCount()) {
             r -= item->rowCount();
             continue;
         }
@@ -109,18 +97,14 @@ QVariant UnitedModel::data(const QModelIndex &index, int role) const {
 
 QModelIndex UnitedModel::parent(const QModelIndex &index) const {
 
-    return QModelIndex();
-//    return createIndex(index.row(),index.column(),index.row());
-
+    return {};
 }
 
 void UnitedModel::startSearch(std::string str) {
     //TODO search in every model
 
     for (auto item:lmodel) {
-        if (auto t = dynamic_cast<ELModelInterface *>(item)) {
-            t->search(str);
-        }
+            item->search(str);
     }
 }
 

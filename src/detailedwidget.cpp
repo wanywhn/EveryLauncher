@@ -7,6 +7,7 @@
 #include "Detailed/text_preview.h"
 #include <QDebug>
 #include <QMediaPlayer>
+#include <Detailed/map_preview.h>
 
 //    QStringList supportedMimeTypes = m_player->supportedMimeTypes();
 //    if (!supportedMimeTypes.isEmpty()) {
@@ -23,9 +24,10 @@ DetailedWidget::DetailedWidget(QWidget *parent) : QStackedWidget(parent) {
   addWidget( new PdfPreview(this));
   addWidget(new imagePreview(this));
   addWidget(new Player(this));
+  addWidget(new map_preview);
   for (int i = 0; i != this->count(); ++i) {
     auto w = qobject_cast<DetailedW *>(this->widget(i));
-    for (auto m : w->getSupportedMimeTypes()) {
+    for (const auto &m : w->getSupportedMimeTypes()) {
       wididx.insert(m, w);
     }
   }

@@ -10,7 +10,7 @@ extern RclConfig *theconfig;
 typedef QString (FieldGetter)(const std::string &fldname,
                                  const Rcl::Doc &doc);
 
-class RecollModel : public QAbstractListModel,public ELModelInterface{
+class RecollModel :public ELModelInterface{
 
   Q_OBJECT
 public:
@@ -45,7 +45,7 @@ public slots:
 
 signals:
   void sortDataChanged(DocSeqSortSpec);
-  void restultReady();
+
 
 private:
 

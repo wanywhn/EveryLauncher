@@ -16,3 +16,4 @@ int ModelWeather::rowCount(const QModelIndex &parent) const {
 QVariant ModelWeather::data(const QModelIndex &index, int role) const {
     return sl.at(index.row());
 }
+

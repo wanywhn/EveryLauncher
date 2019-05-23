@@ -7,13 +7,15 @@
 
 #include <Model/ELModelInterface.h>
 
-class ModelWeather: public ELModelInterface,public QAbstractListModel{
+class ModelWeather: public ELModelInterface{
+    Q_OBJECT
 public:
     void search(std::string &string) override;
 
     int rowCount(const QModelIndex &parent) const override;
 
     QVariant data(const QModelIndex &index, int role) const override;
+
 
 private:
     QStringList sl{"1","2"};

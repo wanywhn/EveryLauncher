@@ -6,6 +6,43 @@
 #include <QtCore/QSortFilterProxyModel>
 #include "Model/recollmodel.h"
 
+// FIXME this is a workaround
+class MFilterModel :public ELModelInterface {
+    Q_OBJECT
+public:
+    explicit MFilterModel(RecollModel *parent) :ELModelInterface(parent), model(parent) {
+        sfmodel=new QSortFilterProxyModel();
+        sfmodel->setSourceModel(model);
+        sfmodel->setFilterRole(RecollModel::ModelRoles::Role_NODISPLAY);
+        sfmodel->setFilterRegExp("^((?!true).)*$");
+        sfmodel->setDynamicSortFilter(true);
+        connect(model,&RecollModel::resultsReady,this,&ELModelInterface::resultsReady);
+    }
+
+    int rowCount(const QModelIndex &parent) const override {
+        return sfmodel->rowCount();
+    }
+
+    QVariant data(const QModelIndex &index, int role) const override {
+        return sfmodel->data(index,role);
+    }
+
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override {
+        return sfmodel->index(row,column,parent);
+    }
+
+
+    void search(std::string &string1) override {
+        model->search(string1);
+
+    }
+
+
+private:
+    RecollModel *model;
+    QSortFilterProxyModel *sfmodel;
+
+};
 class UnitedModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -26,14 +63,13 @@ public:
 public slots:
     void startSearch(std::string str);
 
-    signals:
 
 private:
     int rowNumber{0};
 //    QVector<RecollModel *> rmodel;
 //    RecollModel *m_model;
 //    QSortFilterProxyModel *filterNone;
-    QVector<QAbstractItemModel *> lmodel;
+    QVector<ELModelInterface *> lmodel;
 };
 
 #endif // UNITEDMODEL_H

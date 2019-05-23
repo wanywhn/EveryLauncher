@@ -1,7 +1,7 @@
 set(CMD_NAME everylauncher)
 
 
-set(QTPKG Core Widgets Gui DBus WebEngineWidgets X11Extras Network Xml Multimedia
+set(QTPKG Core Widgets Gui DBus WebEngineWidgets X11Extras Network Xml Multimedia WebEngine
         MultimediaWidgets
         )
 list(TRANSFORM QTPKG PREPEND "Qt5")
@@ -46,7 +46,7 @@ aux_source_directory(./confgui SRC)
 aux_source_directory(./Model SRC)
 
 qt5_wrap_ui(FORMS widget.ui)
-add_executable(${CMD_NAME} ${SRC} ${QTRES} ${FORMS})
+add_executable(${CMD_NAME} ${SRC} ${QTRES} ${FORMS} Detailed/map_preview.cpp Detailed/map_preview.h Model/map_model.cpp Model/map_model.h Model/ELModelInterface.cpp)
 
 
 
