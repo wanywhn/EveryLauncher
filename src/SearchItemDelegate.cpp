@@ -14,9 +14,9 @@ void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 //            index.data(RecollModel::Role_MIME_TYPE).toString();
 
     auto filename =
-    index.data(RecollModel::Role_TITLE).toString();
+    index.data(ELModelInterface::Role_TITLE).toString();
             if(filename.isEmpty())
-                filename=index.data(RecollModel::Role_FILE_NAME).toString();
+                filename=index.data(ELModelInterface::Role_FILE_NAME).toString();
 //    if (index.data(RecollModel::Role_MIME_TYPE).toString() ==
 //        "application/x-all") {
         // TODO find app icon
@@ -24,9 +24,10 @@ void SearchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 //                index.data(RecollModel::Role_APP_NAME).toString();
 //    }
     auto iconpath =
-            index.data(RecollModel::Role_ICON_PATH).toString();
+            index.data(ELModelInterface::Role_ICON_ByteArray).toByteArray();
 
-    QPixmap icon(iconpath);
+    QPixmap icon;
+    icon.loadFromData(iconpath);
     if (icon.isNull()) {
 //        qDebug() << "null icon:" << iconpath;
     }

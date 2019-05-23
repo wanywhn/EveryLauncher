@@ -194,7 +194,7 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             break;
         }
             // the default cat icon
-        case Role_ICON_PATH: {
+        case Role_ICON_ByteArray: {
             auto mtype = gengetter("mtype", doc);
             if (mtype != "application/x-all") {
                 std::string apptag;
@@ -204,6 +204,12 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             } else {
                 var = gengetter("appicon", doc);
             }
+            auto u=QUrl::fromLocalFile(var.toString());
+            qDebug()<<u.toLocalFile();
+            QFile f(u.toLocalFile());
+            f.open(QIODevice::OpenModeFlag::ReadOnly);
+            var=f.readAll();
+
             break;
         }
         case Role_APP_NAME: {
