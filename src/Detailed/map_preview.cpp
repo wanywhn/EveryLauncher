@@ -8,12 +8,12 @@
 #include "map_preview.h"
 
 void map_preview::showDoc() {
-    auto url=index.data(ELModelInterface::ModelRoles::Role_MAP_URL).toString();
-    auto qurl=QUrl("qrc:/html/GaoDeMap.html");
-    view->page()->load(qurl);
-//    view->setContent(html.toLocal8Bit(),"text/html");
+//    auto url=index.data(ELModelInterface::ModelRoles::Role_MAP_POIID).toString();
+//    auto qurl=QUrl("qrc:/html/GaoDeMap.html");
+    auto url=QString("https://uri.amap.com/marker?poiid=%1");
+    auto poiid=index.data(ELModelInterface::Role_MAP_POIID).toString();
 
-//    view->page()->load(QUrl(url));
+    view->page()->load(QUrl(url.arg(poiid)));
 }
 
 map_preview::map_preview() {
