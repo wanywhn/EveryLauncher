@@ -4,6 +4,7 @@
 #include <QAbstractItemModel>
 #include <docseq.h>
 #include <QtCore/QSortFilterProxyModel>
+#include <queue>
 #include "Model/recollmodel.h"
 
 // FIXME this is a workaround
@@ -11,6 +12,8 @@ class MFilterModel :public ELModelInterface {
     Q_OBJECT
 public:
     explicit MFilterModel(RecollModel *parent) :ELModelInterface(parent), model(parent) {
+        this->setObjectName("MFilterModel");
+        this->setDisplayName(tr("×文档"));
         sfmodel=new QSortFilterProxyModel();
         sfmodel->setSourceModel(model);
         sfmodel->setFilterRole(RecollModel::ModelRoles::Role_NODISPLAY);
@@ -60,13 +63,16 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
 public slots:
-    void startSearch(std::string str);
+    void startSearch(QString str);
     void cleanSearch();
 
 
 private:
     int rowNumber{0};
+    std::priority_queue<ELModelInterface *> usermodel;
     QVector<ELModelInterface *> lmodel;
+
+    void getOption(QString &basic_string, QString &qString, QString &k2);
 };
 
 #endif // UNITEDMODEL_H

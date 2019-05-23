@@ -85,7 +85,7 @@ private slots:
   virtual void restoreText();
 
 signals:
-  void startSearch(std::string );
+  void startSearch(QString);
 
     void clearSearch();
   void partialWord(int, const QString &text, const QString &partial);
@@ -96,11 +96,8 @@ signals:
 private:
   void init_ui();
   void init_conn();
-  void init_input_state();
 
 private:
-  bool normalInputState{true};
-  QString searchUrl{""};
   int getPartialWord(QString &word);
 
     MLineEdit *queryText;

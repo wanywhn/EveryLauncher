@@ -21,3 +21,29 @@ create,modified,open
 
 
 - [ ] 地图当前位置
+- [ ] 跳跃分组栏选择
+- [ ] 设置分组搜索显示优先级
+- [ ] 搜索选项
+
+kind:application
+kind:applications
+kind:app
+
+kind:folder
+
+kind:pdf
+
+kind:doc
+
+kind:txt
+
+kind:image
+
+kind:audio
+
+kind:video
+
+date:today
+
+date:yesterday
+se(search engine):bd|bi|gg|so|zh

@@ -120,23 +120,7 @@ void SearchWidget::init_ui() {
 void SearchWidget::init_conn() {
     connect(queryText, &QLineEdit::textChanged, this,&SearchWidget::searchTextChanged);
 //    connect(queryText, &QLineEdit::textEdited, this,&SearchWidget::searchTextEdited);
-    connect(queryText, &MLineEdit::returnPressed, [this]() {
-        if (normalInputState) {
-            emit this->returnPressed();
-            return;
-        }
-        if (searchUrl.isEmpty()) {
-            return;
-        }
-        auto qt = this->queryText->text();
-        // left three char is "xx "
-        auto content = qt.right(qt.length() - 3).trimmed();
-
-        if (content.isEmpty()) {
-            return;
-        }
-        QDesktopServices::openUrl(QUrl(searchUrl + content.replace(" ", "+")));
-    });
+    connect(queryText, &MLineEdit::returnPressed,this,&SearchWidget::returnPressed);
 
     auto completer = new QCompleter(m_completermodel, this);
     /*
@@ -155,7 +139,6 @@ void SearchWidget::init_conn() {
     //    connect(s,&QShortcut::activated,this,&SearchWidget::clearAll);
      */
     connect(this->queryText, &MLineEdit::tabPressed, [this]() {
-        if (normalInputState)
                 emit this->tabPressed();
     });
 
@@ -163,8 +146,6 @@ void SearchWidget::init_conn() {
     connect(this->btnSearch, &QPushButton::clicked, this,
             &SearchWidget::prepareSimpleSearch);
 }
-
-void SearchWidget::init_input_state() { normalInputState = true; }
 
 void SearchWidget::takeFocus() {
     LOGDEB1("SearchWidget: take focus\n");
@@ -176,7 +157,6 @@ QString SearchWidget::currentText() { return queryText->text(); }
 
 void SearchWidget::clearAll() {
     queryText->clear();
-    init_input_state();
     emit clearSearch();
 }
 
@@ -216,26 +196,10 @@ void SearchWidget::searchTextEdited(const QString &text) {
 
 void SearchWidget::searchTextChanged(const QString &text) {
     qDebug()<<"SearchWidget::searchTextChanged: text [" <<text << "]\n";
-
-    if (text.size() < 3) {
-        normalInputState = true;
+    if(text.size()<2){
+        return ;
     }
-    if (text.size() == 3) {
-        if (text.trimmed().size() == 2) {
-            QSettings sett;
-            sett.beginGroup("SearchPrefix");
-            searchUrl = sett.value(text.trimmed()).toStringList().at(0);
-            if (!searchUrl.isEmpty()) {
-                normalInputState = false;
-            }
-            sett.endGroup();
-            return;
-        }
-        normalInputState = true;
-    }
-    if (text.trimmed().size() >= 3 && normalInputState) {
         prepareSimpleSearch();
-    }
 }
 
 void SearchWidget::prepareSimpleSearch() {
@@ -247,6 +211,7 @@ void SearchWidget::prepareSimpleSearch() {
         emit clearSearch();
         return;
     }
+    /*
     QString s("");
     for (auto tmp : str) {
         if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
@@ -258,8 +223,9 @@ void SearchWidget::prepareSimpleSearch() {
     if (s.isEmpty()) {
         return;
     }
+     */
 
-    emit startSearch(s.toStdString());
+    emit startSearch(str);
 }
 
 void SearchWidget::onWordReplace(const QString &o, const QString &n) {

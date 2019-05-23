@@ -96,6 +96,9 @@ bool dump_contents(RclConfig *rclconfig, Rcl::Doc& idoc,std::string &strsout)
 
 RecollModel::RecollModel(QObject *parent)
          {
+    // FIXME 还有不同种类的模型呢。
+    this->setObjectName("RecollModel");
+    this->setDisplayName(tr("文档*"));
     // Initialize the translated map for column headers
     o_displayableFields["abstract"] = tr("Abstract");
     o_displayableFields["author"] = tr("Author");

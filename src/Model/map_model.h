@@ -13,6 +13,8 @@
 class map_model: public ELModelInterface{
     Q_OBJECT
 public:
+    map_model();
+
     void search(std::string &string) override;
 
     int rowCount(const QModelIndex &parent) const override;

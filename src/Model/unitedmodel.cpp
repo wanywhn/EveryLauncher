@@ -31,14 +31,17 @@ UnitedModel::UnitedModel(QObject *parent)
 //        theconfig->getGuiFilter(k2k.value(item), frag);
 //        DocSeqFiltSpec m_filtspec;
 //        m_filtspec.orCrit(DocSeqFiltSpec::DSFS_QLANG, frag);
-    auto m = new RecollModel;
 //        m->setFilterSpec(m_filtspec);
+
+    auto m = new RecollModel;
     auto filterNone = new MFilterModel(m);
     lmodel.push_back(filterNone);
-
-    // FIXME there
     lmodel.push_back(new map_model());
-    for(auto item:lmodel){
+    for(auto i=0;i!=lmodel.size();++i){
+
+        auto item=lmodel.at(i);
+        item->setDisplayPriority(i);
+//        item->setDisplayPriority()
     connect(item, &ELModelInterface::resultsReady, [this]() {
         qDebug() << "ready";
         this->beginResetModel();
@@ -100,11 +103,36 @@ QModelIndex UnitedModel::parent(const QModelIndex &index) const {
     return {};
 }
 
-void UnitedModel::startSearch(std::string str) {
+void UnitedModel::startSearch(QString str) {
     //TODO search in every model
+    // get k1&k2
+    // if not: normal search ,get x result in model in user defined order,
+    // else use k1&k2 for specific search
+    // emit search hint
+
+    QString k1,k2;
+    getOption(str,k1,k2);
+    if(k1.isEmpty()||k2.isEmpty()){
+
+
+    }
+
+    /*
+    QString s("");
+    for (auto tmp : str) {
+        if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
+            s += tmp + QString("*");
+        } else {
+            s += tmp;
+        }
+    }
+     */
+
 
     for (auto item:lmodel) {
-            item->search(str);
+            auto s=str.toStdString();
+//            item->search(s);
+item->isEnable();
     }
 }
 
@@ -112,6 +140,19 @@ void UnitedModel::cleanSearch() {
     //TODO clean res
     for(auto item:lmodel){
     }
+
+}
+
+void UnitedModel::getOption(QString &basic_string, QString &qString, QString &k2) {
+    auto sped=basic_string.split(" ");
+    Q_ASSERT(!sped.empty());
+    auto k1k2=sped.at(0).split(":");
+    if(k1k2.size()!=2){
+        return ;
+    }
+    qString=k1k2.at(0);
+    k2=k1k2.at(1);
+
 
 }
 

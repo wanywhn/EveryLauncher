@@ -95,3 +95,8 @@ void map_model::imageReady(QNetworkReply *rpl, int i) {
     rpl->deleteLater();
 
 }
+
+map_model::map_model() {
+    this->setObjectName("MapModel");
+    this->setDisplayName(tr("地图"));
+}

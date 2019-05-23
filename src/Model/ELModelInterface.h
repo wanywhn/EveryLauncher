@@ -8,6 +8,8 @@
 #include <string>
 #include <QAbstractListModel>
 #include "Model/ELModelInterface.h"
+#include <QDebug>
+#include <QSettings>
 
 static const QString MAP_TYPE{"MAP_TYPE"};
 class ELModelInterface: public QAbstractListModel {
@@ -35,8 +37,49 @@ public:
 public:
     ELModelInterface(QObject *parent=nullptr) : QAbstractListModel(parent) {}
 
-    virtual void search(std::string &){}
+    virtual void search(std::string &)=0;
+    bool operator<(const ELModelInterface &rhs)const{
+        return this->displayPriority()<rhs.displayPriority();
+    }
+    virtual bool isEnable(){
+        QSettings settings;
+        settings.beginGroup("Model");
+        settings.beginGroup("Enabled");
+        return settings.value(this->objectName(),true).toBool();
+//        settings.endGroup();
+//        settings.endGroup();
+    }
+    virtual void setDisplayPriority(int priority){
+        QSettings settings;
+        settings.beginGroup("Model");
+        settings.beginGroup("Priority");
+        bool i{false};
+        auto v=settings.value(this->objectName()).toInt(&i);
+        if(i){
+            qDebug()<<"to int false";
+            return ;
+        }
+        settings.setValue(this->objectName(),priority);
+    }
+
+protected:
+    virtual int displayPriority()const{
+        QSettings settings;
+        settings.beginGroup("Model");
+        settings.beginGroup("Priority");
+        return settings.value(this->objectName(),1).toInt();
+    }
+
+    virtual void setDisplayName(QString name){
+        QSettings settings;
+        settings.beginGroup("Model");
+        settings.beginGroup("Display");
+        settings.setValue(this->objectName(),name);
+
+    }
+
     signals:
+
     void resultsReady();
 
 };

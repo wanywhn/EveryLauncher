@@ -17,3 +17,8 @@ QVariant ModelWeather::data(const QModelIndex &index, int role) const {
     return sl.at(index.row());
 }
 
+ModelWeather::ModelWeather() {
+    this->setObjectName("WeatherModel");
+    this->setDisplayName(tr("天气"));
+}
+
