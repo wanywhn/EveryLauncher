@@ -26,6 +26,7 @@ private:
 
  signals:
     void exitAll();
+    void ConfigChanged();
 private:
     QWidget *mainWindow;
     QMenu *trayMenu;

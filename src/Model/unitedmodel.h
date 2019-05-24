@@ -69,10 +69,12 @@ public slots:
 
 private:
     int rowNumber{0};
-    std::priority_queue<ELModelInterface *> usermodel;
+    QVector<ELModelInterface *>usermodel;
     QVector<ELModelInterface *> lmodel;
 
     void getOption(QString &basic_string, QString &qString, QString &k2);
+
+    void reloadModel();
 };
 
 #endif // UNITEDMODEL_H

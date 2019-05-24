@@ -49,7 +49,7 @@ public:
 //        settings.endGroup();
 //        settings.endGroup();
     }
-    virtual void setDisplayPriority(int priority){
+    virtual void initDisplayPriority(int priority){
         QSettings settings;
         settings.beginGroup("Model");
         settings.beginGroup("Priority");

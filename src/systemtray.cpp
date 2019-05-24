@@ -21,7 +21,6 @@ void SystemTray::showWindow() {
   this->mainWindow->activateWindow();
   QApplication::setActiveWindow(this->mainWindow);
     }
-  return;
 }
 
 void SystemTray::init_ui() {
@@ -42,9 +41,10 @@ void SystemTray::init_conn() {
 
   connect(this->showUp, &QAction::triggered, this,
           &SystemTray::showWindow); //[this](){
-  connect(this->preferenceAction, &QAction::triggered, []() {
+  connect(this->preferenceAction, &QAction::triggered, [this]() {
     ELconfgui::ConfIndexW w(nullptr, theconfig);
     w.exec();
+    emit ConfigChanged();
   });
 
   connect(this->exitAction, &QAction::triggered, this, &SystemTray::exitAll);

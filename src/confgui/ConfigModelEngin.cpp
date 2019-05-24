@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QAbstractTableModel>
 
+//TODO restore when user cancel?
 class ConfigModelEngineModel : public QAbstractTableModel {
 public:
     ConfigModelEngineModel(QObject *parent = nullptr) : QAbstractTableModel(parent) {
