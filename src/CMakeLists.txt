@@ -46,7 +46,7 @@ aux_source_directory(./confgui SRC)
 aux_source_directory(./Model SRC)
 
 qt5_wrap_ui(FORMS widget.ui)
-add_executable(${CMD_NAME} ${SRC} ${QTRES} ${FORMS} Detailed/map_preview.cpp Detailed/map_preview.h Model/map_model.cpp Model/map_model.h Model/ELModelInterface.cpp)
+add_executable(${CMD_NAME} ${SRC} ${QTRES} ${FORMS} Detailed/map_preview.cpp Detailed/map_preview.h Model/map_model.cpp Model/map_model.h Model/ELModelInterface.cpp confgui/ConfigModelEngin.cpp confgui/ConfigModelEngin.h)
 
 
 

@@ -49,7 +49,7 @@
 using std::list;
 using std::vector;
 
-namespace confgui {
+namespace ELconfgui {
 
 static const int spacing = 2;
 static const int margin = 2;

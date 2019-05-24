@@ -43,7 +43,7 @@ class ConfParamW;
 class ConfParamDNLW;
 
 DTK_USE_NAMESPACE
-namespace confgui {
+namespace ELconfgui {
 
 class ConfIndexW : public  DDialog{
     Q_OBJECT

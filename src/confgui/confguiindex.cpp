@@ -28,7 +28,7 @@
 #include <qtimer.h>
 #include <qwidget.h>
 
-#include <configsearchengine.h>
+#include <confgui/configsearchengine.h>
 #include <dbusproxy.h>
 #include <functional>
 #include <list>
@@ -46,8 +46,9 @@ using std::string;
 #include "rclconfig.h"
 #include "rcldb.h"
 #include "smallut.h"
+#include "ConfigModelEngin.h"
 
-namespace confgui {
+namespace ELconfgui {
 static const int spacing = 3;
 static const int margin = 3;
 
@@ -212,6 +213,10 @@ void ConfIndexW::reloadPanels() {
   w=new ConfigSearchEngine(this);
   m_widgets.push_back(w);
   tabWidget->addTab(w,QObject::tr("Search Engine"));
+
+  w=new ConfigModelEngine();
+  m_widgets.push_back(w);
+  tabWidget->addTab(w,QObject::tr("数据来源"));
 
 }
 

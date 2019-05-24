@@ -43,7 +43,7 @@ void SystemTray::init_conn() {
   connect(this->showUp, &QAction::triggered, this,
           &SystemTray::showWindow); //[this](){
   connect(this->preferenceAction, &QAction::triggered, []() {
-    confgui::ConfIndexW w(nullptr, theconfig);
+    ELconfgui::ConfIndexW w(nullptr, theconfig);
     w.exec();
   });
 

@@ -65,7 +65,7 @@ static QString myGetFileName(bool b){
     return "";
 
 };
-namespace confgui {
+namespace ELconfgui {
 
     // A class to isolate the gui widget from the config storage mechanism
     class ConfLinkRep {
