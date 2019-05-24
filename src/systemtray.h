@@ -8,25 +8,33 @@
 #include <rclconfig.h>
 
 extern RclConfig *theconfig;
-class SystemTray : public QSystemTrayIcon
-{
-    Q_OBJECT
+
+class SystemTray : public QSystemTrayIcon {
+Q_OBJECT
 public:
     explicit SystemTray(QWidget *mpranet);
-    static SystemTray& getInstance(QWidget *parent){
+
+    static SystemTray &getInstance(QWidget *parent) {
         static SystemTray instance(parent);
         return instance;
 
     }
+
 public slots:
+
     void showWindow();
+
 private:
     void init_ui();
+
     void init_conn();
 
- signals:
+signals:
+
     void exitAll();
+
     void ConfigChanged();
+
 private:
     QWidget *mainWindow;
     QMenu *trayMenu;

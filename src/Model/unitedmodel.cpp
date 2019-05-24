@@ -26,6 +26,7 @@ UnitedModel::UnitedModel(QObject *parent)
             {"message",      "message"},
             {"other",        "other"},
     };
+
 //    for(const auto &item:k2k.keys()){
 //        string frag;
 //        theconfig->getGuiFilter(k2k.value(item), frag);
@@ -33,19 +34,23 @@ UnitedModel::UnitedModel(QObject *parent)
 //        m_filtspec.orCrit(DocSeqFiltSpec::DSFS_QLANG, frag);
 //        m->setFilterSpec(m_filtspec);
 
+    indexModule=new IndexModule;
     auto m = new RecollModel;
+    connect(indexModule,&IndexModule::sourceChanged,m,&ELModelInterface::sourceChanged);
     auto filterNone = new MFilterModel(m);
     lmodel.push_back(filterNone);
     lmodel.push_back(new map_model());
     reloadModel();
-    connect(&SystemTray::getInstance(nullptr),&SystemTray::ConfigChanged,this,&UnitedModel::reloadModel);
+    connect(&SystemTray::getInstance(nullptr), &SystemTray::ConfigChanged, this, &UnitedModel::reloadModel);
 
-//        m_model=m;
-//    }
 }
 
+
 void UnitedModel::reloadModel() {
-    for(auto item:usermodel){
+    //TODO re read when user change order or enabled
+    //!!TODO optim
+
+    for (auto item:usermodel) {
         item->disconnect();
 //        this->disconnect(item);
     }
@@ -53,21 +58,22 @@ void UnitedModel::reloadModel() {
     for (auto i = 0; i != lmodel.size(); ++i) {
         auto item = lmodel.at(i);
         item->initDisplayPriority(i);
+
         if (item->isEnable()) {
             usermodel.push_back(item);
         }
     }
-    //TODO re read when user change order or enabled
     std::sort(usermodel.begin(), usermodel.end());
     qDebug() << usermodel;
     for (auto item:usermodel) {
-        connect(item, &ELModelInterface::resultsReady, [this,item]() {
-            qDebug() <<item<< "ready";
+        connect(item, &ELModelInterface::resultsReady, [this, item]() {
+            qDebug() << item << "ready";
             beginResetModel();
             endResetModel();
         });
     }
 }
+
 
 
 QModelIndex UnitedModel::index(int row, int column, const QModelIndex &parent) const {

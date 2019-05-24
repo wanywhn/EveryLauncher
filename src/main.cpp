@@ -33,19 +33,20 @@ const QString DBUS_PATH = "/com/gitee/wanywhn/EveryLauncher";
 // QString DBUS_INTERFACE="com.gitee.wanywhn.EveryLauncher";
 const QString ORGANIZATION_NAME = "WANYWHN";
 
-const QString DBUS_MONITOR_SERVER ="com.gitee.wanywhn.EveryLauncherMonitor";
-const QString DBUS_MONITOR_PATH ="/com/gitee/wanywhn/EveryLauncherMonitor";
+const QString DBUS_MONITOR_SERVER = "com.gitee.wanywhn.EveryLauncherMonitor";
+const QString DBUS_MONITOR_PATH = "/com/gitee/wanywhn/EveryLauncherMonitor";
 //#define DBUS_INTERFACE "com.gitee.wanywhn.everylauncherMonitor"
 RclConfig *theconfig;
 std::shared_ptr<Rcl::Db> rcldb;
 
-static QMap<QString,QStringList> searchEngineMap={
-    {"so",{"http://stackoverflow.com/search?q=","StackOverflow"}},
-    {"bi",{"https://cn.bing.com/search?q=","Bing"}},
-    {"zh",{"http://www.zhihu.com/search?q=","知乎"}},
-    {"bd",{"https://www.baidu.com/s?wd=","百度"}},
+static QMap<QString, QStringList> searchEngineMap = {
+        {"so", {"http://stackoverflow.com/search?q=", "StackOverflow"}},
+        {"bi", {"https://cn.bing.com/search?q=",      "Bing"}},
+        {"zh", {"http://www.zhihu.com/search?q=",     "知乎"}},
+        {"bd", {"https://www.baidu.com/s?wd=",        "百度"}},
 
 };
+
 /**
  * 打开数据库
  * @param reason 传出错误用参数
@@ -84,15 +85,15 @@ void _create_dirs() {
         cfgDir.mkpath(cfgDir.absolutePath());
     }
     //TODO clear filter
-        if(!cfgDir.exists(RECOLL_CONFIG_DIR)){
+    if (!cfgDir.exists(RECOLL_CONFIG_DIR)) {
         QStringList args;
-        args<<"/usr/share/everylauncher/recoll_conf";
-        args<<cfgDir.absolutePath();
-        args<<"-r";
-        QProcess::execute("cp",args);
-        }
+        args << "/usr/share/everylauncher/recoll_conf";
+        args << cfgDir.absolutePath();
+        args << "-r";
+        QProcess::execute("cp", args);
+    }
 
-        //TODO clear db
+    //TODO clear db
     cfgDir.setPath(RECOLL_CONFIG_DIR);
     if (!cfgDir.exists(XAPIAN_DB_DIR)) {
         cfgDir.mkdir(XAPIAN_DB_DIR);
@@ -106,15 +107,13 @@ int main(int argc, char *argv[]) {
     DApplication::setOrganizationName(AppName);
     DApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     DApplication::setQuitOnLastWindowClosed(false);
-//    Dtk::Widget::DApplication::setApplicationName(AppName);
     _create_dirs();
 
 
-
     std::string reason;
-    // TODO -c
-    auto cfh=QDir(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).absoluteFilePath(RECOLL_CONFIG_DIR);
-    std::string confg =cfh.toStdString();
+    auto cfh = QDir(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).absoluteFilePath(
+            RECOLL_CONFIG_DIR);
+    std::string confg = cfh.toStdString();
     theconfig = recollinit(0, recollCleanup, nullptr, reason, &confg);
     if (!theconfig || !theconfig->ok()) {
         QString msg = "Configuration problem: ";
@@ -139,17 +138,18 @@ int main(int argc, char *argv[]) {
 //  w.setAttribute(Qt::WA_TranslucentBackground);
     w.setEnableBlurWindow(true);
 
-//  w.setWindowFlags(Qt::FramelessWindowHint);
+    w.setWindowFlags(Qt::FramelessWindowHint);
 
-    DBusProxy proxy(SystemTray::getInstance(&w), w);
-    EveryLauncherAdaptor adaptor(&proxy);
+//    DBusProxy proxy(&w);
+    auto proxy=DBusProxy::getInstance();
+    EveryLauncherAdaptor adaptor(proxy);
     if (!conn.registerService(DBUS_SERVICE)) {
 //        EveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
         ComGiteeWanywhnEveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
         itface.showWindow();
         return 0;
     } else {
-        conn.registerObject(DBUS_PATH, &proxy);
+        conn.registerObject(DBUS_PATH, proxy);
     }
 //    QObject::connect(&monitorItfc, &EveryLauncherMonitorInterface::fileWrited,
 //                     [](QStringList sl) { qDebug() << "get?" << sl;
@@ -173,25 +173,26 @@ int main(int argc, char *argv[]) {
            (desktop->height() - w.height()) / 3);
 
     w.show();
+
     QSettings s;
-    if(s.value("firstTime",true).toBool()){
+    if (s.value("firstTime", true).toBool()) {
         firstTimeInit ftDialog(&w);
-        if(ftDialog.exec()!=QDialog::Accepted){
-            QMessageBox::warning(&w,QObject::tr("尚未索引"),QObject::tr("警告，尚未创建索引。可能无法搜索到东西。"));
-        }else{
-            s.setValue("firstTime",false);
+        if (ftDialog.exec() != QDialog::Accepted) {
+            QMessageBox::warning(&w, QObject::tr("尚未索引"), QObject::tr("警告，尚未创建索引。可能无法搜索到东西。"));
+        } else {
+            s.setValue("firstTime", false);
 
         }
     }
 
     QSettings sett;
     sett.beginGroup("SearchPrefix");
-    for(auto item:searchEngineMap.keys()){
-        if(!sett.contains(item)){
-            sett.setValue(item,searchEngineMap.value(item));
+    for (const auto &item:searchEngineMap.keys()) {
+        if (!sett.contains(item)) {
+            sett.setValue(item, searchEngineMap.value(item));
         }
     }
 
     sett.endGroup();
-    return Dtk::Widget::DApplication::exec();
+    return DApplication::exec();
 }

@@ -8,36 +8,23 @@
 #include <wasatorcl.h>
 
 #include "widget.h"
-#include "ui_widget.h"
 
 
-void MainWindow::IndexSomeFiles(QStringList paths) {
-    auto t = QSet<QString>::fromList(paths);
-    QMutexLocker locker(&mtxTobeIndex);
-    tobeIndex.unite(t);
-}
-
-MainWindow::MainWindow(QWidget *parent) :DMainWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) : DMainWindow(parent) {
     this->restable = new ResWidget(this);
     this->searchLine = new SearchWidget(this);
-    this->idxProcess = new QProcess(this);
-    this->idxTimer = new QTimer(this);
-    this->m_model=new UnitedModel(this);
-    this->m_indexAvtive = false;
-    this->escKey=new QShortcut(QKeySequence(Qt::Key_Escape),this);
-    this->upKey=new QShortcut(QKeySequence(Qt::Key_Up),this);
-    this->downkey=new QShortcut(QKeySequence(Qt::Key_Down),this);
+    this->m_model = new UnitedModel(this);
+    this->escKey = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    this->upKey = new QShortcut(QKeySequence(Qt::Key_Up), this);
+    this->downkey = new QShortcut(QKeySequence(Qt::Key_Down), this);
     init_ui();
     init_conn();
-    // TODO configure
-    this->idxTimer->setInterval(4000);
-    this->idxTimer->start();
 }
 
 
 void MainWindow::init_ui() {
 
-    auto cw=new QWidget(this);
+    auto cw = new QWidget(this);
     this->setCentralWidget(cw);
 
     auto mvLayout = new QVBoxLayout();
@@ -51,58 +38,18 @@ void MainWindow::init_ui() {
 }
 
 void MainWindow::init_conn() {
-    connect(this->searchLine, &SearchWidget::startSearch,m_model, &UnitedModel::startSearch);
-    connect(this->searchLine,&SearchWidget::clearSearch,restable,&ResWidget::cleanSearch);
+    connect(this->searchLine, &SearchWidget::startSearch, m_model, &UnitedModel::startSearch);
 
-//  connect(this->searchLine,&SearchWidget::tabPressed,this->restable,&ResWidget::moveToNextResoule);
-    connect(this->searchLine,&SearchWidget::returnPressed,this->restable,&ResWidget::returnPressed);
+    connect(this->searchLine, &SearchWidget::clearSearch, restable, &ResWidget::cleanSearch);
 
+    connect(this->searchLine, &SearchWidget::returnPressed, this->restable, &ResWidget::returnPressed);
 
-    connect(this->escKey,&QShortcut::activated,this->searchLine,&SearchWidget::clearAll);
+    connect(this->escKey, &QShortcut::activated, this->searchLine, &SearchWidget::clearAll);
 
-    connect(this->upKey,&QShortcut::activated,this->restable,&ResWidget::currentMoveUp);
+    connect(this->upKey, &QShortcut::activated, this->restable, &ResWidget::currentMoveUp);
 
-    connect(this->downkey,&QShortcut::activated,this->restable,&ResWidget::currentMoveDown);
-
-    connect(this->idxTimer, &QTimer::timeout, this, &MainWindow::toggleIndexing);
-
-    connect(this->idxProcess,QOverload<int,QProcess::ExitStatus>::of(&QProcess::finished)
-            , [this]() {
-                qDebug()<<"fi1";
-                this->m_indexAvtive = false;
-            });
-    connect(this->idxProcess,&QProcess::errorOccurred,[this](){
-        qDebug()<<"fi2";
-        this->m_indexAvtive = false;
-
-    });
-    connect(this->idxProcess, &QProcess::started,
-            [this]() { this->m_indexAvtive = true; });
+    connect(this->downkey, &QShortcut::activated, this->restable, &ResWidget::currentMoveDown);
 
 }
 
-void MainWindow::toggleIndexing() {
-    if (m_indexAvtive) {
-        qDebug() << "already indexing";
-        return;
-    }
-    QStringList sl;
-    {
-        QMutexLocker locker(&mtxTobeIndex);
-        sl = QStringList::fromSet(tobeIndex);
-        tobeIndex.clear();
-    }
 
-    if(sl.empty()){
-        return;
-    }
-    QStringList args;
-    args << "-c";
-    args<<QString::fromStdString(theconfig->getConfDir());
-    args << "-i";
-    for(const auto &item:sl){
-        args<<item;
-    }
-
-    idxProcess->start("recollindex", args);
-}

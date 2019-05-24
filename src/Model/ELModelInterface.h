@@ -12,78 +12,80 @@
 #include <QSettings>
 
 static const QString MAP_TYPE{"MAP_TYPE"};
-class ELModelInterface: public QAbstractListModel {
-    Q_OBJECT
+
+class ELModelInterface : public QAbstractListModel {
+Q_OBJECT
 public:
-    enum ModelRoles{
+    enum ModelRoles {
         Role_FILE_NAME = Qt::UserRole + 1,
         Role_LOCATION = Qt::UserRole + 2,
-        Role_ICON_ByteArray=Qt::UserRole+3,
+        Role_ICON_ByteArray = Qt::UserRole + 3,
         Role_FILE_SIMPLE_CONTENT = Qt::UserRole + 4,
         Role_MIME_TYPE = Qt::UserRole + 5,
-        Role_RELEVANCY=Qt::UserRole+6,
-        Role_APP_COMMENT=Qt::UserRole+7,
-        Role_APP_NAME=Qt::UserRole+8,
-        Role_NODISPLAY=Qt::UserRole+10,
-        Role_APP_VERSION=Qt::UserRole+11,
-        Role_TITLE=Qt::UserRole+12,
-        Role_FILE_FULLTEXT_COLORED_FROM_RAW=Qt::UserRole+13,
-        Role_FILE_FULLTEXT_COLORED_FROM_CACHED=Qt::UserRole+14,
-        Role_MAP_POIID=Qt::UserRole+15,
+        Role_RELEVANCY = Qt::UserRole + 6,
+        Role_APP_COMMENT = Qt::UserRole + 7,
+        Role_APP_NAME = Qt::UserRole + 8,
+        Role_NODISPLAY = Qt::UserRole + 10,
+        Role_APP_VERSION = Qt::UserRole + 11,
+        Role_TITLE = Qt::UserRole + 12,
+        Role_FILE_FULLTEXT_COLORED_FROM_RAW = Qt::UserRole + 13,
+        Role_FILE_FULLTEXT_COLORED_FROM_CACHED = Qt::UserRole + 14,
+        Role_MAP_POIID = Qt::UserRole + 15,
     };
 
-
+public:
+    virtual void sourceChanged(){}
 
 public:
-    ELModelInterface(QObject *parent=nullptr) : QAbstractListModel(parent) {}
+    ELModelInterface(QObject *parent = nullptr) : QAbstractListModel(parent) {}
 
-    virtual void search(std::string &)=0;
-    bool operator<(const ELModelInterface &rhs)const{
-        return this->displayPriority()<rhs.displayPriority();
+    virtual void search(std::string &) = 0;
+
+    bool operator<(const ELModelInterface &rhs) const {
+        return this->displayPriority() < rhs.displayPriority();
     }
-    virtual bool isEnable(){
+
+    virtual bool isEnable() {
         QSettings settings;
         settings.beginGroup("Model");
         settings.beginGroup("Enabled");
-        return settings.value(this->objectName(),true).toBool();
-//        settings.endGroup();
-//        settings.endGroup();
+        return settings.value(this->objectName(), true).toBool();
     }
-    virtual void initDisplayPriority(int priority){
+
+    virtual void initDisplayPriority(int priority) {
         QSettings settings;
         settings.beginGroup("Model");
         settings.beginGroup("Priority");
         bool i{false};
-        auto v=settings.value(this->objectName()).toInt(&i);
-        if(i){
-            qDebug()<<"to int false";
-            return ;
+        auto v = settings.value(this->objectName()).toInt(&i);
+        if (i) {
+            qDebug() << "to int false";
+            return;
         }
-        settings.setValue(this->objectName(),priority);
+        settings.setValue(this->objectName(), priority);
     }
 
 protected:
-    virtual int displayPriority()const{
+    virtual int displayPriority() const {
         QSettings settings;
         settings.beginGroup("Model");
         settings.beginGroup("Priority");
-        return settings.value(this->objectName(),1).toInt();
+        return settings.value(this->objectName(), 1).toInt();
     }
 
-    virtual void setDisplayName(QString name){
+    virtual void setDisplayName(QString name) {
         QSettings settings;
         settings.beginGroup("Model");
         settings.beginGroup("Display");
-        settings.setValue(this->objectName(),name);
+        settings.setValue(this->objectName(), name);
 
     }
 
-    signals:
+signals:
 
     void resultsReady();
 
 };
-
 
 
 #endif //EVERYLAUNCHER_ELMODELINTERFACE_H

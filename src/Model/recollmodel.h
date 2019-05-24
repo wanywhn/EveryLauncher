@@ -43,8 +43,10 @@ private :
 public slots:
     virtual void resetSource();
 
+    void sourceChanged() override;
 signals:
   void sortDataChanged(DocSeqSortSpec);
+
 
 
 private:

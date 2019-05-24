@@ -358,5 +358,9 @@ void RecollModel::setFilterSpec(DocSeqFiltSpec &spec) {
 
 }
 
+void RecollModel::sourceChanged() {
+    m_indexed=true;
+}
+
 
 

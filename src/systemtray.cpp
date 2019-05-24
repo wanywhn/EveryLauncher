@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QIcon>
 #include "confgui/confguiindex.h"
+#include "dbusproxy.h"
 #include <QtWidgets/QApplication>
 
 SystemTray::SystemTray(QWidget *mpranet)
@@ -10,6 +11,7 @@ SystemTray::SystemTray(QWidget *mpranet)
 
   init_ui();
   init_conn();
+  connect(DBusProxy::getInstance(),&DBusProxy::mShowWindow,this,&SystemTray::showWindow);
 }
 
 void SystemTray::showWindow() {
