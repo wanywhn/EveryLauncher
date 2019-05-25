@@ -12,7 +12,7 @@ class ModelWeather: public ELModelInterface{
 public:
     ModelWeather();
 
-    void search(std::string &string) override;
+    void search(QString &string) override;
 
     int rowCount(const QModelIndex &parent) const override;
 

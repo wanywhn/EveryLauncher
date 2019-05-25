@@ -27,7 +27,7 @@ public:
 
     QVariant data(const QModelIndex &index,
                         int role ) const override;
-    void search(std::string &str) override;
+    void search(QString &qstr) override;
     void setFilterSpec(DocSeqFiltSpec &spec);
 private:
   virtual void readDocSource();

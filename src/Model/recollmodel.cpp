@@ -318,8 +318,9 @@ void RecollModel::resetSource() {
 }
 
 
-void RecollModel::search(std::string &str) {
+void RecollModel::search(QString &qstr) {
 
+    auto str=qstr.toStdString();
     string stemlang = "english";
 
     std::string reason;

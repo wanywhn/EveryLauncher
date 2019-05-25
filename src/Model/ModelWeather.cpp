@@ -4,7 +4,7 @@
 
 #include "ModelWeather.h"
 
-void ModelWeather::search(std::string &string) {
+void ModelWeather::search(QString &string) {
 
 }
 

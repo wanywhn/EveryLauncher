@@ -10,13 +10,14 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QTimer>
+#include <QtGui/QPixmap>
 
 #include "map_model.h"
 
-void map_model::search(std::string &string) {
+void map_model::search(QString &string) {
     mapIcon.clear();
 
-    auto url=restUrl.arg("125.31364243,43.89833761").arg(QString::fromStdString(string));
+    auto url=restUrl.arg("125.31364243,43.89833761").arg(string);
 
     manager=new QNetworkAccessManager(this);
     auto r=manager->get(QNetworkRequest(QUrl(url)));
@@ -45,13 +46,18 @@ QVariant map_model::data(const QModelIndex &index, int role) const {
             var=jsonArray.at(index.row())["id"];
             break;
         }
+        case Qt::DisplayRole:
         case ELModelInterface::Role_TITLE:{
             var=jsonArray.at(index.row())["name"];
             break;
         }
-        case  ELModelInterface::Role_ICON_ByteArray:{
+        case Qt::DecorationRole:{
             //TODO default icon
-            var=mapIcon.value(index.row());
+            QPixmap pix;
+            pix.loadFromData(mapIcon.value(index.row()));
+            var=pix.scaledToHeight(32);
+
+//            var=mapIcon.value(index.row());
         }
         default:break;
     }
@@ -99,4 +105,11 @@ void map_model::imageReady(QNetworkReply *rpl, int i) {
 map_model::map_model() {
     this->setObjectName("MapModel");
     this->setDisplayName(tr("地图"));
+}
+
+void map_model::clearSource() {
+    this->mapIcon.clear();
+    QJsonArray array;
+    jsonArray.swap(array);
+//    this
 }

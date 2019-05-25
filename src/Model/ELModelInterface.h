@@ -38,15 +38,19 @@ public:
 public:
     virtual void sourceChanged(){}
 
+    virtual void clearSource(){}
 public:
     ELModelInterface(QObject *parent = nullptr) : QAbstractListModel(parent) {}
 
-    virtual void search(std::string &) = 0;
+    virtual void search(QString &) = 0;
 
     bool operator<(const ELModelInterface &rhs) const {
         return this->displayPriority() < rhs.displayPriority();
     }
 
+    /*
+     * wheather this model is enabled.it can be disabled by user,default is enable
+     */
     virtual bool isEnable() {
         QSettings settings;
         settings.beginGroup("Model");

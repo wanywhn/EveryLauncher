@@ -13,7 +13,50 @@
 #include "searchline.h"
 #include "map_model.h"
 
+// FIXME this is a workaround
+class MFilterModel : public ELModelInterface {
+Q_OBJECT
+public:
+    explicit MFilterModel(RecollModel *parent) : ELModelInterface(parent), model(parent) {
+        this->setObjectName("MFilterModel");
+        this->setDisplayName(tr("×文档"));
+        sfmodel = new QSortFilterProxyModel();
+        sfmodel->setSourceModel(model);
+        sfmodel->setFilterRole(RecollModel::ModelRoles::Role_NODISPLAY);
+        sfmodel->setFilterRegExp("^((?!true).)*$");
+        sfmodel->setDynamicSortFilter(true);
+        connect(model, &RecollModel::resultsReady, this, &ELModelInterface::resultsReady);
+    }
 
+    int rowCount(const QModelIndex &parent) const override {
+        return sfmodel->rowCount();
+    }
+
+    QVariant data(const QModelIndex &index, int role) const override {
+        return sfmodel->data(index, role);
+    }
+
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override {
+        return sfmodel->index(row, column, parent);
+    }
+
+
+    void search(QString &string1) override {
+        model->search(string1);
+    }
+
+    void clearSource() override {
+        model->clearSource();
+    }
+
+
+private:
+    RecollModel *model;
+    QSortFilterProxyModel *sfmodel;
+
+};
+
+#include "unitedmodel.moc"
 UnitedModel::UnitedModel(QObject *parent)
         : QAbstractListModel(parent) {
 
@@ -140,27 +183,31 @@ void UnitedModel::startSearch(QString str) {
 
     }
 
-    /*
-    QString s("");
-    for (auto tmp : str) {
-        if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
-            s += tmp + QString("*");
-        } else {
-            s += tmp;
-        }
-    }
-     */
 
 
     for (auto item:usermodel) {
-        auto s = str.toStdString();
-        item->search(s);
+//        auto str = str.toStdString();
+        if(item->inherits("MFilterModel")){
+            QString s("");
+            for (auto tmp : str) {
+                if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
+                    s += tmp + QString("*");
+                } else {
+                    s += tmp;
+                }
+            }
+            qDebug()<<"MFileterModel";
+            item->search(s);
+        }else{
+            item->search(str);
+        }
     }
 }
 
 void UnitedModel::cleanSearch() {
     //TODO clean res
     for (auto item:usermodel) {
+        item->clearSource();
     }
 
 }

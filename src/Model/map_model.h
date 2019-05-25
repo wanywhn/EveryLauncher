@@ -15,11 +15,13 @@ class map_model: public ELModelInterface{
 public:
     map_model();
 
-    void search(std::string &string) override;
+    void search(QString &string) override;
 
     int rowCount(const QModelIndex &parent) const override;
 
     QVariant data(const QModelIndex &index, int role) const override;
+
+    void clearSource() override;
 
 private slots:
     void deReply(QNetworkReply *rpl);
