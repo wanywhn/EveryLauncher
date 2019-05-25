@@ -18,6 +18,8 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const override;
 
+    void clearSource() override;
+
 
 private:
     QStringList sl{"1"};

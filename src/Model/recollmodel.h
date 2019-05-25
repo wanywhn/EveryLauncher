@@ -28,7 +28,7 @@ public:
     QVariant data(const QModelIndex &index,
                         int role ) const override;
     void search(QString &qstr) override;
-    void setFilterSpec(DocSeqFiltSpec &spec);
+
 private:
   virtual void readDocSource();
   virtual void setDocSource(std::shared_ptr<DocSequence> nsource);
@@ -41,12 +41,10 @@ private :
     virtual void initiateQuery();
 
 public slots:
-    virtual void resetSource();
 
     void sourceChanged() override;
-signals:
-  void sortDataChanged(DocSeqSortSpec);
 
+    void clearSource() override;
 
 
 private:

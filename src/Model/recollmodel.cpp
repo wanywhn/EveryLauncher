@@ -146,6 +146,12 @@ std::vector<std::string> frag;
     g_hiliter.set_inputhtml(false);
 }
 
+void RecollModel::clearSource() {
+
+    setDocSource(std::shared_ptr<DocSequence>(nullptr));
+    emit resultsReady();
+}
+
 
 int RecollModel::rowCount(const QModelIndex &) const {
     if (!m_source)
@@ -328,11 +334,6 @@ void RecollModel::getHighlight(const vector<string> &vs, QStringList &sl) const 
 }
 
 
-void RecollModel::resetSource() {
-    setDocSource(std::shared_ptr<DocSequence>(nullptr));
-}
-
-
 void RecollModel::search(QString &qstr) {
 
     auto str=qstr.toStdString();
@@ -392,11 +393,6 @@ void RecollModel::initiateQuery() {
     m_queryActive = false;
     this->readDocSource();
     emit(resultsReady());
-}
-
-void RecollModel::setFilterSpec(DocSeqFiltSpec &spec) {
-    m_source->setFiltSpec(spec);
-
 }
 
 void RecollModel::sourceChanged() {

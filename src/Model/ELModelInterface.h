@@ -36,9 +36,15 @@ public:
     };
 
 public:
+    /*
+     * reload data when source changed
+     */
     virtual void sourceChanged() {}
 
-    virtual void clearSource() {}
+    /*
+     * clear model data
+     */
+    virtual void clearSource()=0;
 
 public:
     ELModelInterface(QObject *parent = nullptr) : QAbstractListModel(parent) {}
@@ -90,6 +96,9 @@ protected:
 
 signals:
 
+    /*
+     * the search has completed,can read data
+     */
     void resultsReady();
 
 };

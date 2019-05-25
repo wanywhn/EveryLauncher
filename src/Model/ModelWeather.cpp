@@ -29,3 +29,8 @@ ModelWeather::ModelWeather() {
     this->setDisplayName(tr("天气"));
 }
 
+void ModelWeather::clearSource() {
+    //TODO clear
+
+}
+

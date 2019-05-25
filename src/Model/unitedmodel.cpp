@@ -26,12 +26,13 @@ public:
         connect(model, &RecollModel::resultsReady, this, &ELModelInterface::resultsReady);
     }
 
-    void setSpec(const QString &objName,const QString &dspName){
+    void setSpec(const QString &objName, const QString &dspName) {
 //        this->setObjectName("MFilterModel");
 //        this->setDisplayName(tr("×文档"));
         this->setObjectName(objName);
         this->setDisplayName(dspName);
-}
+    }
+
     int rowCount(const QModelIndex &parent) const override {
         return sfmodel->rowCount();
     }
@@ -53,6 +54,10 @@ public:
         model->clearSource();
     }
 
+    void sourceChanged() override {
+        model->sourceChanged();
+    }
+
 
 private:
     RecollModel *model;
@@ -61,28 +66,30 @@ private:
 };
 
 #include "unitedmodel.moc"
-static QVector<QStringList> modelarg={
-        {"AppModel",QObject::tr("程序"),"app"},
-        {"TextModel",QObject::tr("文本"),"text"},
-        {"SpreadSheetModel",QObject::tr("表格"),"spreadsheet"},
-        {"PresentationModel",QObject::tr("PPT"),"presentation"},
-        {"MediaModel",QObject::tr("媒体"),"media"},
-        {"MessageModel",QObject::tr("信息"),"message"},
-        {"OtherModel",QObject::tr("其他"),"other"},
+
+static QVector<QStringList> modelarg = {
+        {"AppModel",          QObject::tr("程序"),  "app"},
+        {"TextModel",         QObject::tr("文本"),  "text"},
+        {"SpreadSheetModel",  QObject::tr("表格"),  "spreadsheet"},
+        {"PresentationModel", QObject::tr("PPT"), "presentation"},
+        {"MediaModel",        QObject::tr("媒体"),  "media"},
+        {"MessageModel",      QObject::tr("信息"),  "message"},
+        {"OtherModel",        QObject::tr("其他"),  "other"},
 };
+
 UnitedModel::UnitedModel(QObject *parent)
         : QAbstractListModel(parent) {
 
-    indexModule=new IndexModule;
+    indexModule = new IndexModule;
 
     RecollModel *m;
     MFilterModel *filterNone;
-    for(const auto &item:modelarg){
-        m=new RecollModel(item.at(2));
+    for (const auto &item:modelarg) {
+        m = new RecollModel(item.at(2));
         filterNone = new MFilterModel(m);
-        filterNone->setSpec(item.at(0),item.at(1));
+        filterNone->setSpec(item.at(0), item.at(1));
         lmodel.push_back(filterNone);
-        connect(indexModule,&IndexModule::sourceChanged,m,&ELModelInterface::sourceChanged);
+        connect(indexModule, &IndexModule::sourceChanged, filterNone, &ELModelInterface::sourceChanged);
     }
     lmodel.push_back(new map_model());
     reloadModel();
@@ -97,7 +104,6 @@ void UnitedModel::reloadModel() {
 
     for (auto item:usermodel) {
         item->disconnect();
-//        this->disconnect(item);
     }
     usermodel.clear();
     for (auto i = 0; i != lmodel.size(); ++i) {
@@ -120,22 +126,18 @@ void UnitedModel::reloadModel() {
 }
 
 
-
 QModelIndex UnitedModel::index(int row, int column, const QModelIndex &parent) const {
     return createIndex(row, column, row);
 }
 
 
 int UnitedModel::rowCount(const QModelIndex &parent) const {
-//    if (!parent.isValid())
-//        return 0;
     auto totoalcnt = 0;
     for (auto item:usermodel) {
         if (item->rowCount() > 0) {
             totoalcnt += item->rowCount();//+1;
         }
     }
-//return filterNone->rowCount(parent);
     auto ncthis = const_cast<UnitedModel *>(this);
     ncthis->rowNumber = totoalcnt;
     qDebug() << "rowcnt:" << totoalcnt;
@@ -147,7 +149,7 @@ QVariant UnitedModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    //TODO map
+    //TODO section
     if (index.row() >= rowNumber) {
         return QVariant();
     }
@@ -184,11 +186,9 @@ void UnitedModel::startSearch(QString str) {
 
     }
 
-
-
     for (auto item:usermodel) {
 //        auto str = str.toStdString();
-        if(item->inherits("MFilterModel")){
+        if (item->inherits("MFilterModel")) {
             QString s("");
             for (auto tmp : str) {
                 if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
@@ -197,9 +197,9 @@ void UnitedModel::startSearch(QString str) {
                     s += tmp;
                 }
             }
-            qDebug()<<"MFileterModel";
+            qDebug() << "MFileterModel";
             item->search(s);
-        }else{
+        } else {
             item->search(str);
         }
     }

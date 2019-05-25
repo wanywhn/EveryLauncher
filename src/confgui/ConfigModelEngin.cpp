@@ -13,10 +13,10 @@
 //TODO restore when user cancel?
 class ConfigModelEngineModel : public QAbstractTableModel {
 public:
-    ConfigModelEngineModel(QObject *parent = nullptr) : QAbstractTableModel(parent) {
+    explicit ConfigModelEngineModel(QObject *parent = nullptr) : QAbstractTableModel(parent) {
         QSettings sett;
         sl << "来源"
-           << "启用";
+           << "勾选启用";
         //TODO 在unitedmodel中删除某个模型时，这里还会显示。貌似是结构性的问题。
 
 
@@ -24,7 +24,7 @@ public:
         sett.beginGroup("Priority");
 
         vs.reserve(sett.childKeys().size());
-        for (auto item:sett.childKeys()) {
+        for (const auto &item:sett.childKeys()) {
             vs.push_back({sett.value(item).toInt(), item});
         }
         std::sort(vs.begin(), vs.end(), [](const QPair<int, QString> &lhs, const QPair<int, QString> &rhs) {
@@ -35,10 +35,9 @@ public:
         sett.endGroup();
         sett.beginGroup("Enabled");
 
-        for (auto item:sett.childKeys()) {
+        for (const auto &item:sett.childKeys()) {
             if (!sett.value(item).toBool())
                 ve.insert(item);
-//        ve.push_back({item,sett.value(item,true).toBool()});
         }
         sett.endGroup();
         sett.beginGroup("Display");
