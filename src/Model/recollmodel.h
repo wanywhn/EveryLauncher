@@ -17,7 +17,7 @@ public:
 
 
 public:
-    explicit RecollModel(QObject *parent = nullptr);
+    explicit RecollModel(const QString &filed, QObject *parent = nullptr);
 
     ~RecollModel() override = default;
 
@@ -62,6 +62,8 @@ private:
     void getHighlight(const vector<string> &vs, QStringList &sl) const;
 
     void getImgUrl(const Rcl::Doc &doc, QVariant &var, QUrl &u) const;
+    DocSeqSortSpec dsss;
+    DocSeqFiltSpec dsfs;
 };
 
 

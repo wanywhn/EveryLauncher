@@ -16,12 +16,13 @@
 
 void map_model::search(QString &string) {
     mapIcon.clear();
+    //TODO get geo
 
-    auto url=restUrl.arg("125.31364243,43.89833761").arg(string);
+    auto url = restUrl.arg("125.31364243,43.89833761").arg(string);
 
-    manager=new QNetworkAccessManager(this);
-    auto r=manager->get(QNetworkRequest(QUrl(url)));
-    connect(r,&QNetworkReply::finished,[this,r]() {
+    manager = new QNetworkAccessManager(this);
+    auto r = manager->get(QNetworkRequest(QUrl(url)));
+    connect(r, &QNetworkReply::finished, [this, r]() {
         this->deReply(r);
 
     });
@@ -33,33 +34,34 @@ int map_model::rowCount(const QModelIndex &parent) const {
 }
 
 QVariant map_model::data(const QModelIndex &index, int role) const {
-    if(index.row()>=jsonArray.size()){
+    if (index.row() >= jsonArray.size()) {
         return QVariant();
     }
     QVariant var;
-    switch (role){
-        case ELModelInterface::ModelRoles::Role_MIME_TYPE:{
-            var=MAP_TYPE;
+    switch (role) {
+        case ELModelInterface::ModelRoles::Role_MIME_TYPE: {
+            var = MAP_TYPE;
             break;
         }
-        case ELModelInterface::Role_MAP_POIID:{
-            var=jsonArray.at(index.row())["id"];
+        case ELModelInterface::Role_MAP_POIID: {
+            var = jsonArray.at(index.row())["id"];
             break;
         }
         case Qt::DisplayRole:
-        case ELModelInterface::Role_TITLE:{
-            var=jsonArray.at(index.row())["name"];
+        case ELModelInterface::Role_TITLE: {
+            var = jsonArray.at(index.row())["name"];
             break;
         }
-        case Qt::DecorationRole:{
+        case Qt::DecorationRole: {
             //TODO default icon
             QPixmap pix;
             pix.loadFromData(mapIcon.value(index.row()));
-            var=pix.scaledToHeight(32);
+            var = pix.scaledToHeight(32);
 
 //            var=mapIcon.value(index.row());
         }
-        default:break;
+        default:
+            break;
     }
     return var;
 
@@ -67,20 +69,20 @@ QVariant map_model::data(const QModelIndex &index, int role) const {
 
 void map_model::deReply(QNetworkReply *rpl) {
     QTextStream qts(rpl);
-    auto obj=QJsonDocument::fromJson(qts.readAll().toLocal8Bit()).object();
-    if(obj["info"]!="OK") {
-        return ;
+    auto obj = QJsonDocument::fromJson(qts.readAll().toLocal8Bit()).object();
+    if (obj["info"] != "OK") {
+        return;
     }
-    jsonArray=obj["pois"].toArray();
+    jsonArray = obj["pois"].toArray();
 
-    for(auto i=0;i!=jsonArray.size();++i){
-        auto item=jsonArray.at(i);
-        auto ar=item.toObject()["photos"].toArray();
-        if(!ar.empty()){
-            qDebug()<<"url:"<<ar.at(0)["url"].toString();
-            auto r=manager->get(QNetworkRequest(QUrl(ar.at(0)["url"].toString())));
-            connect(r,&QNetworkReply::finished,[this,r,i]() {
-                imageReady(r,i);
+    for (auto i = 0; i != jsonArray.size(); ++i) {
+        auto item = jsonArray.at(i);
+        auto ar = item.toObject()["photos"].toArray();
+        if (!ar.empty()) {
+            qDebug() << "url:" << ar.at(0)["url"].toString();
+            auto r = manager->get(QNetworkRequest(QUrl(ar.at(0)["url"].toString())));
+            connect(r, &QNetworkReply::finished, [this, r, i]() {
+                imageReady(r, i);
             });
         }
 
@@ -90,9 +92,9 @@ void map_model::deReply(QNetworkReply *rpl) {
 }
 
 void map_model::imageReady(QNetworkReply *rpl, int i) {
-    auto all=rpl->readAll();
-    qDebug()<<"data:"<<all;
-    mapIcon.insert(i,all);
+    auto all = rpl->readAll();
+    qDebug() << "data:" << all;
+    mapIcon.insert(i, all);
     // INFO some don't have img
 //    if(i==jsonArray.size()){
 //        emit resultsReady();

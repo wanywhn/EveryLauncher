@@ -18,8 +18,6 @@ class MFilterModel : public ELModelInterface {
 Q_OBJECT
 public:
     explicit MFilterModel(RecollModel *parent) : ELModelInterface(parent), model(parent) {
-        this->setObjectName("MFilterModel");
-        this->setDisplayName(tr("×文档"));
         sfmodel = new QSortFilterProxyModel();
         sfmodel->setSourceModel(model);
         sfmodel->setFilterRole(RecollModel::ModelRoles::Role_NODISPLAY);
@@ -28,6 +26,12 @@ public:
         connect(model, &RecollModel::resultsReady, this, &ELModelInterface::resultsReady);
     }
 
+    void setSpec(const QString &objName,const QString &dspName){
+//        this->setObjectName("MFilterModel");
+//        this->setDisplayName(tr("×文档"));
+        this->setObjectName(objName);
+        this->setDisplayName(dspName);
+}
     int rowCount(const QModelIndex &parent) const override {
         return sfmodel->rowCount();
     }
@@ -57,33 +61,30 @@ private:
 };
 
 #include "unitedmodel.moc"
+static QVector<QStringList> modelarg={
+        {"AppModel",QObject::tr("程序"),"app"},
+        {"TextModel",QObject::tr("文本"),"text"},
+        {"SpreadSheetModel",QObject::tr("表格"),"spreadsheet"},
+        {"PresentationModel",QObject::tr("PPT"),"presentation"},
+        {"MediaModel",QObject::tr("媒体"),"media"},
+        {"MessageModel",QObject::tr("信息"),"message"},
+        {"OtherModel",QObject::tr("其他"),"other"},
+};
 UnitedModel::UnitedModel(QObject *parent)
         : QAbstractListModel(parent) {
 
-    QMap<QString, std::string> k2k{
-            {"app",          "app"},
-            {"text",         "text"},
-            {"spreadsheet",  "spreadsheet"},
-            {"presentation", "presentation"},
-            {"media",        "media"},
-            {"message",      "message"},
-            {"other",        "other"},
-    };
-
-//    for(const auto &item:k2k.keys()){
-//        string frag;
-//        theconfig->getGuiFilter(k2k.value(item), frag);
-//        DocSeqFiltSpec m_filtspec;
-//        m_filtspec.orCrit(DocSeqFiltSpec::DSFS_QLANG, frag);
-//        m->setFilterSpec(m_filtspec);
-
     indexModule=new IndexModule;
-    auto m = new RecollModel;
-    connect(indexModule,&IndexModule::sourceChanged,m,&ELModelInterface::sourceChanged);
-    auto filterNone = new MFilterModel(m);
-    lmodel.push_back(filterNone);
+
+    RecollModel *m;
+    MFilterModel *filterNone;
+    for(const auto &item:modelarg){
+        m=new RecollModel(item.at(2));
+        filterNone = new MFilterModel(m);
+        filterNone->setSpec(item.at(0),item.at(1));
+        lmodel.push_back(filterNone);
+        connect(indexModule,&IndexModule::sourceChanged,m,&ELModelInterface::sourceChanged);
+    }
     lmodel.push_back(new map_model());
-//    lmodel.push_back(new ModelWeather);
     reloadModel();
     connect(&SystemTray::getInstance(nullptr), &SystemTray::ConfigChanged, this, &UnitedModel::reloadModel);
 

@@ -94,11 +94,26 @@ bool dump_contents(RclConfig *rclconfig, Rcl::Doc &idoc, std::string &strsout) {
     return true;
 }
 
-RecollModel::RecollModel(QObject *parent) {
+RecollModel::RecollModel(const QString &filed, QObject *parent) {
     // FIXME 还有不同种类的模型呢。
 //    this->setObjectName("RecollModel");
 //    this->setDisplayName(tr("文档*"));
 
+//    for(const auto &item:k2k.keys()){
+//        DocSeqFiltSpec m_filtspec;
+//        m_filtspec.orCrit(DocSeqFiltSpec::DSFS_QLANG, frag);
+//        m->setFilterSpec(m_filtspec);
+
+//    std::string frag;
+
+std::vector<std::string> frag;
+//    theconfig->getGuiFilter(filed.toStdString(), frag);
+    theconfig->getMimeCatTypes(filed.toStdString(),frag);
+    for(auto item:frag){
+        dsfs.orCrit(DocSeqFiltSpec::Crit::DSFS_MIMETYPE,item);
+        qDebug()<<"RecollModel:"<<QString::fromStdString(item);
+    }
+    dsss.field="relevancyrating";
     // Initialize the translated map for column headers
     o_displayableFields["abstract"] = tr("Abstract");
     o_displayableFields["author"] = tr("Author");
@@ -354,10 +369,6 @@ void RecollModel::search(QString &qstr) {
                                          string(tr("Query results").toUtf8()), std::move(rsdata));
     src->setAbstractParams(true, false);
     m_source = std::shared_ptr<DocSequence>(src);
-
-    DocSeqSortSpec dsss;
-    dsss.field = "mtype";
-    DocSeqFiltSpec dsfs;
 
     m_source->setSortSpec(dsss);
     m_source->setFiltSpec(dsfs);

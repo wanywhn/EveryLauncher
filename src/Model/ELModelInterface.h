@@ -29,16 +29,17 @@ public:
         Role_NODISPLAY = Qt::UserRole + 10,
         Role_APP_VERSION = Qt::UserRole + 11,
         //used to display in list
-        Role_TITLE = Qt::UserRole + 12,
+                Role_TITLE = Qt::UserRole + 12,
         Role_FILE_FULLTEXT_COLORED_FROM_RAW = Qt::UserRole + 13,
         Role_FILE_FULLTEXT_COLORED_FROM_CACHED = Qt::UserRole + 14,
         Role_MAP_POIID = Qt::UserRole + 15,
     };
 
 public:
-    virtual void sourceChanged(){}
+    virtual void sourceChanged() {}
 
-    virtual void clearSource(){}
+    virtual void clearSource() {}
+
 public:
     ELModelInterface(QObject *parent = nullptr) : QAbstractListModel(parent) {}
 
