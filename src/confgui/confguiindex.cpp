@@ -151,6 +151,11 @@ ConfIndexW::ConfIndexW(QWidget *parent, RclConfig *config)
   title += QString::fromLocal8Bit(config->getConfDir().c_str());
   setWindowTitle(title);
   tabWidget = new QTabWidget(this);
+  QString styleSheet="QTabWidget::pane{\
+                      border:0px solid black;\
+                     }\
+                    ";
+  tabWidget->setStyleSheet(styleSheet);
   reloadPanels();
 
   buttonBox =

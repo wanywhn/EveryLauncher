@@ -15,7 +15,9 @@
 #include <DMainWindow>
 #include <QShortcut>
 
-DWIDGET_USE_NAMESPACE
+//DWIDGET_USE_NAMESPACE
+class ResWidget;
+class UnitedModel;
 
 class MainWindow : public DMainWindow {
 Q_OBJECT

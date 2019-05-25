@@ -341,6 +341,9 @@ void RecollModel::search(QString &qstr) {
 
     std::string reason;
     auto sdata = wasaStringToRcl(theconfig, stemlang, str, reason);
+    if(!reason.empty()){
+        qCritical()<<QString::fromStdString(reason);
+    }
 
     std::shared_ptr<Rcl::SearchData> rsdata(sdata);
 

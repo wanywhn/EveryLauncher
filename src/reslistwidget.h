@@ -57,7 +57,7 @@ signals:
 //  void currentChanged();
 private:
   DListView *listview;
-  UnitedModel *m_model;
+//  UnitedModel *m_model;
 public:
     void setM_model(UnitedModel *m_model);
 

@@ -12,6 +12,7 @@
 #include <XdgDirs>
 #include <QProcess>
 #include <QtWebView/QtWebView>
+#include <DAboutDialog>
 
 #include "config.h"
 #include "dbusproxy.h"
@@ -122,7 +123,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     bool b;
-    maybeOpenDb(reason, 1, &b);
+    maybeOpenDb(reason, true, &b);
     //    fprintf(stderr, "recollinit done\n");
     auto conn = QDBusConnection::sessionBus();
     if (!conn.isConnected()) {
@@ -130,16 +131,31 @@ int main(int argc, char *argv[]) {
     }
     MainWindow w;
     QIcon icon(":/icon/everylauncher.svg");
-//    qDebug()<<"icon:"<<icon.pixmap(500,500).save("/tmp/t.png");
     DApplication::setWindowIcon(icon);
+    DApplication::setApplicationDisplayName(QObject::tr("Everylayncher"));
+    DApplication::setDesktopFileName("EveryLauncher.desktop");
+    DApplication::setApplicationVersion(E_VERSION);
+//    auto abt=a.aboutDialog();
+//    abt->setWebsiteName("https://github.com/wanywhn/EveryLauncher");
     a.setProductIcon(icon);
+    auto abt=new DAboutDialog(&w);
+    abt->setWebsiteName("https://github.com/wanywhn/EveryLauncher");
+    abt->setWebsiteLink("https://github.com/wanywhn/EveryLauncher");
+    abt->setCompanyLogo(icon.pixmap(64));
+//    abt->setProductIcon(icon);
+    abt->setWindowIcon(icon);
+    abt->setDescription(QObject::tr("一款检索程序"));
+    abt->setAcknowledgementVisible(false);
+    abt->setVersion(E_VERSION);
+
+    a.setAboutDialog(abt);
     w.setWindowIcon(icon);
 //  w.setWindowOpacity(0.1);
 //  w.setTranslucentBackground(true);
 //  w.setAttribute(Qt::WA_TranslucentBackground);
     w.setEnableBlurWindow(true);
 
-    w.setWindowFlags(Qt::FramelessWindowHint);
+//    w.setWindowFlags(Qt::FramelessWindowHint);
 
 //    DBusProxy proxy(&w);
     auto proxy=DBusProxy::getInstance();

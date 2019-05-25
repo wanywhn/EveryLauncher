@@ -8,15 +8,16 @@
 #include <QtCore/QMutex>
 #include <QtCore/QProcess>
 #include <IndexModule.h>
+#include <widget.h>
+#include "widget.h"
 #include "Model/recollmodel.h"
 
-
+class MainWindow;
 
 class UnitedModel : public QAbstractListModel {
-Q_OBJECT
-
+    Q_OBJECT
 public:
-    explicit UnitedModel(QObject *parent = nullptr);
+    explicit UnitedModel(MainWindow * parent = nullptr);
 
     QModelIndex index(int row, int column,
                       const QModelIndex &parent) const override;

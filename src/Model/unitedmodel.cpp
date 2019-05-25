@@ -8,6 +8,7 @@
 #include <QtCore/QStringListModel>
 #include <Model/ModelWeather.h>
 #include <systemtray.h>
+#include <widget.h>
 #include "unitedmodel.h"
 #include "config.h"
 #include "searchline.h"
@@ -77,7 +78,7 @@ static QVector<QStringList> modelarg = {
         {"OtherModel",        QObject::tr("其他"),  "other"},
 };
 
-UnitedModel::UnitedModel(QObject *parent)
+UnitedModel::UnitedModel(MainWindow *parent)
         : QAbstractListModel(parent) {
 
     indexModule = new IndexModule;
@@ -93,7 +94,7 @@ UnitedModel::UnitedModel(QObject *parent)
     }
     lmodel.push_back(new map_model());
     reloadModel();
-    connect(&SystemTray::getInstance(nullptr), &SystemTray::ConfigChanged, this, &UnitedModel::reloadModel);
+    connect(&SystemTray::getInstance(parent), &SystemTray::ConfigChanged, this, &UnitedModel::reloadModel);
 
 }
 

@@ -1,10 +1,19 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+//
+// Created by tender on 19-5-21.
+//
+
+#ifndef EVERYLAUNCHER_CONFIG_H_IN_H
+#define EVERYLAUNCHER_CONFIG_H_IN_H
+
+#define E_VERSION "@PROJECT_VERSION@"
+#cmakedefine USE_DXCB 1
+#cmakedefine E_DEBUG
+
 
 #include <QString>
 #include <rclconfig.h>
 
-#define E_VERSION "1.0"
+
 extern RclConfig *theconfig;
 extern const QString AppName;
 extern const QString RECOLL_CONFIG_DIR;
@@ -17,4 +26,4 @@ extern const QString RECOLL_CONFIG_FILE;
 extern const QString DBUS_MONITOR_SERVER;
 extern const QString DBUS_MONITOR_PATH;
 
-#endif // CONFIG_H
+#endif //EVERYLAUNCHER_CONFIG_H_IN_H

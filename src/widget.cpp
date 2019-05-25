@@ -42,6 +42,8 @@ void MainWindow::init_conn() {
 
     connect(this->searchLine, &SearchWidget::clearSearch, restable, &ResWidget::cleanSearch);
 
+    connect(this->searchLine,&SearchWidget::clearSearch,m_model,&UnitedModel::cleanSearch);
+
     connect(this->searchLine, &SearchWidget::returnPressed, this->restable, &ResWidget::returnPressed);
 
     connect(this->escKey, &QShortcut::activated, this->searchLine, &SearchWidget::clearAll);
@@ -50,6 +52,14 @@ void MainWindow::init_conn() {
 
     connect(this->downkey, &QShortcut::activated, this->restable, &ResWidget::currentMoveDown);
 
+    QObject::connect(qApp,&DApplication::applicationStateChanged,[this](Qt::ApplicationState state){
+        //TODO optim
+        if(state==Qt::ApplicationInactive){
+            this->hide();
+        }
+    });
+
 }
+
 
 
