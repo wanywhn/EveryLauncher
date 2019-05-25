@@ -92,6 +92,8 @@ public:
                 return Qt::Checked;
             }
         }
+        if(role==Qt::DecorationRole)
+            return QIcon(":/icon/default.svg");
         return {};
     }
 

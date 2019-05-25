@@ -28,6 +28,7 @@ public:
         Role_APP_NAME = Qt::UserRole + 8,
         Role_NODISPLAY = Qt::UserRole + 10,
         Role_APP_VERSION = Qt::UserRole + 11,
+        //used to display in list
         Role_TITLE = Qt::UserRole + 12,
         Role_FILE_FULLTEXT_COLORED_FROM_RAW = Qt::UserRole + 13,
         Role_FILE_FULLTEXT_COLORED_FROM_CACHED = Qt::UserRole + 14,

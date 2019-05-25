@@ -60,6 +60,8 @@ private:
       HighlightData m_hdata;
 
     void getHighlight(const vector<string> &vs, QStringList &sl) const;
+
+    void getImgUrl(const Rcl::Doc &doc, QVariant &var, QUrl &u) const;
 };
 
 

@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/icon">
         <file>everylauncher.svg</file>
+        <file>default.svg</file>
     </qresource>
     <qresource prefix="/html">
         <file>BaiduMap.html</file>

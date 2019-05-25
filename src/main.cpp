@@ -129,7 +129,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     MainWindow w;
-    QIcon icon("qrc:/icon/everylauncher.svg");
+    QIcon icon(":/icon/everylauncher.svg");
+//    qDebug()<<"icon:"<<icon.pixmap(500,500).save("/tmp/t.png");
     DApplication::setWindowIcon(icon);
     a.setProductIcon(icon);
     w.setWindowIcon(icon);

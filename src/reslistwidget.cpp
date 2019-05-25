@@ -46,7 +46,7 @@ void ResWidget::init_ui() {
     listview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listview->setSelectionBehavior(QAbstractItemView::SelectRows);
     listview->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    listview->setItemDelegate(new SearchItemDelegate(this));
+//    listview->setItemDelegate(new SearchItemDelegate(this));
 //  proxyModel->setDynamicSortFilter(false);
 
 

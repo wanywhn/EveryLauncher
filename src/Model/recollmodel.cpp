@@ -83,19 +83,18 @@ FieldGetter *RecollModel::chooseGetter(const string &field) {
     else
         return gengetter;
 }
-bool dump_contents(RclConfig *rclconfig, Rcl::Doc& idoc,std::string &strsout)
- {
-     FileInterner interner(idoc, rclconfig, FileInterner::FIF_forPreview);
-     Rcl::Doc fdoc;
- string ipath = idoc.ipath;
-     if (interner.internfile(fdoc, ipath)) {
-         strsout.append(fdoc.text);
-     }
-     return true;
- }
 
-RecollModel::RecollModel(QObject *parent)
-         {
+bool dump_contents(RclConfig *rclconfig, Rcl::Doc &idoc, std::string &strsout) {
+    FileInterner interner(idoc, rclconfig, FileInterner::FIF_forPreview);
+    Rcl::Doc fdoc;
+    string ipath = idoc.ipath;
+    if (interner.internfile(fdoc, ipath)) {
+        strsout.append(fdoc.text);
+    }
+    return true;
+}
+
+RecollModel::RecollModel(QObject *parent) {
     // FIXME 还有不同种类的模型呢。
 //    this->setObjectName("RecollModel");
 //    this->setDisplayName(tr("文档*"));
@@ -158,7 +157,7 @@ void RecollModel::setDocSource(std::shared_ptr<DocSequence> nsource) {
 
 
 QVariant RecollModel::data(const QModelIndex &index, int role) const {
-    if (!m_source || !index.isValid() || role < Qt::UserRole) {
+    if (!m_source || !index.isValid()) {
         return QVariant();
     }
     Rcl::Doc doc;
@@ -181,7 +180,7 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             m_source->getAbstract(doc, vs);
 
             QString sl;
-            for(const auto &item:vs){
+            for (const auto &item:vs) {
                 sl.append(QString::fromStdString(item));
             }
 
@@ -198,22 +197,21 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             break;
         }
             // the default cat icon
-        case Role_ICON_ByteArray: {
-            auto mtype = gengetter("mtype", doc);
-            if (mtype != "application/x-all") {
-                std::string apptag;
-                doc.getmeta(Rcl::Doc::keyapptg, &apptag);
-                var = QString::fromStdString(
-                        theconfig->getMimeIconPath(doc.mimetype, apptag));
-            } else {
-                var = gengetter("appicon", doc);
-            }
-            auto u=QUrl::fromLocalFile(var.toString());
-            qDebug()<<u.toLocalFile();
-            QFile f(u.toLocalFile());
-            f.open(QIODevice::OpenModeFlag::ReadOnly);
-            var=f.readAll();
+        case Qt::DecorationRole:{
+            QUrl u;
+            getImgUrl(doc,var,u);
 
+            var=QIcon(u.toLocalFile()).pixmap(32);
+            break;
+
+        }
+        case Role_ICON_ByteArray: {
+            QUrl u;
+            getImgUrl(doc, var, u);
+            //            QFile f(u.toLocalFile());
+//            f.open(QIODevice::OpenModeFlag::ReadOnly);
+//            var = f.readAll();
+            var=QIcon(u.toLocalFile());
             break;
         }
         case Role_APP_NAME: {
@@ -234,34 +232,48 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
             break;
 
         }
+        case Qt::DisplayRole:
         case Role_TITLE: {
             var = gengetter("title", doc);
+            if (var.toString().isEmpty())
+                var = gengetter("filename", doc);
             break;
         }
-        case Role_FILE_FULLTEXT_COLORED_FROM_CACHED:{
+        case Role_FILE_FULLTEXT_COLORED_FROM_CACHED: {
             std::vector<std::string> fileContent;
             std::string str;
-            dump_contents(theconfig,doc,str);
+            dump_contents(theconfig, doc, str);
             fileContent.emplace_back(str);
             QStringList sl;
-            getHighlight(fileContent,sl);
-            var=sl;
+            getHighlight(fileContent, sl);
+            var = sl;
             break;
 
         }
-        case Role_FILE_FULLTEXT_COLORED_FROM_RAW:{
-            auto url=QUrl(gengetter("url",doc)).toLocalFile();
+        case Role_FILE_FULLTEXT_COLORED_FROM_RAW: {
+            auto url = QUrl(gengetter("url", doc)).toLocalFile();
             QFile f(url);
-            qDebug()<<url;
+            qDebug() << url;
             std::vector<std::string> fileContent;
             f.open(QIODevice::OpenModeFlag::ReadOnly);
             QTextStream qts(&f);
-            while (!qts.atEnd()){
+            while (!qts.atEnd()) {
                 fileContent.emplace_back(qts.readLine().toStdString());
             }
             QStringList sl;
             getHighlight(fileContent, sl);
-            var=sl;
+            var = sl;
+            break;
+        }
+//        case Qt::SizeHintRole:{
+//            TODO hidpi
+//            var=QSize(0,60);
+//            break;
+//        }
+        case Qt::FontRole:{
+            QFont f;
+            f.setPointSize(13);
+            var=f;
             break;
         }
 
@@ -271,16 +283,33 @@ QVariant RecollModel::data(const QModelIndex &index, int role) const {
     return var;
 }
 
+void RecollModel::getImgUrl(const Rcl::Doc &doc, QVariant &var, QUrl &u) const {
+    u= QUrl::fromLocalFile(var.toString());
+    auto mtype = gengetter("mtype", doc);
+    if (mtype != "application/x-all") {
+                string apptag;
+                doc.getmeta(Rcl::Doc::keyapptg, &apptag);
+                var = QString::fromStdString(
+                        theconfig->getMimeIconPath(doc.mimetype, apptag));
+            } else {
+                var = gengetter("appicon", doc);
+            }
+    qDebug() << "get icon path:" << var;
+    u=QUrl::fromLocalFile(var.toString());
+//            QUrl u(var.toString());
+    qDebug() << "icon path:" << u.toLocalFile();
+}
+
 void RecollModel::getHighlight(const vector<string> &vs, QStringList &sl) const {
     HighlightData hd;
     m_source->getTerms(hd);
     for (const auto &item:vs) {
-                std::list<string> lr;
-                g_hiliter.plaintorich(item, lr,hd);
-                for (const auto &lrstr:lr) {
-                    sl << QString::fromStdString(lrstr);
-                }
-            }
+        std::list<string> lr;
+        g_hiliter.plaintorich(item, lr, hd);
+        for (const auto &lrstr:lr) {
+            sl << QString::fromStdString(lrstr);
+        }
+    }
 }
 
 
@@ -359,7 +388,7 @@ void RecollModel::setFilterSpec(DocSeqFiltSpec &spec) {
 }
 
 void RecollModel::sourceChanged() {
-    m_indexed=true;
+    m_indexed = true;
 }
 
 
