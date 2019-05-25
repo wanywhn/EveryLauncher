@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QMediaPlayer>
 #include <Detailed/map_preview.h>
+#include <Detailed/WeatherPreview.h>
 
 //    QStringList supportedMimeTypes = m_player->supportedMimeTypes();
 //    if (!supportedMimeTypes.isEmpty()) {
@@ -25,6 +26,7 @@ DetailedWidget::DetailedWidget(QWidget *parent) : QStackedWidget(parent) {
   addWidget(new imagePreview(this));
   addWidget(new Player(this));
   addWidget(new map_preview);
+//  addWidget(new WeatherPreview);
   for (int i = 0; i != this->count(); ++i) {
     auto w = qobject_cast<DetailedW *>(this->widget(i));
     for (const auto &m : w->getSupportedMimeTypes()) {

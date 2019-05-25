@@ -17,6 +17,7 @@ public:
         QSettings sett;
         sl << "来源"
            << "启用";
+        //TODO 在unitedmodel中删除某个模型时，这里还会显示。貌似是结构性的问题。
 
 
         sett.beginGroup("Model");

@@ -12,6 +12,7 @@
 #include <QSettings>
 
 static const QString MAP_TYPE{"MAP_TYPE"};
+static const QString WEATHER_TYPE{"WEATHER_TYPE"};
 
 class ELModelInterface : public QAbstractListModel {
 Q_OBJECT

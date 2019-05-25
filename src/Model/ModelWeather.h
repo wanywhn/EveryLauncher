@@ -20,7 +20,7 @@ public:
 
 
 private:
-    QStringList sl{"1","2"};
+    QStringList sl{"1"};
 };
 
 #endif //EVERYLAUNCHER_MODELWEATHER_H

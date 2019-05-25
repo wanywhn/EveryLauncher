@@ -40,6 +40,7 @@ UnitedModel::UnitedModel(QObject *parent)
     auto filterNone = new MFilterModel(m);
     lmodel.push_back(filterNone);
     lmodel.push_back(new map_model());
+//    lmodel.push_back(new ModelWeather);
     reloadModel();
     connect(&SystemTray::getInstance(nullptr), &SystemTray::ConfigChanged, this, &UnitedModel::reloadModel);
 
