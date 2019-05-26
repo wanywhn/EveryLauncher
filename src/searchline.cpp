@@ -120,9 +120,15 @@ void SearchWidget::init_ui() {
 void SearchWidget::init_conn() {
     connect(queryText, &QLineEdit::textChanged, this,&SearchWidget::searchTextChanged);
 //    connect(queryText, &QLineEdit::textEdited, this,&SearchWidget::searchTextEdited);
-    connect(queryText, &MLineEdit::returnPressed,this,&SearchWidget::returnPressed);
+    connect(queryText, &MLineEdit::returnPressed,[this]() {
+        if(this->searchPress){
+            emit returnPressed();
+        }else{
+            prepareSimpleSearch();
+        }
+    });
 
-    auto completer = new QCompleter(m_completermodel, this);
+//    auto completer = new QCompleter(m_completermodel, this);
     /*
     completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
     completer->setFilterMode(Qt::MatchContains);
@@ -196,10 +202,14 @@ void SearchWidget::searchTextEdited(const QString &text) {
 
 void SearchWidget::searchTextChanged(const QString &text) {
     qDebug()<<"SearchWidget::searchTextChanged: text [" <<text << "]\n";
+    this->searchPress=false;
+    if(text.size()==0){
+        emit clearSearch();
+    }
     if(text.size()<2){
         return ;
     }
-        prepareSimpleSearch();
+//        prepareSimpleSearch();
 }
 
 void SearchWidget::prepareSimpleSearch() {
@@ -211,20 +221,8 @@ void SearchWidget::prepareSimpleSearch() {
         emit clearSearch();
         return;
     }
-    /*
-    QString s("");
-    for (auto tmp : str) {
-        if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
-            s += tmp + QString("*");
-        } else {
-            s += tmp;
-        }
-    }
-    if (s.isEmpty()) {
-        return;
-    }
-     */
 
+    // TODO enable auyo search
     emit startSearch(str);
 }
 

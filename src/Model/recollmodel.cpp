@@ -377,8 +377,6 @@ void RecollModel::search(QString &qstr) {
     m_source->setSortSpec(dsss);
     m_source->setFiltSpec(dsfs);
 
-//  emit useFilterProxy();
-//    emit docSourceChanged(m_source);
     this->setDocSource(m_source);
 
     initiateQuery();

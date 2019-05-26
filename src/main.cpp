@@ -16,7 +16,6 @@
 
 #include "config.h"
 #include "dbusproxy.h"
-#include "../cmake-build-debug/src/everylauncher_adaptor.h"
 #include "everylauncher_adaptor.h"
 #include "everylauncher_interface.h"
 #include "everylaunchermonitor_interface.h"
@@ -47,6 +46,8 @@ static QMap<QString, QStringList> searchEngineMap = {
         {"bd", {"https://www.baidu.com/s?wd=",        "百度"}},
 
 };
+
+void create_deepin_sk();
 
 /**
  * 打开数据库
@@ -124,7 +125,6 @@ int main(int argc, char *argv[]) {
     }
     bool b;
     maybeOpenDb(reason, true, &b);
-    //    fprintf(stderr, "recollinit done\n");
     auto conn = QDBusConnection::sessionBus();
     if (!conn.isConnected()) {
         return -1;
@@ -135,14 +135,11 @@ int main(int argc, char *argv[]) {
     DApplication::setApplicationDisplayName(QObject::tr("Everylayncher"));
     DApplication::setDesktopFileName("EveryLauncher.desktop");
     DApplication::setApplicationVersion(E_VERSION);
-//    auto abt=a.aboutDialog();
-//    abt->setWebsiteName("https://github.com/wanywhn/EveryLauncher");
     a.setProductIcon(icon);
     auto abt=new DAboutDialog(&w);
     abt->setWebsiteName("https://github.com/wanywhn/EveryLauncher");
     abt->setWebsiteLink("https://github.com/wanywhn/EveryLauncher");
     abt->setCompanyLogo(icon.pixmap(64));
-//    abt->setProductIcon(icon);
     abt->setWindowIcon(icon);
     abt->setDescription(QObject::tr("一款检索程序"));
     abt->setAcknowledgementVisible(false);
@@ -150,9 +147,6 @@ int main(int argc, char *argv[]) {
 
     a.setAboutDialog(abt);
     w.setWindowIcon(icon);
-//  w.setWindowOpacity(0.1);
-//  w.setTranslucentBackground(true);
-//  w.setAttribute(Qt::WA_TranslucentBackground);
     w.setEnableBlurWindow(true);
 
 //    w.setWindowFlags(Qt::FramelessWindowHint);
@@ -161,15 +155,16 @@ int main(int argc, char *argv[]) {
     auto proxy=DBusProxy::getInstance();
     EveryLauncherAdaptor adaptor(proxy);
     if (!conn.registerService(DBUS_SERVICE)) {
-//        EveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
         ComGiteeWanywhnEveryLauncherInterface itface(DBUS_SERVICE, DBUS_PATH, conn);
         itface.showWindow();
         return 0;
     } else {
         conn.registerObject(DBUS_PATH, proxy);
     }
-//    QObject::connect(&monitorItfc, &EveryLauncherMonitorInterface::fileWrited,
-//                     [](QStringList sl) { qDebug() << "get?" << sl;
+    ComGiteeWanywhnEveryLauncherMonitorInterface interface(DBUS_MONITOR_SERVER,DBUS_MONITOR_PATH,conn);
+    if(!interface.isValid()){
+        interface.wakeup();
+    }
 //                                        });
     SystemTray::getInstance(&w).show();
     SystemTray::getInstance(&w).setIcon(icon);
@@ -193,6 +188,7 @@ int main(int argc, char *argv[]) {
 
     QSettings s;
     if (s.value("firstTime", true).toBool()) {
+        create_deepin_sk();
         firstTimeInit ftDialog(&w);
         if (ftDialog.exec() != QDialog::Accepted) {
             QMessageBox::warning(&w, QObject::tr("尚未索引"), QObject::tr("警告，尚未创建索引。可能无法搜索到东西。"));
@@ -203,6 +199,7 @@ int main(int argc, char *argv[]) {
     }
 
     QSettings sett;
+    sett.setIniCodec("UTF-8");
     sett.beginGroup("SearchPrefix");
     for (const auto &item:searchEngineMap.keys()) {
         if (!sett.contains(item)) {
@@ -212,4 +209,41 @@ int main(int argc, char *argv[]) {
 
     sett.endGroup();
     return DApplication::exec();
+}
+
+void create_deepin_sk() {
+    //!!FIXME 中文
+    auto customIni=QDir::home().absoluteFilePath(".config/deepin/dde-daemon/keybinding/custom.ini");
+
+    qDebug()<<"ini file:"<<customIni;
+    QSettings s(customIni,QSettings::Format::IniFormat);
+    s.setIniCodec("UTF-8");
+    auto cg=s.childGroups();
+    bool finded=false;
+    for(const auto &g:cg){
+        s.beginGroup(g);
+        if(s.value("Name")==AppName){
+            finded=true;
+            break;
+        }
+        s.endGroup();
+    }
+    if(!finded){
+        QUuid id=QUuid::createUuid();
+        while (cg.contains(id.toString())){
+            id=QUuid::createUuid();
+        }
+        s.beginGroup(id.toString().remove("{").remove("}"));
+        s.setValue("Name",AppName);
+        s.setValue("Action","everylauncher-toggle");
+        s.setValue("Accels","<Alt><Super>space");
+
+        s.endGroup();
+        QDBusInterface keybings(
+                "com.deepin.daemon.Keybinding",
+                "/com/deepin/daemon/Keybinding",
+                "com.deepin.daemon.Keybinding"
+                );
+        keybings.call("Reset");
+    }
 }

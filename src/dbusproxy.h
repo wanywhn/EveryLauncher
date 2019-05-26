@@ -8,18 +8,18 @@
 
 #include <QObject>
 
-class MonitorFactory{
-public:
-    static EveryLauncherMonitorInterface *getInstance(){
-        static auto instance=new EveryLauncherMonitorInterface(
-                    DBUS_MONITOR_SERVER,DBUS_MONITOR_PATH,
-                    QDBusConnection::sessionBus());
-        return instance;
-    }
-private:
+//class MonitorFactory{
+//public:
+//    static EveryLauncherMonitorInterface *getInstance(){
+//        static auto instance=new EveryLauncherMonitorInterface(
+//                    DBUS_MONITOR_SERVER,DBUS_MONITOR_PATH,
+//                    QDBusConnection::sessionBus());
+//        return instance;
+//    }
+//private:
 //    EveryLauncherMonitorInterface monitorItfc(
 //            DBUS_MONITOR_SERVER, DBUS_MONITOR_PATH, QDBusConnection::sessionBus());
-};
+//};
 class DBusProxy : public QObject
 {
     Q_OBJECT

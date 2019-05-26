@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 
 ConfigSearchEngine::ConfigSearchEngine(QWidget *parent) : QWidget(parent) {
+    sett.setIniCodec("UTF-8");
 
   init_ui();
 }
@@ -81,9 +82,9 @@ void ConfigSearchEngine::init_ui() {
   twidget->setHorizontalHeaderLabels(sl);
   mlayout->addWidget(twidget);
 
-  btnAdd = new QPushButton("AddRow");
+  btnAdd = new QPushButton(tr("添加一行"));
   connect(btnAdd, &QPushButton::clicked, this, &ConfigSearchEngine::addRow);
-  btnDelete = new QPushButton("DeleteRow");
+  btnDelete = new QPushButton("删除该行");
   connect(btnDelete, &QPushButton::clicked, this,
           &ConfigSearchEngine::deleteRow);
 

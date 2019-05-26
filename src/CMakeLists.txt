@@ -1,5 +1,7 @@
 set(CMD_NAME everylauncher)
 
+set(CMAKE_AUTOMOC  ON)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 set(QTPKG Core Widgets Gui DBus WebEngineWidgets X11Extras Network Xml Multimedia WebEngine
         MultimediaWidgets
@@ -18,7 +20,7 @@ set(dbus_interface_xml com.gitee.wanywhn.EveryLauncher.xml)
 
 ## FIXME why not work
 qt5_generate_dbus_interface(
-        ${CMAKE_CURRENT_SOURCE_DIR}}/dbusproxy.h
+        dbusproxy.h
         ${dbus_interface_xml}
         OPTIONS -a
 )
@@ -63,7 +65,8 @@ set(LLIBS X11 Xext Xtst Qt5Pdf recoll Qt5PdfWidgets )
 target_link_libraries(${CMD_NAME} PUBLIC ${LLIBS})
 target_link_libraries(${CMD_NAME} PUBLIC Qt5Xdg PkgConfig::Dtk)
 
-set(THIRD_INCLUDEPATH ../3rdparty/recoll1-code/src/query
+set(THIRD_INCLUDEPATH
+        ../3rdparty/recoll1-code/src/query
         ../3rdparty/recoll1-code/src/utils
         ../3rdparty/recoll1-code/src/rcldb
         ../3rdparty/recoll1-code/src/internfile
@@ -80,3 +83,10 @@ set(THIRD_INCLUDEPATH ../3rdparty/recoll1-code/src/query
 target_include_directories(${CMD_NAME} PRIVATE ${THIRD_INCLUDEPATH})
 
 set_target_properties(${CMD_NAME} PROPERTIES AUTOMOC TRUE)
+
+INSTALL(TARGETS ${CMD_NAME}
+        RUNTIME DESTINATION bin
+        )
+INSTALL(FILES com.gitee.wanywhn.EveryLauncher.xml
+        DESTINATION /usr/share/dbus-1/interfaces
+        )

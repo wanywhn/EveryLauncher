@@ -9,6 +9,7 @@
 #include <Model/ModelWeather.h>
 #include <systemtray.h>
 #include <widget.h>
+#include <QtGui/QDesktopServices>
 #include "unitedmodel.h"
 #include "config.h"
 #include "searchline.h"
@@ -183,27 +184,37 @@ void UnitedModel::startSearch(QString str) {
     QString k1, k2;
     getOption(str, k1, k2);
     if (k1.isEmpty() || k2.isEmpty()) {
-
-
-    }
-
-    for (auto item:usermodel) {
-//        auto str = str.toStdString();
-        if (item->inherits("MFilterModel")) {
-            QString s("");
-            for (auto tmp : str) {
-                if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
-                    s += tmp + QString("*");
-                } else {
-                    s += tmp;
+        for (auto item:usermodel) {
+            if (item->inherits("MFilterModel")) {
+                QString s("");
+                for (auto tmp : str) {
+                    if ((tmp >= 'a' && tmp <= 'z') || (tmp >= 'A' && tmp <= 'Z')) {
+                        s += tmp + QString("*");
+                    } else {
+                        s += tmp;
+                    }
                 }
+                qDebug() << "MFileterModel";
+                item->search(s);
+            } else {
+                item->search(str);
             }
-            qDebug() << "MFileterModel";
-            item->search(s);
-        } else {
-            item->search(str);
         }
+
+    }else{
+        //暂时只支持se:*
+        if(k1=="se"){
+            QSettings sett;
+            sett.beginGroup("SearchPrefix");
+            auto url=sett.value(k2).toStringList().at(0);
+            auto list=str.split(" ");
+            list.removeAt(0);
+            auto content=list.join(" ");
+            QDesktopServices::openUrl(url+content);
+        }
+
     }
+
 }
 
 void UnitedModel::cleanSearch() {
