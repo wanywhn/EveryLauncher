@@ -102,6 +102,7 @@ private:
 
     MLineEdit *queryText;
   QPushButton *btnSearch;
+  bool searchPress{false};
 
   QString m_savedEditText;
   KeyWordsCompleterModel *m_completermodel{nullptr};

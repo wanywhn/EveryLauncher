@@ -1,6 +1,11 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="com.gitee.wanywhn.EveryLauncher">
+    <signal name="mShowWindow">
+    </signal>
+    <signal name="mIndexChangeFiles">
+      <arg name="paths" type="as" direction="out"/>
+    </signal>
     <method name="IndexChangeFiles">
       <arg name="paths" type="as" direction="in"/>
     </method>

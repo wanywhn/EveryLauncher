@@ -11,7 +11,7 @@ class firstTimeInit : public DDialog
 {
     Q_OBJECT
 public:
-    firstTimeInit(QWidget *parent);
+    explicit firstTimeInit(QWidget *parent);
 
 private:
     void init_ui();
