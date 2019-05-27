@@ -108,9 +108,9 @@ void firstTimeInit::setTopdirsAndIndex() {
     args << "-c";
     args << QString::fromStdString(theconfig->getConfDir());
 
-    args << "-i";
-    args << "-Z";
-    args << model->stringList();
+//    args << "-i";
+    args << "-z";
+//    args << model->stringList();
     cp = new QProgressDialog(this);
     connect(p, &QProcess::readyRead, [this, p]() {
         QTextStream ts(p);
@@ -134,6 +134,7 @@ void firstTimeInit::setTopdirsAndIndex() {
         cp->hide();
     });
     p->setProcessChannelMode(QProcess::MergedChannels);
+    cp->setWindowTitle(tr("正在索引，请稍后。"));
     cp->setRange(0, 0);
     cp->show();
     p->start("recollindex", args);

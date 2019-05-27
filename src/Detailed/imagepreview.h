@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QObject>
 #include <QPixmap>
+#include <QtWidgets/QScrollArea>
 
 class imagePreview : public DetailedW
 {
@@ -23,6 +24,7 @@ private:
     QLabel *timeAcccess;
     QLabel *timeModify;
     QLabel *timeChange;
+    QScrollArea *sa;
 
 
     // DetailedW interface

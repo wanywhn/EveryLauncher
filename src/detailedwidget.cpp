@@ -10,6 +10,7 @@
 #include <Detailed/map_preview.h>
 #include <Detailed/WeatherPreview.h>
 
+
 //    QStringList supportedMimeTypes = m_player->supportedMimeTypes();
 //    if (!supportedMimeTypes.isEmpty()) {
 //        supportedMimeTypes.append("audio/x-m3u"); // MP3 playlists

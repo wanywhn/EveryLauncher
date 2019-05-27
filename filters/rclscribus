@@ -19,8 +19,8 @@
 # set variables
 LANG=C ; export LANG
 LC_ALL=C ; export LC_ALL
-progname="rcldesktop"
-filetype=desktop
+progname="rclscribus"
+filetype=Scribus
 
 
 
@@ -105,78 +105,86 @@ sedjoinprog=':a
 #$!N;/^ *[^<]/s/\n/ /;ta
 #P;D'
 
-# TODO assume the first is the correct entry
 # Extract description title author and keywords
-name=`cat $infile |\
-awk -F'=' '
-BEGIN{
-find=0
-}
-/Name/ {
-if(find==0){
-       printf("%s", $2);
-       find=1;
-       }
-}
-'
-`
-
-icon=`cat $infile|\
-awk -F'=' '
-BEGIN{
-find=0
-}
-/Icon/ {
-if(find==0){
-       printf("%s", $2);
-       find=1;
-       }
-}
-'
-`
-
-ec=`cat $infile|\
-awk -F'=' '
-BEGIN{
-find=0
-}
-/Exec/{
-if(find==0){
-    printf("%s",$2);
-    find=1;
+description=`sed -e "$sedjoinprog" < "$infile" | \
+awk '
+/<DOCUMENT / {
+    if (match($0, " COMMENTS=\"[^\"]+")) { 
+       s=substr($0, RSTART+11, RLENGTH-11)
+       printf("%s", s);
+       # Note: there is no way to know if this ends a frame, so no "<br>"
     }
 }
-'
-`
+'`
 
-
-comment=`cat $infile|\
-awk -F'=' '
-BEGIN{
-find=0
-}
-/Comment/{
-if(find==0){
-    printf("%s",$2);
-    find=1;
+title=`sed -e "$sedjoinprog" < "$infile" | \
+awk '
+/<DOCUMENT / {
+    if (match($0, " TITLE=\"[^\"]+")) { 
+       s=substr($0, RSTART+8, RLENGTH-8)
+       printf("%s", s);
+       # Note: there is no way to know if this ends a frame, so no "<br>"
     }
 }
-'
-`
+'`
+
+author=`sed -e "$sedjoinprog" < "$infile" | \
+awk '
+/<DOCUMENT / {
+    if (match($0, " AUTHOR=\"[^\"]+")) { 
+       s=substr($0, RSTART+9, RLENGTH-9)
+       printf("%s", s);
+       # Note: there is no way to know if this ends a frame, so no "<br>"
+    }
+}
+'`
+
+keywords=`sed -e "$sedjoinprog" < "$infile" | \
+awk '
+/<DOCUMENT / {
+    if (match($0, " KEYWORDS=\"[^\"]+")) { 
+       s=substr($0, RSTART+11, RLENGTH-11)
+       printf("%s", s);
+       # Note: there is no way to know if this ends a frame, so no "<br>"
+    }
+}
+'`
 
 #echo description: [$description];echo title: [$title];
 #echo author: [$author];echo keywords: [$keywords]
 
 cat <<EOF
 <html><head>
-<title>$name</title>
+<title>$title</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<meta name="exec" content="$ec">
-<meta name="icon" content="$icon">
-<meta name="comment" content="$comment">
+<meta name="author" content="$author">
+<meta name="description" content="$description">
+<meta name="keywords" content="$keywords">
 </head>
-<body></body>
-</html>
+<body><p>
 EOF
 
 
+sed -e ':a' -e '/[^>] *$/N; s/\n/ /; ta' < "$infile" | \
+awk '
+/<ITEXT |<para|<trail PA/ {
+    if (match($0, " CH=\"[^\"]+")) { 
+       s=substr($0, RSTART+5, RLENGTH-5)
+       printf("%s", s)
+       # Note: No way to know if this ends a paragraph, so no "<br>"
+       #  but it migth be good to have one in some instances
+    }
+    else if (match($0, "<para+")) {
+       printf("<br>")
+       # New paragraph so a <br>
+    }
+    else if (match($0, "<trail PARENT=\"+")) {
+       printf("<br>")
+       # End of something so a <br>
+    }
+}
+END {
+    print "</p></body></html>"
+}
+' | \
+sed -e 's/&#x5;/<br>/g' -e 's/&#x1c;/<br>/g' -e 's//<br>/g' -e 's//<br>/g' -e 's// /g'

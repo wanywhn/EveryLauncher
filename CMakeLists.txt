@@ -28,27 +28,26 @@ INSTALL(FILES everylauncher.svg
         DESTINATION share/icons/hicolor/scalable/apps
         )
 ## !!!FIXME assume /usr
+
 INSTALL(DIRECTORY recoll_conf
         DESTINATION share/everylauncher
+        PATTERN "xapiandb" EXCLUDE
+        PATTERN "recoll.conf.in" EXCLUDE
         )
-INSTALL(DIRECTORY filters
-        DESTINATION share/everylauncher
-        )
-INSTALL(DIRECTORY icon
+INSTALL(DIRECTORY filters icon
         DESTINATION share/everylauncher
         )
 
-
-add_subdirectory(src)
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "
-libqt5xdg-dev,libqt5x11extras5v,
-libdtkwidget-dev,x11proto-record-dev, libxtst-dev,
-libqt5webengine5,recollcmd,
-libqt5webenginewidgets
-")
+#TODO remove dev package
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5xdg-dev,libqt5x11extras5,libdtkwidget-dev,x11proto-record-dev, libxtst-dev,libqt5webengine5,recollcmd,libqt5webenginewidgets5")
 
 #SET(CMAKE_DEBIAN_PACKAGE_ARCHITECTUREE "i386")
+SET(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "一个全文搜索加桌面启动器。")
 set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA src/postinst)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Jia Qingtong (wanywhn@qq.com)")
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/recoll_conf/recoll.conf.in ${CMAKE_CURRENT_SOURCE_DIR}/recoll_conf/recoll.conf )
+add_subdirectory(src)
 INCLUDE(CPack)

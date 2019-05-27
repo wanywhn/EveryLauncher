@@ -61,21 +61,24 @@ void imagePreview::init_ui()
     hinfolayout->addLayout(infoLayout);
     hinfolayout->addStretch(1);
 
-    auto sa=new QScrollArea();
+    sa=new QScrollArea();
     sa->setWidget(imgView);
-    vlayout->addWidget(sa);
-    vlayout->addLayout(hinfolayout);
+    sa->setWidgetResizable(true);
+    vlayout->addWidget(sa,1);
+    vlayout->addLayout(hinfolayout,0);
     this->setLayout(vlayout);
 }
 
 void imagePreview::showDoc()
 {
-   auto filepath=index.data(ELModelInterface::Role_LOCATION).toString().replace("file://","");
+
+   auto filepath=QUrl(index.data(ELModelInterface::Role_LOCATION).toString()).toLocalFile();
    img->load(filepath);
    imgView->setPixmap(*img);
-   imgView->setScaledContents(true);
+//   imgView->setScaledContents(true);
 //   imgView->adjustSize();
-   imgView->resize(this->sizeHint().width(),(this->sizeHint().width()/imgView->width())*imgView->height());
+    //!!FIXME
+   imgView->resize(sa->sizeHint().width(),(sa->size().width()/imgView->width())*imgView->height());
 
    QFileInfo info(QUrl(index.data(ELModelInterface::Role_LOCATION).toString()).toLocalFile());
    imgType->setText(index.data(ELModelInterface::Role_MIME_TYPE).toString());

@@ -187,6 +187,7 @@ recoll_conf/idxstatus.txt
 recoll_conf/index.pid
 recoll_conf/missing
 recoll_conf/ptrans
+recoll_conf/recoll.conf
 recoll_conf/xapiandb/
 
 

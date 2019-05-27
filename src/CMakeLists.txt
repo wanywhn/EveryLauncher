@@ -47,6 +47,10 @@ aux_source_directory(./Detailed/player SRC)
 aux_source_directory(./confgui SRC)
 aux_source_directory(./Model SRC)
 
+set(CMAKE_INSTALL_RPATH "/usr/lib/recoll")
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--enable-new-dtags" )
+
 qt5_wrap_ui(FORMS widget.ui)
 add_executable(${CMD_NAME} ${SRC} ${QTRES} ${FORMS} Detailed/map_preview.cpp Detailed/map_preview.h Model/map_model.cpp Model/map_model.h Model/ELModelInterface.cpp confgui/ConfigModelEngin.cpp confgui/ConfigModelEngin.h IndexModule.cpp IndexModule.h Detailed/WeatherPreview.cpp Detailed/WeatherPreview.h)
 
@@ -59,7 +63,8 @@ foreach (item ${QTPKG})
 endforeach ()
 
 target_link_directories(${CMD_NAME} PRIVATE ../3rdparty/qtpdf/lib  PRIVATE /usr/lib/recoll)
-set(CMAKE_INSTALL_RPATH /usr/lib/recoll)
+
+
 
 set(LLIBS X11 Xext Xtst Qt5Pdf recoll Qt5PdfWidgets )
 
