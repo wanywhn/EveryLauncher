@@ -1,6 +1,6 @@
 # 易寻(EveryLauncher)
 
-![img](https://gitee.com/wanywhn/everyLauncher/raw/convert-to-cxx/demo/overview.gif)
+![img](https://github.com/wanywhn/EveryLauncher/raw/convert-to-cxx/demo/overview.gif)
 
 # 简介
 易寻项目初期致力于实现Linux下的Spotlight，并添加全文索引，可以针对各种类型的文件实现内容索引。
